@@ -1,0 +1,10 @@
+{
+  "text.autoconfig.police_terminal.title": "Minebuck Currency Config",
+
+  "text.autoconfig.police_terminal.category.default": "General",
+  "text.autoconfig.police_terminal.category.web": "Web Terminal",
+
+  "text.autoconfig.police_terminal.option.port": "Port",
+  "text.autoconfig.police_terminal.option.port.@Tooltip": "The port used to connect to the web terminal (<address>:<port>)",
+  "text.autoconfig.police_terminal.option.port.ValidationException": "The port value must be between 1023 and 65535"
+}

@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "police_terminal",
+	"version": "${version}",
+	"name": "Police Terminal",
+	"description": "This is a Fabric and Quilt Mod to add a duty system and a police web terminal!",
+	"authors": [
+		"Rupyber Studios",
+		"Pyrix25633",
+		"Ruken"
+	],
+	"contact": {
+		"homepage": "https://rupyberstudios.github.io/website/",
+		"sources": "https://github.com/Pyrix25633/Fabric-FbiAndSwatArmors",
+		"issues": "https://github.com/Pyrix25633/Fabric-FbiAndSwatArmors/issues"
+	},
+	"license": "GPL-3.0",
+	"icon": "assets/police_terminal/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.rupyber_studios.police_terminal.PoliceTerminal"
+		],
+		"client": [
+			"net.rupyber_studios.police_terminal.PoliceTerminalClient"
+		],
+		"fabric-datagen": [
+			"net.rupyber_studios.police_terminal.PoliceTerminalDataGenerator"
+		],
+		"modmenu": [
+			"net.rupyber_studios.police_terminal.config.ModMenuConfig"
+		]
+	},
+	"mixins": [
+		"police_terminal.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.3",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
