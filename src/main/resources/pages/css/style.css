@@ -1,0 +1,193 @@
+:root {
+    --color-background: #060621;
+    --color-lighter: #0b0b3d;
+    --color-foreground: #DDDDDD;
+    --color-error: #F54F47;
+    --color-warning: #F3E63D;
+    --color-success: #71E0AE;
+    --color-police: #FFEC58;
+    --color-police-transparent: #08275970;
+    --color-police-dark: #082759;
+}
+
+* {
+    color: var(--color-foreground);
+    font-size: 20px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-background);
+    min-height: 100dvh;
+    margin: 0;
+}
+body::-webkit-scrollbar-track, body::-webkit-scrollbar, body::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+h2 {
+    font-size: 27px;
+    text-align: center;
+    letter-spacing: -1px;
+}
+h3 {
+    font-size: 22px;
+    text-align: center;
+    letter-spacing: -1px;
+}
+
+label {
+    line-height: 26px;
+    text-align: center;
+}
+input {
+    height: 26px;
+    border: 1px solid var(--color-foreground);
+    padding: 1px 1px 2px 5px;
+    background-color: var(--color-background);
+}
+button {
+    display: flex;
+    border: 0;
+    background-color: var(--color-police);
+    color: var(--color-background);
+    font-weight: bold;
+    align-items: center;
+}
+img.button {
+    height: 25px;
+}
+input:focus {
+    border-color: var(--color-police);
+    outline: none;
+}
+input:-webkit-autofill {
+    background-color: transparent !important;
+    -webkit-box-shadow: 0 0 0 50px var(--color-background) inset;
+}
+input.medium {
+    width: 90px;
+}
+input.small {
+    width: 40px;
+}
+button:active {
+    color: var(--color-police);
+    background-color: var(--color-foreground);
+}
+button:disabled {
+    filter: brightness(70%);
+}
+
+span.text, span.text * {
+    font-size: 16px;
+    text-align: center;
+}
+span.title {
+    font-size: 25px;
+    line-height: 30px;
+    letter-spacing: -1px;
+}
+.police-color {
+    color: var(--color-police);
+}
+
+a {
+    color: var(--color-police);
+}
+
+.error {
+    color: var(--color-error) !important;
+}
+.warning, .warning * {
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+}
+button.warning {
+    background-color: var(--color-warning);
+    color: var(--color-background);
+}
+button.warning:active {
+    background-color: var(--color-foreground);
+    color: var(--color-warning);
+}
+.success {
+    color: var(--color-success) !important;
+}
+
+nav#navbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+div.navbar {
+    background-color: var(--color-police-dark);
+}
+
+div#footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+}
+
+img#icon {
+    width: 30px;
+    margin-left: 10px;
+}
+
+div.box {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    align-items: center;
+}
+div.box.main {
+    width: 100%;
+}
+
+div.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+div.container.no-margin {
+    margin: 0 !important;
+}
+
+div.margin-top {
+    margin-top: 15px;
+}
+
+div.panel {
+    background-color: var(--color-lighter);
+}
+div.panel > h2, div.panel > h3 {
+    margin-top: 0;
+}
+div.section h2, div.section h3 {
+    margin-bottom: 0px;
+}
+
+@media screen and (max-width: 600px) {
+    div.label-input {
+        flex-direction: column;
+    }
+    div.label-input label {
+        margin-right: 0;
+        margin-bottom: 2px;
+    }
+}

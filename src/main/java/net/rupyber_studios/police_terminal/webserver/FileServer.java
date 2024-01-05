@@ -1,12 +1,13 @@
 package net.rupyber_studios.police_terminal.webserver;
 
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileServer {
     private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -27,9 +28,21 @@ public class FileServer {
         }
 
         String content = new String(input.readAllBytes());
-        response += WebServer.getContentLengthHeader(content) + WebServer.CRLF + content +
+        response += WebServer.getContentLengthHeader(content) + getContentTypeHeader(path) + WebServer.CRLF + content +
                 WebServer.CRLF + WebServer.CRLF;
 
         output.write(response.getBytes());
+    }
+
+    public static @NotNull String getContentTypeHeader(String path) {
+        Matcher matcher = Pattern.compile("^.*\\.(html|css|js)$").matcher(path);
+        if(matcher.find()) {
+            return "Content-Type: text/" + switch(matcher.group(1)) {
+                case "css" -> "css";
+                case "js" -> "javascript";
+                default -> "html";
+            } + WebServer.CRLF;
+        }
+        else return "";
     }
 }

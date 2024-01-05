@@ -1,0 +1,177 @@
+:root {
+    --sidebars-height: calc(100dvh - 10px);
+    --chat-topbar-width: calc(100vw - 277px*2 - 10px);
+    --marquee-big-width: calc(var(--chat-topbar-width) - 70px - 5px);
+    --messages-width: calc(100% - 10px);
+    --message-max-width: calc(var(--chat-topbar-width) - 100px);
+    --textarea-width: calc(var(--chat-topbar-width) - 70px);
+    --chat-topbar-mobile-width: calc(100vw - 10px);
+    --marquee-big-mobile-width: calc(var(--chat-topbar-mobile-width) - 70px - 15px - 25px*2);
+    --message-mobile-max-width: calc(var(--chat-topbar-mobile-width) - 100px);
+    --textarea-mobile-width: calc(var(--chat-topbar-mobile-width) - 70px);
+    --marquee-big-mobile-small-width: calc(var(--chat-topbar-mobile-width) - 50px - 15px - 25px*2);
+}
+
+nav#navbar {
+    padding: 20px 0;
+    width: 100vw;
+}
+div.navbar {
+    padding: 10px;
+}
+
+div.bottom-margin {
+    margin-bottom: 90px;
+}
+
+div#footer {
+    padding-bottom: 20px;
+    margin-top: 20px;
+}
+div#footer *:not(:first-child) {
+    margin-left: 50px;
+}
+
+label {
+    margin-right: 10px;
+}
+
+span.text {
+    margin-top: 5px;
+}
+
+div.container:not(:first-child) {
+    margin-top: 12px;
+}
+div.container span:not(:first-child) {
+    margin-left: 7px;
+}
+
+div.panel {
+    padding: 40px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+div.read, div.unread, div.online, div.offline {
+    right: 5px;
+}
+
+img.chat-logo, img.pfp, img#chat-logo {
+    margin-right: 5px;
+}
+
+div.chat, div.user, div#chats, div#users, div#chat-topbar, div.dpl {
+    padding: 5px;
+}
+div.chat:not(:first-child), div.user:not(:first-child) {
+    margin-top: 5px;
+}
+
+div.chat-settings, div.user-settings, div.user-actions, span.user-last-online, span.user-status {
+    margin-top: 3px !important;
+}
+
+button {
+    padding: 5px 10px 5px 10px;
+}
+div.container > img.button:not(:first-child) {
+    margin-left: 5px;
+}
+img#show-chats {
+    margin-right: 5px;
+}
+div.box > img.button:not(:first-child) {
+    margin-top: 5px;
+}
+button img.button {
+    margin-left: 5px;
+}
+
+div#messages {
+    padding: 5px;
+}
+div.message {
+    margin-left: 5px;
+}
+div.message-metas {
+    margin-left: 5px;
+}
+div.message:not(:first-child) {
+    margin-top: 5px;
+}
+div.message-data {
+    margin-bottom: 5px;
+}
+span.message-text {
+    padding: 5px;
+}
+div.message-actions {
+    margin-top: 5px !important;
+}
+
+div.load-more {
+    margin-bottom: 5px;
+}
+
+div#unread-messages {
+    width: calc(100% - 10px);
+    height: 20px;
+    margin: 0 5px 20px 5px;
+}
+div#unread-messages span {
+    line-height: 40px;
+    padding: 0 10px;
+}
+
+div#textarea {
+    margin: 5px 0;
+}
+
+textarea {
+    padding: 5px;
+}
+
+div.show-sidebars {
+    margin-right: 5px;
+}
+div.textarea-extras {
+    margin-left: 5px;
+}
+
+span.char-counter {
+    margin-top: 5px;
+}
+
+div#emoji-selector {
+    gap: 5px;
+    padding: 5px;
+}
+
+div.user-options {
+    margin-left: 5px;
+}
+
+h3#name {
+    margin: 10px 0;
+}
+
+img.status {
+    margin-left: 20px;
+}
+
+canvas {
+    padding: 5px;
+}
+
+div.panel.status {
+    margin-top: 20px;
+}
+
+@media screen and (max-width: 850px) {
+    div.panel {
+        padding: 25px;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+}
