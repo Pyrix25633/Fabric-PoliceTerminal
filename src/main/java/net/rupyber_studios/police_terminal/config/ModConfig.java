@@ -6,7 +6,6 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
-import net.minecraft.text.Text;
 
 @Config(name = "police_terminal")
 public class ModConfig implements ConfigData {
@@ -18,14 +17,23 @@ public class ModConfig implements ConfigData {
         INSTANCE = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
     }
 
-    @Override
-    public void validatePostLoad() throws ValidationException {
-        if(port < 1024 || port > 65535) throw new ValidationException(
-                Text.translatable("text.autoconfig.police_terminal.option.port.ValidationException").getLiteralString());
-    }
-
     @ConfigEntry.Gui.Tooltip()
     @ConfigEntry.Category("web")
     @Comment("The port used to connect to the web terminal (<address>:<port>)")
     public int port = 3000;
+
+    @ConfigEntry.Gui.Tooltip()
+    @ConfigEntry.Category("web")
+    @Comment("If enabled the server will use the https protocol (strongly recommended) and the certificate path below should be set")
+    public boolean https = false;
+
+    @ConfigEntry.Gui.Tooltip()
+    @ConfigEntry.Category("web")
+    @Comment("The https certificate path, if invalid the server will default to http")
+    public String httpsCertificate = "";
+
+    @ConfigEntry.Gui.Tooltip()
+    @ConfigEntry.Category("web")
+    @Comment("The https certificate password, if invalid the server will default to http")
+    public String httpsPassword = "";
 }

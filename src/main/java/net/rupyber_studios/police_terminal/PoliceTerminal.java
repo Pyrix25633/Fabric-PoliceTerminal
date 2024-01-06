@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.ServerSocket;
 import java.nio.file.Path;
+import java.security.KeyStore;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -52,7 +53,17 @@ public class PoliceTerminal implements ModInitializer {
 			}
 
 			try {
-				socket = new ServerSocket(ModConfig.INSTANCE.port);
+				boolean httpsError = false;
+				if(ModConfig.INSTANCE.https) {
+					try {
+						KeyStore keyStore = KeyStore.getInstance("");
+					} catch(Exception e) {
+						httpsError = true;
+						LOGGER.warn("Error starting https server, defaulting to http: ", e);
+					}
+				}
+				if(!ModConfig.INSTANCE.https || httpsError)
+					socket = new ServerSocket(ModConfig.INSTANCE.port);
 				serverThread = new Thread(() -> {
 					while(!socket.isClosed()) {
 						try {
