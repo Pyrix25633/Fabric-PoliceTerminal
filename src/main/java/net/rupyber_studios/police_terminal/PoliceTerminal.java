@@ -10,6 +10,9 @@ import net.rupyber_studios.police_terminal.webserver.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.security.KeyStore;
@@ -56,7 +59,15 @@ public class PoliceTerminal implements ModInitializer {
 				boolean httpsError = false;
 				if(ModConfig.INSTANCE.https) {
 					try {
-						KeyStore keyStore = KeyStore.getInstance("");
+						KeyStore keyStore = KeyStore.getInstance("JKS");
+						keyStore.load(new FileInputStream(ModConfig.INSTANCE.httpsCertificate),
+								ModConfig.INSTANCE.httpsPassword.toCharArray());
+						KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+						keyManagerFactory.init(keyStore, ModConfig.INSTANCE.httpsPassword.toCharArray());
+						SSLContext sslContext = SSLContext.getInstance("TLS");
+						sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+						socket = sslContext.getServerSocketFactory().createServerSocket(ModConfig.INSTANCE.port);
+						LOGGER.info("Successfully initialized ServerSocket with https");
 					} catch(Exception e) {
 						httpsError = true;
 						LOGGER.warn("Error starting https server, defaulting to http: ", e);

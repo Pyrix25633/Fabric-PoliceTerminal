@@ -10,7 +10,7 @@
   "text.autoconfig.police_terminal.option.https": "HTTPS",
   "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol (strongly recommended) and the certificate path below should be set",
 
-  "text.autoconfig.police_terminal.option.httpsCertificate": "HTTPS Certificate",
+  "text.autoconfig.police_terminal.option.httpsCertificate": "HTTPS Certificate Path",
   "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, if invalid the server will default to http",
 
   "text.autoconfig.police_terminal.option.httpsPassword": "HTTPS Certificate Password",
