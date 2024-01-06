@@ -2,17 +2,27 @@
   "text.autoconfig.police_terminal.title": "Minebuck Currency Config",
 
   "text.autoconfig.police_terminal.category.default": "General",
-  "text.autoconfig.police_terminal.category.web": "Web Terminal",
+  "text.autoconfig.police_terminal.option.hudHorizontal": "HUD Horizontal Position",
+  "text.autoconfig.police_terminal.option.hudHorizontal.@Tooltip": "The horizontal position of the hud",
+  "text.autoconfig.police_terminal.option.hudVertical": "HUD Vertical Position",
+  "text.autoconfig.police_terminal.option.hudVertical.@Tooltip": "The vertical position of the hud",
+  "text.autoconfig.police_terminal.enum.horizontal.left": "Left",
+  "text.autoconfig.police_terminal.enum.horizontal.center": "Center",
+  "text.autoconfig.police_terminal.enum.horizontal.right": "Right",
+  "text.autoconfig.police_terminal.enum.vertical.top": "Top",
+  "text.autoconfig.police_terminal.enum.vertical.center": "Center",
+  "text.autoconfig.police_terminal.enum.vertical.bottom": "Bottom",
 
+  "text.autoconfig.police_terminal.category.web": "Web Terminal",
   "text.autoconfig.police_terminal.option.port": "Port",
   "text.autoconfig.police_terminal.option.port.@Tooltip": "The port used to connect to the web terminal (<address>:<port>)",
-
   "text.autoconfig.police_terminal.option.https": "HTTPS",
   "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol (strongly recommended) and the certificate path below should be set",
-
   "text.autoconfig.police_terminal.option.httpsCertificate": "HTTPS Certificate Path",
   "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, if invalid the server will default to http",
-
   "text.autoconfig.police_terminal.option.httpsPassword": "HTTPS Certificate Password",
-  "text.autoconfig.police_terminal.option.httpsPassword.@Tooltip": "The https certificate password, if invalid the server will default to http"
+  "text.autoconfig.police_terminal.option.httpsPassword.@Tooltip": "The https certificate password, if invalid the server will default to http",
+
+  "text.hud.police_terminal.status": "Status: ",
+  "text.hud.police_terminal.status.out_of_service": "§eOut Of Service"
 }
