@@ -8,6 +8,8 @@ import net.minecraft.text.Text;
 public class HudOverlay implements HudRenderCallback {
     private static final int WHITE_COLOR = 0xFFFFFF;
     private static final Text STATUS_TEXT = Text.translatable("text.hud.police_terminal.status");
+    private static final Text RANK_TEXT = Text.translatable("text.hud.police_terminal.rank");
+    private static final Text CALLSIGN_TEXT = Text.translatable("text.hud.police_terminal.callsign");
 
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {
@@ -17,7 +19,13 @@ public class HudOverlay implements HudRenderCallback {
             int height = client.getWindow().getScaledHeight();
 
             // TODO: configurable position
-            context.drawText(client.textRenderer, STATUS_TEXT, 10, 10, WHITE_COLOR, true);
+            // TODO: rank and callsign
+            context.drawText(client.textRenderer, STATUS_TEXT.copy().append(Text.translatable("text.hud.police_terminal.status.out_of_service")),
+                    10, 10, WHITE_COLOR, true);
+            context.drawText(client.textRenderer, RANK_TEXT.copy().append(Text.translatable("text.hud.police_terminal.status.out_of_service")),
+                    10, 10, WHITE_COLOR, true);
+            context.drawText(client.textRenderer, CALLSIGN_TEXT.copy().append(Text.translatable("text.hud.police_terminal.status.out_of_service")),
+                    10, 10, WHITE_COLOR, true);
         }
     }
 }
