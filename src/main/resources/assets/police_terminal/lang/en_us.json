@@ -12,6 +12,12 @@
   "text.autoconfig.police_terminal.enum.vertical.top": "Top",
   "text.autoconfig.police_terminal.enum.vertical.center": "Center",
   "text.autoconfig.police_terminal.enum.vertical.bottom": "Bottom",
+  "text.autoconfig.police_terminal.option.hudHorizontalDistance": "HUD Horizontal Distance",
+  "text.autoconfig.police_terminal.option.hudHorizontalDistance.@Tooltip": "The hud horizontal distance from the screen border",
+  "text.autoconfig.police_terminal.option.hudVerticalDistance": "HUD Vertical Distance",
+  "text.autoconfig.police_terminal.option.hudVerticalDistance.@Tooltip": "The hud vertical distance from the screen border",
+  "text.autoconfig.police_terminal.option.hudBackground": "HUD Background Color",
+  "text.autoconfig.police_terminal.option.hudBackground.@Tooltip": "The background color of the hud",
 
   "text.autoconfig.police_terminal.category.duty": "Duty System",
   "text.autoconfig.police_terminal.option.ranks": "Ranks",
@@ -19,6 +25,20 @@
   "text.autoconfig.police_terminal.option.Rank": "Rank",
   "text.autoconfig.police_terminal.option.Rank.rank": "Rank",
   "text.autoconfig.police_terminal.option.Rank.color": "Color",
+  "text.autoconfig.police_terminal.option.callsignNumberLetterNumber": "Callsign Number-Letter-Number",
+  "text.autoconfig.police_terminal.option.callsignNumberLetterNumber.@Tooltip": "If true callsigns like 7-Adam-22 will be used",
+  "text.autoconfig.police_terminal.option.callsignNumberLetter": "Callsign Number-Letter",
+  "text.autoconfig.police_terminal.option.callsignNumberLetter.@Tooltip": "If true callsigns like 20-David will be used",
+  "text.autoconfig.police_terminal.option.callsignLetterNumber": "Callsign Letter-Number",
+  "text.autoconfig.police_terminal.option.callsignLetterNumber.@Tooltip": "If true callsigns like Sam-81 will be used",
+  "text.autoconfig.police_terminal.option.callsignFirstNumberMin": "Callsign First Number Minimum",
+  "text.autoconfig.police_terminal.option.callsignFirstNumberMin.@Tooltip": "The minimum for the first number that is $-Adam-22 and $-David",
+  "text.autoconfig.police_terminal.option.callsignFirstNumberMax": "Callsign First Number Maximum",
+  "text.autoconfig.police_terminal.option.callsignFirstNumberMax.@Tooltip": "The maximum for the first number that is $-Adam-22 and $-David",
+  "text.autoconfig.police_terminal.option.callsignSecondNumberMin": "Callsign First Number Minimum",
+  "text.autoconfig.police_terminal.option.callsignSecondNumberMin.@Tooltip": "The minimum for the second number that is $-Adam-22 and $-David",
+  "text.autoconfig.police_terminal.option.callsignSecondNumberMax": "Callsign First Number Maximum",
+  "text.autoconfig.police_terminal.option.callsignSecondNumberMax.@Tooltip": "The maximum for the second number that is $-Adam-22 and $-David",
 
   "text.autoconfig.police_terminal.category.web": "Web Terminal",
   "text.autoconfig.police_terminal.option.port": "Port",
@@ -38,5 +58,5 @@
   "text.hud.police_terminal.status.on_scene": "§3On Scene",
   "text.hud.police_terminal.rank": "Rank: ",
   "text.hud.police_terminal.rank.out_of_service": "§eOut Of Service",
-  "text.hud.police_terminal.callsign": "Callsign: §9"
+  "text.hud.police_terminal.callsign": "Callsign: "
 }
