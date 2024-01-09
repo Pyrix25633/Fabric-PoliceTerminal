@@ -24,6 +24,11 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("default")
+    @Comment("If true coordinates will be shown in the hud")
+    public boolean hudShowCoordinates = true;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("default")
     @Comment("The horizontal position of the hud")
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     public HudPosition.Horizontal hudHorizontal = HudPosition.Horizontal.LEFT;
@@ -37,14 +42,14 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("default")
     @Comment("The hud horizontal distance from the screen border")
-    @ConfigEntry.BoundedDiscrete(min = 5, max = 35)
-    public int hudHorizontalDistance = 10;
+    @ConfigEntry.BoundedDiscrete(min = 0, max = 30)
+    public int hudHorizontalDistance = 5;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("default")
     @Comment("The hud vertical distance from the screen border")
-    @ConfigEntry.BoundedDiscrete(min = 5, max = 35)
-    public int hudVerticalDistance = 10;
+    @ConfigEntry.BoundedDiscrete(min = 0, max = 30)
+    public int hudVerticalDistance = 5;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("default")
@@ -56,19 +61,22 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The list of ranks used in the duty system, highers ones are higher in the chain of command")
+    @Comment("The list of ranks used in the duty system, id must be unique, highers ones are higher in the chain of command")
     public List<Rank> ranks = List.of(
-            new Rank("Officer", 0x5555FF),
-            new Rank("Rookie", 0x55FFFF)
+            new Rank(10, "Officer", 0x5555FF),
+            new Rank(0, "Rookie", 0x55FFFF)
     );
 
     public static class Rank {
         public Rank() {}
 
-        public Rank(String rank, int color) {
+        public Rank(int id, String rank, int color) {
+            this.id = id;
             this.rank = rank;
             this.color = color;
         }
+
+        public int id = 10;
 
         public String rank = "New Rank";
 
@@ -128,7 +136,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("web")
-    @Comment("If enabled the server will use the https protocol (strongly recommended) and the certificate path below should be set")
+    @Comment("If enabled the server will use the https protocol (strongly recommended), the options below should be set")
     public boolean https = false;
 
     @ConfigEntry.Gui.Tooltip

@@ -2,6 +2,8 @@
   "text.autoconfig.police_terminal.title": "Minebuck Currency Config",
 
   "text.autoconfig.police_terminal.category.default": "General",
+  "text.autoconfig.police_terminal.option.hudShowCoordinates": "HUD Show Coordinates",
+  "text.autoconfig.police_terminal.option.hudShowCoordinates.@Tooltip": "If true coordinates will be shown in the hud",
   "text.autoconfig.police_terminal.option.hudHorizontal": "HUD Horizontal Position",
   "text.autoconfig.police_terminal.option.hudHorizontal.@Tooltip": "The horizontal position of the hud",
   "text.autoconfig.police_terminal.option.hudVertical": "HUD Vertical Position",
@@ -21,8 +23,9 @@
 
   "text.autoconfig.police_terminal.category.duty": "Duty System",
   "text.autoconfig.police_terminal.option.ranks": "Ranks",
-  "text.autoconfig.police_terminal.option.ranks.@Tooltip": "The list of ranks used in the duty system, highers ones are higher in the chain of command",
+  "text.autoconfig.police_terminal.option.ranks.@Tooltip": "The list of ranks used in the duty system, id must be unique, highers ones are higher in the chain of command",
   "text.autoconfig.police_terminal.option.Rank": "Rank",
+  "text.autoconfig.police_terminal.option.Rank.id": "ID",
   "text.autoconfig.police_terminal.option.Rank.rank": "Rank",
   "text.autoconfig.police_terminal.option.Rank.color": "Color",
   "text.autoconfig.police_terminal.option.callsignNumberLetterNumber": "Callsign Number-Letter-Number",
@@ -44,7 +47,7 @@
   "text.autoconfig.police_terminal.option.port": "Port",
   "text.autoconfig.police_terminal.option.port.@Tooltip": "The port used to connect to the web terminal (<address>:<port>)",
   "text.autoconfig.police_terminal.option.https": "HTTPS",
-  "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol (strongly recommended) and the certificate path below should be set",
+  "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol (strongly recommended), the options below should be set",
   "text.autoconfig.police_terminal.option.httpsCertificate": "HTTPS Certificate Path",
   "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, if invalid the server will default to http",
   "text.autoconfig.police_terminal.option.httpsPassword": "HTTPS Certificate Password",
@@ -53,10 +56,12 @@
   "text.hud.police_terminal.status": "Status: ",
   "text.hud.police_terminal.status.out_of_service": "§eOut Of Service",
   "text.hud.police_terminal.status.available": "§aAvailable",
+  "text.hud.police_terminal.status.on_patrol": "§2On Patrol",
   "text.hud.police_terminal.status.busy": "§6Busy",
   "text.hud.police_terminal.status.en_route": "§bEn Route",
   "text.hud.police_terminal.status.on_scene": "§3On Scene",
+  "text.hud.police_terminal.status.emergency": "§4Emergency",
   "text.hud.police_terminal.rank": "Rank: ",
-  "text.hud.police_terminal.rank.out_of_service": "§eOut Of Service",
-  "text.hud.police_terminal.callsign": "Callsign: "
+  "text.hud.police_terminal.callsign": "Callsign: ",
+  "text.hud.police_terminal.coordinates": "Coordinates: "
 }

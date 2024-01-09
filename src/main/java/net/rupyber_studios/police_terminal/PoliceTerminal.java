@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.util.WorldSavePath;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.util.ModRegistries;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,8 @@ public class PoliceTerminal implements ModInitializer {
 		// Proceed with mild caution.
 
 		ModConfig.init();
+
+		ModRegistries.registerCommands();
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			Path worldPath = server.getSavePath(WorldSavePath.ROOT);
