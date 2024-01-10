@@ -3,10 +3,12 @@ package net.rupyber_studios.police_terminal;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.WorldSavePath;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.util.ModRegistries;
+import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ public class PoliceTerminal implements ModInitializer {
 		ModRegistries.registerCommands();
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+			Rank.loadRanks();
 			Path worldPath = server.getSavePath(WorldSavePath.ROOT);
 			String url = "jdbc:sqlite:" + worldPath + "police.db";
 
@@ -109,6 +112,22 @@ public class PoliceTerminal implements ModInitializer {
 				serverThread.join(0, 1);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
+			}
+		});
+
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			try {
+				DatabaseManager.insertOrUpdatePlayer(handler.player.getUuid(), handler.player.getGameProfile().getName());
+			} catch (SQLException e) {
+				LOGGER.error("Error handling player join: ", e);
+			}
+		});
+
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			try {
+				DatabaseManager.handlePlayerDisconnection(handler.player.getUuid());
+			} catch (SQLException e) {
+				LOGGER.error("Error handling player disconnection: ", e);
 			}
 		});
 

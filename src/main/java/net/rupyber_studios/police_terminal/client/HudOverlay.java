@@ -5,36 +5,53 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.config.ModConfig;
+import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.util.Callsign;
+import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
 
 public class HudOverlay implements HudRenderCallback {
-    public static Status status = Status.OUT_OF_SERVICE;
-
     private static final int WHITE_COLOR = 0xFFFFFF;
     private static final Text STATUS_TEXT = Text.translatable("text.hud.police_terminal.status");
     private static final Text RANK_TEXT = Text.translatable("text.hud.police_terminal.rank");
     private static final Text CALLSIGN_TEXT = Text.translatable("text.hud.police_terminal.callsign");
     private static final Text COORDINATES_TEXT = Text.translatable("text.hud.police_terminal.coordinates");
 
+    private final MinecraftClient client;
     // TODO: remove
-    private static final String randomCallsign = Callsign.createRandomCallsign();
+    public static PlayerInfo info;
+
+    public HudOverlay() {
+        // TODO: change, it is initialized only once at client init
+        client = MinecraftClient.getInstance();
+        if(client != null && client.player != null)
+            try {
+                info = DatabaseManager.getPlayerInfo(client.player.getUuid());
+            } catch(Exception e) {
+                info = new PlayerInfo();
+                PoliceTerminal.LOGGER.error("Error: ", e);
+            }
+        else {
+            info = new PlayerInfo();
+            PoliceTerminal.LOGGER.error("Else");
+        }
+    }
 
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {
-        MinecraftClient client = MinecraftClient.getInstance();
         if(client != null) {
+            if(info.rank == null || info.status == null) return;
             if(client.inGameHud.getDebugHud().shouldShowDebugHud() || client.inGameHud.getSpectatorHud().isOpen() ||
                     client.options.hudHidden) return;
 
             int width = client.getWindow().getScaledWidth(), height = client.getWindow().getScaledHeight();
-
             // Calculate widths
-            Text statusText = STATUS_TEXT.copy().append(status.getText());
-            Text rankText = RANK_TEXT.copy().append(ModConfig.INSTANCE.ranks.get(0).rank);
-            Text callsignText = CALLSIGN_TEXT.copy().append("§9" + randomCallsign);
+            Text statusText = STATUS_TEXT.copy().append(info.status.getText());
+            Text rankText = RANK_TEXT.copy().append(info.rank.rank);
+            Text callsignText = CALLSIGN_TEXT.copy().append(info.callsign != null ? ("§9" + info.callsign) : "§7-");
             int statusWidth = client.textRenderer.getWidth(statusText);
             int rankWidth = client.textRenderer.getWidth(rankText);
             int callsignWidth = client.textRenderer.getWidth(callsignText);
@@ -88,7 +105,7 @@ public class HudOverlay implements HudRenderCallback {
             context.drawText(client.textRenderer, statusText, statusX, statusY, WHITE_COLOR, true);
             context.drawText(client.textRenderer, RANK_TEXT.copy(), rankX, rankY, WHITE_COLOR, true);
             context.drawText(client.textRenderer, Text.literal(ModConfig.INSTANCE.ranks.get(0).rank),
-                    rankRankX, rankRankY, ModConfig.INSTANCE.ranks.get(0).color, true);
+                    rankRankX, rankRankY, info.rank.color, true);
             context.drawText(client.textRenderer, callsignText, callsignX, callsignY, WHITE_COLOR, true);
 
             if(ModConfig.INSTANCE.hudShowCoordinates) {

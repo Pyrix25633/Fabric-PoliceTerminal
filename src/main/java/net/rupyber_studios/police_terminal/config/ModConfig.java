@@ -7,6 +7,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import net.rupyber_studios.police_terminal.client.HudPosition;
+import net.rupyber_studios.police_terminal.util.Rank;
 
 import java.util.List;
 
@@ -61,28 +62,11 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The list of ranks used in the duty system, id must be unique, highers ones are higher in the chain of command")
+    @Comment("The list of ranks used in the duty system, id and rank must be unique [do not use 0 as Java cannot be distinguish it from NULL (civilian)!], highers ones are higher in the chain of command")
     public List<Rank> ranks = List.of(
             new Rank(10, "Officer", 0x5555FF),
-            new Rank(0, "Rookie", 0x55FFFF)
+            new Rank(5, "Rookie", 0x55FFFF)
     );
-
-    public static class Rank {
-        public Rank() {}
-
-        public Rank(int id, String rank, int color) {
-            this.id = id;
-            this.rank = rank;
-            this.color = color;
-        }
-
-        public int id = 10;
-
-        public String rank = "New Rank";
-
-        @ConfigEntry.ColorPicker
-        public int color = 0x5555FF;
-    }
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")

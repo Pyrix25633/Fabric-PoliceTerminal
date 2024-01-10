@@ -23,7 +23,7 @@
 
   "text.autoconfig.police_terminal.category.duty": "Duty System",
   "text.autoconfig.police_terminal.option.ranks": "Ranks",
-  "text.autoconfig.police_terminal.option.ranks.@Tooltip": "The list of ranks used in the duty system, id must be unique, highers ones are higher in the chain of command",
+  "text.autoconfig.police_terminal.option.ranks.@Tooltip": "The list of ranks used in the duty system, §eid and rank must be unique §4[do not use 0 as Java cannot be distinguish it from NULL (civilian)!]§r, highers ones are higher in the chain of command",
   "text.autoconfig.police_terminal.option.Rank": "Rank",
   "text.autoconfig.police_terminal.option.Rank.id": "ID",
   "text.autoconfig.police_terminal.option.Rank.rank": "Rank",
@@ -47,11 +47,11 @@
   "text.autoconfig.police_terminal.option.port": "Port",
   "text.autoconfig.police_terminal.option.port.@Tooltip": "The port used to connect to the web terminal (<address>:<port>)",
   "text.autoconfig.police_terminal.option.https": "HTTPS",
-  "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol (strongly recommended), the options below should be set",
+  "text.autoconfig.police_terminal.option.https.@Tooltip": "If enabled the server will use the https protocol §e(strongly recommended)§r, the options below should be set",
   "text.autoconfig.police_terminal.option.httpsCertificate": "HTTPS Certificate Path",
-  "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, if invalid the server will default to http",
+  "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, §eif invalid the server will default to http",
   "text.autoconfig.police_terminal.option.httpsPassword": "HTTPS Certificate Password",
-  "text.autoconfig.police_terminal.option.httpsPassword.@Tooltip": "The https certificate password, if invalid the server will default to http",
+  "text.autoconfig.police_terminal.option.httpsPassword.@Tooltip": "The https certificate password, §eif invalid the server will default to http",
 
   "text.hud.police_terminal.status": "Status: ",
   "text.hud.police_terminal.status.out_of_service": "§eOut Of Service",
