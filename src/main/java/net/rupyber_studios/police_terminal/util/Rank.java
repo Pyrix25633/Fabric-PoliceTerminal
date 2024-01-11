@@ -6,7 +6,7 @@ import net.rupyber_studios.police_terminal.config.ModConfig;
 import java.util.HashMap;
 
 public class Rank {
-    private static HashMap<Integer, Rank> ranks;
+    public static HashMap<Integer, Rank> ranks;
 
     public static void loadRanks() {
         ranks = new HashMap<>();

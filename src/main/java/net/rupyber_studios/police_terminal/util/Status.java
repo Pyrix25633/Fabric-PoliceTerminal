@@ -1,11 +1,12 @@
 package net.rupyber_studios.police_terminal.util;
 
 import net.minecraft.text.Text;
+import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public enum Status {
+public enum Status implements StringIdentifiable {
     OUT_OF_SERVICE, AVAILABLE, ON_PATROL, BUSY, EN_ROUTE, ON_SCENE, EMERGENCY;
 
     @Contract(pure = true)
@@ -21,5 +22,10 @@ public enum Status {
 
     public int getId() {
         return this.ordinal() + 1;
+    }
+
+    @Override
+    public @NotNull String asString() {
+        return this.name().toLowerCase();
     }
 }

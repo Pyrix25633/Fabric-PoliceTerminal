@@ -3,6 +3,8 @@ package net.rupyber_studios.police_terminal.util;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 
 public class PlayerInfo {
+    public static PlayerInfo info;
+
     public Status status;
     public Rank rank;
     public String callsign;
@@ -16,6 +18,6 @@ public class PlayerInfo {
     public PlayerInfo(Status status, Rank rank, String callsign) {
         this.status = status;
         this.rank = rank;
-        this.callsign = callsign;
+        this.callsign = (callsign == null || callsign.isEmpty()) ? null : callsign;
     }
 }

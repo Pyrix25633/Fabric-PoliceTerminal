@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.WorldSavePath;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.networking.packet.SyncPlayerInfoS2CPacket;
+import net.rupyber_studios.police_terminal.networking.packet.SyncRanksS2CPacket;
 import net.rupyber_studios.police_terminal.util.ModRegistries;
 import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
@@ -117,7 +119,9 @@ public class PoliceTerminal implements ModInitializer {
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			try {
+				SyncRanksS2CPacket.send(handler.player);
 				DatabaseManager.insertOrUpdatePlayer(handler.player.getUuid(), handler.player.getGameProfile().getName());
+				SyncPlayerInfoS2CPacket.send(handler.player);
 			} catch (SQLException e) {
 				LOGGER.error("Error handling player join: ", e);
 			}

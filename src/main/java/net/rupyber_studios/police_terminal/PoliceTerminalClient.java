@@ -3,6 +3,7 @@ package net.rupyber_studios.police_terminal;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.rupyber_studios.police_terminal.client.HudOverlay;
+import net.rupyber_studios.police_terminal.networking.ModMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,8 @@ public class PoliceTerminalClient implements ClientModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+
+		ModMessages.registerS2CPackets();
 
 		HudRenderCallback.EVENT.register(new HudOverlay());
 

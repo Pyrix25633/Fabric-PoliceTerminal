@@ -4,27 +4,21 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.rupyber_studios.police_terminal.client.HudOverlay;
+import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.command.argument.StatusArgumentType;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
 
 public class StatusCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher,
+    public static void register(@NotNull CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess registryAccess,
                                 CommandManager.RegistrationEnvironment environment) {
-        for(Status status : Status.values()) {
-            registerStatusCommand(dispatcher, status);
-        }
-    }
-
-    public static void registerStatusCommand(@NotNull CommandDispatcher<ServerCommandSource> dispatcher, @NotNull Status status) {
-        // TODO: change and use argument
-        dispatcher.register(CommandManager.literal("status").then(CommandManager.literal(status.name().toLowerCase())
-                .executes((context) -> {
-                    // TODO handle with packets
-                    HudOverlay.info.status = status;
+        dispatcher.register(CommandManager.literal("status").then(CommandManager.argument("status", new StatusArgumentType())
+                .executes((context -> {
+                    Status status = context.getArgument("status", Status.class);
+                    //TODO: make it work
+                    PoliceTerminal.LOGGER.warn(status.name());
                     return 1;
-                })
-        ));
+        }))));
     }
 }
