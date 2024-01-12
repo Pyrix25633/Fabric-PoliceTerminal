@@ -70,6 +70,21 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
+    @Comment("If true only admins will be able to use the rank command")
+    public boolean rankCommandRequiresAdmin = false;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("If true an officer will be able to promote himself and other players to a rank higher than his rank")
+    public boolean officerCanGrantRankHigherThanHis = false;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("Only officers with a rank id greater or equal than the one set below will be able to use the rank command")
+    public int minimumRankIdForRankCommand = 10;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
     @Comment("If true callsigns like 7-Adam-22 will be used")
     public boolean callsignNumberLetterNumber = true;
 

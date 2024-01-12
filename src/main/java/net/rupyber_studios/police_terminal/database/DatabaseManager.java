@@ -5,6 +5,7 @@ import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -96,5 +97,22 @@ public class DatabaseManager {
         if(!result.next()) return new PlayerInfo();
         return new PlayerInfo(Status.fromId(result.getInt("status")), Rank.fromId(result.getInt("rank")),
                 result.getString("callsign"));
+    }
+
+    public static @Nullable Rank getPlayerRank(@NotNull UUID player) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT rank FROM players WHERE uuid=?;""");
+        preparedStatement.setString(1, player.toString());
+        ResultSet result = preparedStatement.executeQuery();
+        if(!result.next()) return null;
+        return Rank.fromId(result.getInt("rank"));
+    }
+
+    public static void setPlayerStatus(@NotNull UUID player, @NotNull Status status) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE players SET status=? WHERE uuid=?;""");
+        preparedStatement.setInt(1, status.getId());
+        preparedStatement.setString(2, player.toString());
+        preparedStatement.execute();
     }
 }

@@ -7,6 +7,7 @@ import net.rupyber_studios.police_terminal.util.Status;
 
 public class StatusArgumentType extends EnumArgumentType<Status> {
     private static final Codec<Status> CODEC = StringIdentifiable.createCodec(Status::values);
+
     public StatusArgumentType() {
         super(CODEC, Status::values);
     }

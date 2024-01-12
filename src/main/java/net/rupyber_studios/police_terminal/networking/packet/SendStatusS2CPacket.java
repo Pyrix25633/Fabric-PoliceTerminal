@@ -11,32 +11,19 @@ import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
-import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
 
-public class SyncPlayerInfoS2CPacket {
-    public static void send(ServerPlayerEntity player) {
+public class SendStatusS2CPacket {
+    public static void send(ServerPlayerEntity player, Status status) {
         PacketByteBuf data = PacketByteBufs.create();
-        try {
-            PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
-            data.writeInt(info.rank != null ? info.status.getId() : 0);
-            data.writeInt(info.status != null ? info.rank.id : 0);
-            data.writeString(info.callsign != null ? info.callsign : "");
-            ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
-        } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncPlayerInfoS2CPacket: ", e);
-        }
+        data.writeInt(status != null ? status.getId() : 0);
+        ServerPlayNetworking.send(player, ModMessages.SEND_STATUS, data);
     }
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler,
                                @NotNull PacketByteBuf buf, PacketSender responseSender) {
-        new Thread(() -> {
-            try {
-                SyncRanksS2CPacket.finished.acquire();
-                PlayerInfo.info = new PlayerInfo(Status.fromId(buf.readInt()), Rank.fromId(buf.readInt()), buf.readString());
-                PoliceTerminal.LOGGER.info("Successfully synced player info");
-            } catch(Exception ignored) {}
-        }).start();
+        PlayerInfo.info.status = Status.fromId(buf.readInt());
+        PoliceTerminal.LOGGER.info("Successfully received player status");
     }
 }
