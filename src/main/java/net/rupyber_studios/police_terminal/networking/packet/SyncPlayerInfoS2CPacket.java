@@ -20,10 +20,10 @@ public class SyncPlayerInfoS2CPacket {
         PacketByteBuf data = PacketByteBufs.create();
         try {
             PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
-            data.writeInt(info.rank != null ? info.status.getId() : 0);
-            data.writeInt(info.status != null ? info.rank.id : 0);
+            data.writeInt(info.status != null ? info.status.getId() : 0);
+            data.writeInt(info.rank != null ? info.rank.id : 0);
             data.writeString(info.callsign != null ? info.callsign : "");
-            ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
+            ServerPlayNetworking.send(player, ModMessages.SYNC_PLAYER_INFO, data);
         } catch(Exception e) {
             PoliceTerminal.LOGGER.error("Could not send SyncPlayerInfoS2CPacket: ", e);
         }
@@ -35,7 +35,6 @@ public class SyncPlayerInfoS2CPacket {
             try {
                 SyncRanksS2CPacket.finished.acquire();
                 PlayerInfo.info = new PlayerInfo(Status.fromId(buf.readInt()), Rank.fromId(buf.readInt()), buf.readString());
-                PoliceTerminal.LOGGER.info("Successfully synced player info");
             } catch(Exception ignored) {}
         }).start();
     }

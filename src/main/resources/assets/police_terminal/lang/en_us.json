@@ -69,5 +69,7 @@
   "text.hud.police_terminal.status.emergency": "§4Emergency",
   "text.hud.police_terminal.rank": "Rank: ",
   "text.hud.police_terminal.callsign": "Callsign: ",
-  "text.hud.police_terminal.coordinates": "Coordinates: "
+  "text.hud.police_terminal.coordinates": "Coordinates: ",
+
+  "argument.rank.invalid": "Invalid Rank"
 }

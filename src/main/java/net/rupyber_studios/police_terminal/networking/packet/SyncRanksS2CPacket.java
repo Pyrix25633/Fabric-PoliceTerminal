@@ -8,9 +8,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
-import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Rank;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +21,6 @@ public class SyncRanksS2CPacket {
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
         try {
-            PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
             data.writeInt(Rank.ranks.size());
             for(int id : Rank.ranks.keySet()) {
                 Rank rank = Rank.fromId(id);
@@ -31,9 +28,9 @@ public class SyncRanksS2CPacket {
                 data.writeString(rank.rank);
                 data.writeInt(rank.color);
             }
-            ServerPlayNetworking.send(player, ModMessages.SYNC_PLAYER_INFO, data);
+            ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
         } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncPlayerInfoS2CPacket: ", e);
+            PoliceTerminal.LOGGER.error("Could not send SyncRanksS2CPacket: ", e);
         }
     }
 

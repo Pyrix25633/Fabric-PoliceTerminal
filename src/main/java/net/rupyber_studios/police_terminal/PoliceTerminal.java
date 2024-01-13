@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.WorldSavePath;
+import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.packet.SyncPlayerInfoS2CPacket;
@@ -48,6 +49,8 @@ public class PoliceTerminal implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			Rank.loadRanks();
+			RankArgumentType.init();
+
 			Path worldPath = server.getSavePath(WorldSavePath.ROOT);
 			String url = "jdbc:sqlite:" + worldPath + "police.db";
 
