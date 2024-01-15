@@ -55,6 +55,7 @@ public class DatabaseManager {
                 CREATE TABLE IF NOT EXISTS players (
                     uuid CHAR(36),
                     username VARCHAR(16) NULL,
+                    online BOOLEAN NOT NULL DEFAULT TRUE,
                     status INT NULL DEFAULT NULL,
                     rankId INT NULL DEFAULT NULL,
                     callsign VARCHAR(16) NULL DEFAULT NULL,
@@ -90,17 +91,43 @@ public class DatabaseManager {
     }
 
     public static void insertOrUpdatePlayer(@NotNull UUID player, @NotNull String username) throws SQLException {
+        // Searching for a record with the same username
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                REPLACE INTO players (uuid, username) VALUES (?, ?);""");
+                SELECT uuid FROM players WHERE username=?;""");
+        preparedStatement.setString(1, username);
+        ResultSet result = preparedStatement.executeQuery();
+        if(result.next()) {
+            String uuid = result.getString("uuid");
+            if(uuid.equals(player.toString())) {
+                // Same player, just update online
+                preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                        UPDATE players SET online=TRUE WHERE uuid=?;""");
+                preparedStatement.setString(1, player.toString());
+                preparedStatement.execute();
+                preparedStatement.close();
+                return;
+            }
+            else {
+                // Other player, set username to null
+                preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                        UPDATE players SET username=NULL WHERE uuid=?;""");
+                preparedStatement.setString(1, uuid);
+                preparedStatement.execute();
+            }
+        }
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT uuid FROM players WHERE uuid=?;""");
         preparedStatement.setString(1, player.toString());
-        preparedStatement.setString(2, username);
-        try {
-            preparedStatement.execute();
-        } catch(SQLException exception) {
+        result = preparedStatement.executeQuery();
+        if(result.next()) {
+            // Player is already in database, just update online
             preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                    UPDATE players SET username=NULL WHERE username=?;""");
-            preparedStatement.setString(1, username);
+                        UPDATE players SET online=TRUE WHERE uuid=?;""");
+            preparedStatement.setString(1, player.toString());
             preparedStatement.execute();
+        }
+        else {
+            // Player has to be inserted
             preparedStatement = PoliceTerminal.connection.prepareStatement("""
                     INSERT INTO players (uuid, username) VALUES (?, ?);""");
             preparedStatement.setString(1, player.toString());
@@ -120,14 +147,28 @@ public class DatabaseManager {
         if(result.getInt("rankId") != 0) {
             String queryString;
             if(result.getBoolean("callsignReserved"))
-                queryString = "UPDATE players SET status=0 WHERE uuid=?;";
+                queryString = "UPDATE players SET status=1 WHERE uuid=?;";
             else
-                queryString = "UPDATE players SET status=0, callsign=NULL WHERE uuid=?;";
+                queryString = "UPDATE players SET status=1, callsign=NULL WHERE uuid=?;";
             preparedStatement = PoliceTerminal.connection.prepareStatement(queryString);
             preparedStatement.setString(1, player.toString());
             preparedStatement.execute();
         }
         preparedStatement.close();
+    }
+
+    public static void setAllPlayersOffline() throws SQLException {
+        Statement statement = PoliceTerminal.connection.createStatement();
+        statement.execute("UPDATE players SET online=FALSE;");
+    }
+
+    public static @NotNull ArrayList<String> getAllOnlineCallsigns() throws SQLException {
+        Statement statement = PoliceTerminal.connection.createStatement();
+        ResultSet result = statement.executeQuery("SELECT callsign FROM players WHERE online=TRUE;");
+        ArrayList<String> callsigns = new ArrayList<>();
+        while(result.next())
+            callsigns.add(result.getString("callsign"));
+        return callsigns;
     }
 
     public static @NotNull String getPlayerUsername(@NotNull UUID player) throws SQLException {
@@ -168,19 +209,39 @@ public class DatabaseManager {
         return Rank.fromId(result.getInt("rankId"));
     }
 
-    public static void setPlayerStatus(@NotNull UUID player, @NotNull Status status) throws SQLException {
+    public static @Nullable String getPlayerCallsign(@NotNull UUID player) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT callsign FROM players WHERE uuid=?;""");
+        preparedStatement.setString(1, player.toString());
+        ResultSet result = preparedStatement.executeQuery();
+        if(!result.next()) return null;
+        return result.getString("callsign");
+    }
+
+    public static @Nullable UUID getPlayerUuidFromCallsign(String callsign) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT uuid FROM players WHERE callsign=?;""");
+        preparedStatement.setString(1, callsign);
+        ResultSet result = preparedStatement.executeQuery();
+        if(!result.next()) return null;
+        return UUID.fromString(result.getString("uuid"));
+    }
+
+    public static void setPlayerStatus(@NotNull UUID player, @Nullable Status status) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
                 UPDATE players SET status=? WHERE uuid=?;""");
-        preparedStatement.setInt(1, status.getId());
+        Integer s = status != null ? status.getId() : null;
+        preparedStatement.setObject(1, s);
         preparedStatement.setString(2, player.toString());
         preparedStatement.execute();
         preparedStatement.close();
     }
 
-    public static void setPlayerRank(@NotNull UUID player, @NotNull Rank rank) throws SQLException {
+    public static void setPlayerRank(@NotNull UUID player, @Nullable Rank rank) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
                 UPDATE players SET rankId=? WHERE uuid=?;""");
-        preparedStatement.setInt(1, rank.id);
+        Integer r = rank != null ? rank.id : null;
+        preparedStatement.setObject(1, r);
         preparedStatement.setString(2, player.toString());
         preparedStatement.execute();
         preparedStatement.close();

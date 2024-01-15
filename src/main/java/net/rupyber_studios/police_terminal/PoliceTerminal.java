@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.WorldSavePath;
+import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
@@ -59,12 +60,15 @@ public class PoliceTerminal implements ModInitializer {
 				if(connection != null) {
 					LOGGER.info("Connected to the database");
 					DatabaseManager.createTables();
+					DatabaseManager.setAllPlayersOffline();
 				}
 				else throw new IllegalStateException("Not connected to the police database!");
 			} catch(Exception e) {
 				LOGGER.error("Error: ", e);
 				throw new IllegalStateException("Error operating the police database!");
 			}
+
+			OnlineCallsignArgumentType.init();
 
 			try {
 				boolean httpsError = false;
@@ -105,6 +109,7 @@ public class PoliceTerminal implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			try {
+				DatabaseManager.setAllPlayersOffline();
 				LOGGER.info("Closing police database connection");
 				connection.close();
 			} catch (SQLException e) {
@@ -125,6 +130,7 @@ public class PoliceTerminal implements ModInitializer {
 				SyncRanksS2CPacket.send(handler.player);
 				DatabaseManager.insertOrUpdatePlayer(handler.player.getUuid(), handler.player.getGameProfile().getName());
 				SyncPlayerInfoS2CPacket.send(handler.player);
+				OnlineCallsignArgumentType.init();
 			} catch (SQLException e) {
 				LOGGER.error("Error handling player join: ", e);
 			}
@@ -133,6 +139,7 @@ public class PoliceTerminal implements ModInitializer {
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
 			try {
 				DatabaseManager.handlePlayerDisconnection(handler.player.getUuid());
+				OnlineCallsignArgumentType.init();
 			} catch (SQLException e) {
 				LOGGER.error("Error handling player disconnection: ", e);
 			}

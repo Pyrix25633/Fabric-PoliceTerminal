@@ -8,14 +8,14 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SendStatusS2CPacket {
-    public static void send(ServerPlayerEntity player, Status status) {
+    public static void send(ServerPlayerEntity player, @Nullable Status status) {
         PacketByteBuf data = PacketByteBufs.create();
         data.writeInt(status != null ? status.getId() : 0);
         ServerPlayNetworking.send(player, ModMessages.SEND_STATUS, data);

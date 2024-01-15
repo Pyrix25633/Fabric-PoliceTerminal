@@ -31,7 +31,7 @@
   "text.autoconfig.police_terminal.option.rankCommandRequiresAdmin": "Rank Command Requires Admin Privileges",
   "text.autoconfig.police_terminal.option.rankCommandRequiresAdmin.@Tooltip": "If true only admins will be able to use the rank command",
   "text.autoconfig.police_terminal.option.officerCanGrantRankHigherThanHis": "Officer can grant Rank higher than his",
-  "text.autoconfig.police_terminal.option.officerCanGrantRankHigherThanHis.@Tooltip": "If true an officer will be able to promote himself and other players to a rank higher than his rank",
+  "text.autoconfig.police_terminal.option.officerCanGrantRankHigherThanHis.@Tooltip": "If true an officer will be able to promote himself and other players to a rank higher than his rank and use the rank command on players with a higher rank (admins can violate these rules)",
   "text.autoconfig.police_terminal.option.minimumRankIdForRankCommand": "Minimum Rank Id for Rank Command",
   "text.autoconfig.police_terminal.option.minimumRankIdForRankCommand.@Tooltip": "Only officers with a rank id greater or equal than the one set below will be able to use the rank command",
   "text.autoconfig.police_terminal.option.callsignNumberLetterNumber": "Callsign Number-Letter-Number",
@@ -71,5 +71,19 @@
   "text.hud.police_terminal.callsign": "Callsign: ",
   "text.hud.police_terminal.coordinates": "Coordinates: ",
 
-  "argument.rank.invalid": "Invalid Rank"
+  "argument.rank.invalid": "Invalid Rank",
+  "commands.rank.success.was_promoted": " was promoted",
+  "commands.rank.success.was_demoted": " was demoted",
+  "commands.rank.success.promoted": " promoted ",
+  "commands.rank.success.demoted": " demoted ",
+  "commands.rank.success.from": " from ",
+  "commands.rank.success.to": " to ",
+  "commands.status.success.status_set_to": "Status set to ",
+  "commands.officer.success.officer": "Officer ",
+  "commands.officer.success.status": "\nStatus: ",
+  "commands.officer.success.rank": "\nRank: ",
+  "commands.officer.success.callsign": "\nCallsign: ",
+  "commands.officer.success.not_officer": " is not an Officer",
+  "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
+  "commands.radio.success.radio": "§3Radio§r "
 }

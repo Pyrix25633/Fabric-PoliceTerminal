@@ -75,7 +75,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("If true an officer will be able to promote himself and other players to a rank higher than his rank (except admins)")
+    @Comment("If true an officer will be able to promote himself and other players to a rank higher than his rank  and use the rank command on players with a higher rank (admins can violate these rules)")
     public boolean officerCanGrantRankHigherThanHis = false;
 
     @ConfigEntry.Gui.Tooltip

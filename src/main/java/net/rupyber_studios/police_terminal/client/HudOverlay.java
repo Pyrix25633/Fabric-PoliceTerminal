@@ -86,7 +86,7 @@ public class HudOverlay implements HudRenderCallback {
             // Draw texts
             context.drawText(client.textRenderer, statusText, statusX, statusY, WHITE_COLOR, true);
             context.drawText(client.textRenderer, RANK_TEXT.copy(), rankX, rankY, WHITE_COLOR, true);
-            context.drawText(client.textRenderer, Text.literal(ModConfig.INSTANCE.ranks.get(0).rank),
+            context.drawText(client.textRenderer, Text.literal(PlayerInfo.info.rank.rank),
                     rankRankX, rankRankY, PlayerInfo.info.rank.color, true);
             context.drawText(client.textRenderer, callsignText, callsignX, callsignY, WHITE_COLOR, true);
 
