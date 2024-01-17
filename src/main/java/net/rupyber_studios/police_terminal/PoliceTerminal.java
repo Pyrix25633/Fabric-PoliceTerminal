@@ -60,7 +60,7 @@ public class PoliceTerminal implements ModInitializer {
 				if(connection != null) {
 					LOGGER.info("Connected to the database");
 					DatabaseManager.createTables();
-					DatabaseManager.setAllPlayersOffline();
+					DatabaseManager.handleShutdown();
 				}
 				else throw new IllegalStateException("Not connected to the police database!");
 			} catch(Exception e) {
@@ -109,7 +109,7 @@ public class PoliceTerminal implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			try {
-				DatabaseManager.setAllPlayersOffline();
+				DatabaseManager.handleShutdown();
 				LOGGER.info("Closing police database connection");
 				connection.close();
 			} catch (SQLException e) {

@@ -157,18 +157,28 @@ public class DatabaseManager {
         preparedStatement.close();
     }
 
-    public static void setAllPlayersOffline() throws SQLException {
+    public static void handleShutdown() throws SQLException {
         Statement statement = PoliceTerminal.connection.createStatement();
         statement.execute("UPDATE players SET online=FALSE;");
+        statement.execute("UPDATE players SET callsign=NULL WHERE callsignReserved=FALSE;");
+        statement.close();
     }
 
     public static @NotNull ArrayList<String> getAllOnlineCallsigns() throws SQLException {
         Statement statement = PoliceTerminal.connection.createStatement();
-        ResultSet result = statement.executeQuery("SELECT callsign FROM players WHERE online=TRUE;");
+        ResultSet result = statement.executeQuery("SELECT callsign FROM players WHERE online=TRUE AND callsign IS NOT NULL;");
         ArrayList<String> callsigns = new ArrayList<>();
         while(result.next())
             callsigns.add(result.getString("callsign"));
         return callsigns;
+    }
+
+    public static boolean isCallsignInUse(String callsign) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT callsign FROM players WHERE callsign=?;""");
+        preparedStatement.setString(1, callsign);
+        ResultSet result = preparedStatement.executeQuery();
+        return result.next();
     }
 
     public static @NotNull String getPlayerUsername(@NotNull UUID player) throws SQLException {
@@ -243,6 +253,16 @@ public class DatabaseManager {
         Integer r = rank != null ? rank.id : null;
         preparedStatement.setObject(1, r);
         preparedStatement.setString(2, player.toString());
+        preparedStatement.execute();
+        preparedStatement.close();
+    }
+
+    public static void setPlayerCallsign(@NotNull UUID player, @Nullable String callsign, boolean reserved) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE players SET callsign=?, callsignReserved=? WHERE uuid=?;""");
+        preparedStatement.setString(1, callsign);
+        preparedStatement.setBoolean(2, reserved);
+        preparedStatement.setString(3, player.toString());
         preparedStatement.execute();
         preparedStatement.close();
     }

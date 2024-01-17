@@ -1,8 +1,8 @@
 package net.rupyber_studios.police_terminal.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,18 +29,19 @@ public class RadioCommand {
                 return false;
             }
         }).then(CommandManager.argument("callsign", new OnlineCallsignArgumentType())
-                .then(CommandManager.argument("message", StringArgumentType.string())
+                .then(CommandManager.argument("message", MessageArgumentType.message())
                         .executes((context) -> {
                             ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
                             if(dispatchingPlayer == null) return 0;
                             String callsign = context.getArgument("callsign", String.class);
-                            String message = StringArgumentType.getString(context, "message");
+                            Text message = MessageArgumentType.getMessage(context, "message");
                             try {
                                 String dispatchingPlayerCallsign = DatabaseManager.getPlayerCallsign(dispatchingPlayer.getUuid());
                                 UUID playerUuid = DatabaseManager.getPlayerUuidFromCallsign(callsign);
                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
                                 if(player == null) return 0;
-                                Text feedback = RADIO_TEXT.copy().append("(§9" + dispatchingPlayerCallsign + "§r):\n")
+                                Text feedback = RADIO_TEXT.copy()
+                                        .append("(§9" + dispatchingPlayerCallsign + " §rto §9" + callsign + "§r):\n")
                                         .append(message);
                                 context.getSource().sendFeedback(() -> feedback, false);
                                 player.sendMessage(feedback);

@@ -84,6 +84,8 @@
   "commands.officer.success.rank": "\nRank: ",
   "commands.officer.success.callsign": "\nCallsign: ",
   "commands.officer.success.not_officer": " is not an Officer",
+  "argument.unused_callsign.invalid": "Invalid Callsign: specified Callsign is already in use",
+  "commands.callsign.success.your_callsign_is_now": "Your Callsign is now ",
   "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
   "commands.radio.success.radio": "§3Radio§r "
 }

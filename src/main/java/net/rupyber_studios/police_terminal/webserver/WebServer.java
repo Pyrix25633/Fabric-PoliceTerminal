@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +25,8 @@ public class WebServer {
     public static final String RESPONSE_405 = HTTP_VERSION + " 405 Method Not Allowed " + CRLF;
     public static final String RESPONSE_500 = HTTP_VERSION + " 500 Server Error " + CRLF;
     public static final String CONTENT_LENGTH_HEADER = "Content-Length: ";
+    private static final Pattern REQUEST_LINE_PATTERN = Pattern.compile("^(.*) (.*) HTTP/(.*)$");
+    private static final Pattern HEADER_PATTERN = Pattern.compile("^(.*): (.*)$");
 
     @Contract(pure = true)
     public static @NotNull String getContentLengthHeader(@NotNull String content) {
@@ -82,7 +83,7 @@ public class WebServer {
                 builder.append((char)b);
         }
 
-        Matcher matcher = Pattern.compile("^(.*) (.*) HTTP/(.*)$").matcher(builder.toString());
+        Matcher matcher = REQUEST_LINE_PATTERN.matcher(builder.toString());
         if(matcher.find()) {
             if(Float.parseFloat(matcher.group(3)) < 1.1F)
                 return null;
@@ -97,7 +98,6 @@ public class WebServer {
         StringBuilder builder = new StringBuilder();
         HashMap<String, String> headers = new HashMap<>();
         short crlf = 0;
-        Pattern pattern = Pattern.compile("^(.*): (.*)$");
 
         // Waiting for \r\n\r\n to close headers
         while((b = input.read()) >= 0) {
@@ -106,7 +106,7 @@ public class WebServer {
                 if(crlf > 1) break;
                 String header = builder.toString();
                 builder = new StringBuilder();
-                Matcher matcher = pattern.matcher(header);
+                Matcher matcher = HEADER_PATTERN.matcher(header);
                 if(matcher.find())
                     headers.put(matcher.group(1), matcher.group(2));
             }
