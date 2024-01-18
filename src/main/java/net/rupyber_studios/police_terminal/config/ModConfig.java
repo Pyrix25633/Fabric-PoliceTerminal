@@ -126,6 +126,16 @@ public class ModConfig implements ConfigData {
             "Nora", "Ocean", "Paul", "Queen", "Robert", "Sam", "Tom", "Union", "Victor", "William", "X-Ray", "Young", "Zebra"
     );
 
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("If true only admins will be able to use the rank command (except for 'request' subcommand)")
+    public boolean callsignCommandRequiresAdmin = false;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("Only officers with a rank id greater or equal than the one set below will be able to use the callsign command (except for 'request' subcommand)")
+    public int minimumRankIdForCallsignCommand = 10;
+
     // web
 
     @ConfigEntry.Gui.Tooltip

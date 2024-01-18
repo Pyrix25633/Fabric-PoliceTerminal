@@ -17,6 +17,7 @@ import java.util.UUID;
 
 public class RadioCommand {
     private static final Text RADIO_TEXT = Text.translatable("commands.radio.success.radio");
+    private static final Text TO_TEXT = Text.translatable("commands.radio.success.to");
 
     public static void register(@NotNull CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess registryAccess,
@@ -40,8 +41,8 @@ public class RadioCommand {
                                 UUID playerUuid = DatabaseManager.getPlayerUuidFromCallsign(callsign);
                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
                                 if(player == null) return 0;
-                                Text feedback = RADIO_TEXT.copy()
-                                        .append("(§9" + dispatchingPlayerCallsign + " §rto §9" + callsign + "§r):\n")
+                                Text feedback = RADIO_TEXT.copy().append("(§9" + dispatchingPlayerCallsign + "§r")
+                                        .append(TO_TEXT).append("§9" + callsign + "§r):\n")
                                         .append(message);
                                 context.getSource().sendFeedback(() -> feedback, false);
                                 player.sendMessage(feedback);

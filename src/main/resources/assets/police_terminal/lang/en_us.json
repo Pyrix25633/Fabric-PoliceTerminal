@@ -48,6 +48,10 @@
   "text.autoconfig.police_terminal.option.callsignSecondNumberMin.@Tooltip": "The minimum for the second number that is $-Adam-22 and $-David",
   "text.autoconfig.police_terminal.option.callsignSecondNumberMax": "Callsign First Number Maximum",
   "text.autoconfig.police_terminal.option.callsignSecondNumberMax.@Tooltip": "The maximum for the second number that is $-Adam-22 and $-David",
+  "text.autoconfig.police_terminal.option.callsignCommandRequiresAdmin": "Rank Command Requires Admin Privileges",
+  "text.autoconfig.police_terminal.option.callsignCommandRequiresAdmin.@Tooltip": "If true only admins will be able to use the rank command (except for 'request' subcommand)",
+  "text.autoconfig.police_terminal.option.minimumRankIdForCallsignCommand": "Minimum Rank Id for Callsign Command",
+  "text.autoconfig.police_terminal.option.minimumRankIdForCallsignCommand.@Tooltip": "Only officers with a rank id greater or equal than the one set below will be able to use the callsign command (except for 'request' subcommand)\"",
 
   "text.autoconfig.police_terminal.category.web": "Web Terminal",
   "text.autoconfig.police_terminal.option.port": "Port",
@@ -86,6 +90,11 @@
   "commands.officer.success.not_officer": " is not an Officer",
   "argument.unused_callsign.invalid": "Invalid Callsign: specified Callsign is already in use",
   "commands.callsign.success.your_callsign_is_now": "Your Callsign is now ",
+  "commands.callsign.success.callsign": "Callsign ",
+  "commands.callsign.success.was_reserved_for": " was reserved (and assigned) for ",
+  "commands.callsign.success.reserved_callsign": " reserved (and assigned) Callsign ",
+  "commands.callsign.success.for": " for ",
   "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
-  "commands.radio.success.radio": "§3Radio§r "
+  "commands.radio.success.radio": "§3Radio§r ",
+  "commands.radio.success.to": " to "
 }
