@@ -19,6 +19,7 @@ import net.rupyber_studios.police_terminal.util.Rank;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class CallsignCommand {
     private static final Text YOUR_CALLSIGN_IS_NOW_TEXT = Text.translatable("commands.callsign.success.your_callsign_is_now");
@@ -26,6 +27,8 @@ public class CallsignCommand {
     private static final Text WAS_RESERVED_FOR_TEXT = Text.translatable("commands.callsign.success.was_reserved_for");
     private static final Text RESERVED_CALLSIGN_TEXT = Text.translatable("commands.callsign.success.reserved_callsign");
     private static final Text FOR_TEXT = Text.translatable("commands.callsign.success.for");
+    private static final Text RELEASED_CALLSIGN_TEXT = Text.translatable("commands.callsign.success.released_callsign");
+    private static final Text WAS_RELEASED_TEXT = Text.translatable("commands.callsign.success.was_released");
 
     public static void register(@NotNull CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess registryAccess,
@@ -93,7 +96,8 @@ public class CallsignCommand {
                                             .append(RESERVED_CALLSIGN_TEXT).append("§9" + callsign + "§r").append(FOR_TEXT);
                                 feedback.append(player.getGameProfile().getName());
                                 context.getSource().sendFeedback(() -> feedback, true);
-                                player.sendMessage(feedback);
+                                if(dispatchingPlayer != player)
+                                    player.sendMessage(feedback);
                             } catch(SQLException e) {
                                 PoliceTerminal.LOGGER.error("Could not reserve callsign for player: ", e);
                             }
@@ -102,6 +106,31 @@ public class CallsignCommand {
                 )
         ).then(CommandManager.literal("release").requires(CallsignCommand::canExecute)
                 .then(CommandManager.argument("callsign", new OnlineCallsignArgumentType()).executes((context) -> {
+                    String callsign = context.getArgument("callsign", String.class);
+                    ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
+                    try {
+                        UUID playerUuid = DatabaseManager.getPlayerUuidFromCallsign(callsign);
+                        if(playerUuid == null) return 0;
+                        ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
+                        if(player == null) return 0;
+                        DatabaseManager.setPlayerCallsign(playerUuid, null, false);
+                        SendCallsignS2CPacket.send(player, callsign);
+                        OnlineCallsignArgumentType.init();
+                        context.getSource().getServer().getCommandManager().sendCommandTree(player);
+                        Text feedback;
+                        if(dispatchingPlayer == null)
+                            feedback = CALLSIGN_TEXT.copy().append("§9" + callsign + "§r")
+                                    .append(" (" + player.getGameProfile().getName() + ")").append(WAS_RELEASED_TEXT);
+                        else
+                            feedback = Text.literal(dispatchingPlayer.getGameProfile().getName())
+                                    .append(RELEASED_CALLSIGN_TEXT).append("§9" + callsign + "§r")
+                                    .append(" (" + player.getGameProfile().getName() + ")");
+                        context.getSource().sendFeedback(() -> feedback, true);
+                        if(dispatchingPlayer != player)
+                            player.sendMessage(feedback);
+                    } catch(SQLException e) {
+                        PoliceTerminal.LOGGER.error("Could not release callsign: ", e);
+                    }
                     return 1;
                 }))
         ));

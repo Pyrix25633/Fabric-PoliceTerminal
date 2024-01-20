@@ -45,7 +45,8 @@ public class RadioCommand {
                                         .append(TO_TEXT).append("§9" + callsign + "§r):\n")
                                         .append(message);
                                 context.getSource().sendFeedback(() -> feedback, false);
-                                player.sendMessage(feedback);
+                                if(dispatchingPlayer != player)
+                                    player.sendMessage(feedback);
                             } catch(SQLException e) {
                                 PoliceTerminal.LOGGER.error("Could not get player from callsign: ", e);
                             }

@@ -86,7 +86,8 @@ public class RankCommand {
                         feedback.append(FROM_TEXT).append(Text.literal(playerRank.rank).withColor(playerRank.color))
                                 .append(TO_TEXT).append(Text.literal(rank.rank).withColor(rank.color));
                         context.getSource().sendFeedback(() -> feedback, true);
-                        player.sendMessage(feedback);
+                        if(dispatchingPlayer != player)
+                            player.sendMessage(feedback);
                     } catch(SQLException e) {
                         PoliceTerminal.LOGGER.error("Could not set rank for player: ", e);
                     }
@@ -131,7 +132,8 @@ public class RankCommand {
                         feedback.append(FROM_TEXT).append(Text.literal(playerRank.rank).withColor(playerRank.color))
                                 .append(TO_TEXT).append(Text.literal(CIVILLIAN_RANK.rank).withColor(CIVILLIAN_RANK.color));
                         context.getSource().sendFeedback(() -> feedback, true);
-                        player.sendMessage(feedback);
+                        if(dispatchingPlayer != player)
+                            player.sendMessage(feedback);
                     } catch(SQLException e) {
                         PoliceTerminal.LOGGER.error("Could not unset rank for player: ", e);
                     }

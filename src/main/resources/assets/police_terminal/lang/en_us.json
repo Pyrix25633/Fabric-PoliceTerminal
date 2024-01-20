@@ -94,6 +94,8 @@
   "commands.callsign.success.was_reserved_for": " was reserved (and assigned) for ",
   "commands.callsign.success.reserved_callsign": " reserved (and assigned) Callsign ",
   "commands.callsign.success.for": " for ",
+  "commands.callsign.success.released_callsign": " released Callsign ",
+  "commands.callsign.success.was_released": " was released",
   "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
   "commands.radio.success.radio": "§3Radio§r ",
   "commands.radio.success.to": " to "
