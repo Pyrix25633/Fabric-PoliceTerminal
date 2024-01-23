@@ -27,6 +27,7 @@ public class WebServer {
     public static final String CONTENT_LENGTH_HEADER = "Content-Length: ";
     private static final Pattern REQUEST_LINE_PATTERN = Pattern.compile("^(.*) (.*) HTTP/(.*)$");
     private static final Pattern HEADER_PATTERN = Pattern.compile("^(.*): (.*)$");
+    private static final Pattern API_URI_PATTERN = Pattern.compile("^/api(.*)$");
 
     @Contract(pure = true)
     public static @NotNull String getContentLengthHeader(@NotNull String content) {
@@ -48,9 +49,18 @@ public class WebServer {
 
                 HashMap<String, String> headers = parseHeaders(input);
 
-                switch(requestLine.uri()) {
-                    case "/" -> FileServer.serveFile(requestLine.method(), "index.html", output);
-                    default -> FileServer.serveFile(requestLine.method(), requestLine.uri(), output);
+                Matcher matcher = API_URI_PATTERN.matcher(requestLine.uri());
+                if(matcher.find()) {
+                    switch(matcher.group(1)) {
+                        case "/user/validate-token" -> ApiServer.validateToken(requestLine.method(), parseBody(input, headers), output);
+                        default -> FileServer.serveFile("GET", "/404", output);
+                    }
+                }
+                else {
+                    switch(requestLine.uri()) {
+                        case "/" -> FileServer.serveFile(requestLine.method(), "index.html", output);
+                        default -> FileServer.serveFile(requestLine.method(), requestLine.uri(), output);
+                    }
                 }
 
                 input.close();
@@ -63,12 +73,20 @@ public class WebServer {
         worker.start();
     }
 
+    public static void send400(@NotNull OutputStream output) throws IOException {
+        output.write(RESPONSE_400.getBytes());
+    }
+
     public static void send400AndClose(@NotNull InputStream input, @NotNull OutputStream output,
                                        @NotNull Socket socket) throws IOException {
-        output.write(RESPONSE_400.getBytes());
+        send400(output);
         input.close();
         output.close();
         socket.close();
+    }
+
+    public static void send405(@NotNull OutputStream output) throws IOException {
+        output.write(RESPONSE_405.getBytes());
     }
 
     public static @Nullable RequestLine parseRequestLine(@NotNull InputStream input) throws IOException {
@@ -117,5 +135,21 @@ public class WebServer {
         }
 
         return headers;
+    }
+
+    public static @Nullable String parseBody(@NotNull InputStream input, @NotNull HashMap<String, String> headers) throws IOException {
+        String contentLengthString = headers.get("Content-Length");
+        if(contentLengthString == null) return null;
+        int contentLength = Integer.parseInt(contentLengthString);
+        if(contentLength <= 0) return null;
+        int b;
+        StringBuilder body = new StringBuilder();
+
+        // Waiting for \r\n\r\n to close headers
+        while((b = input.read()) >= 0 && body.length() < contentLength) {
+            body.append(b);
+        }
+
+        return body.toString();
     }
 }

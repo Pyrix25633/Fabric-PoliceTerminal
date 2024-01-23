@@ -1,6 +1,7 @@
 package net.rupyber_studios.police_terminal.database;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.util.Credentials;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
@@ -60,6 +61,8 @@ public class DatabaseManager {
                     rankId INT NULL DEFAULT NULL,
                     callsign VARCHAR(16) NULL DEFAULT NULL,
                     callsignReserved BOOLEAN NOT NULL DEFAULT FALSE,
+                    password CHAR(8) NULL DEFAULT NULL,
+                    token CHAR(16) NULL DEFAULT NULL,
                     PRIMARY KEY (uuid),
                     UNIQUE (username),
                     UNIQUE (callsign),
@@ -147,9 +150,9 @@ public class DatabaseManager {
         if(result.getInt("rankId") != 0) {
             String queryString;
             if(result.getBoolean("callsignReserved"))
-                queryString = "UPDATE players SET status=1 WHERE uuid=?;";
+                queryString = "UPDATE players SET status=1, password=NULL, token=NULL WHERE uuid=?;";
             else
-                queryString = "UPDATE players SET status=1, callsign=NULL WHERE uuid=?;";
+                queryString = "UPDATE players SET status=1, callsign=NULL, password=NULL, token=NULL WHERE uuid=?;";
             preparedStatement = PoliceTerminal.connection.prepareStatement(queryString);
             preparedStatement.setString(1, player.toString());
             preparedStatement.execute();
@@ -159,7 +162,7 @@ public class DatabaseManager {
 
     public static void handleShutdown() throws SQLException {
         Statement statement = PoliceTerminal.connection.createStatement();
-        statement.execute("UPDATE players SET online=FALSE;");
+        statement.execute("UPDATE players SET online=FALSE, password=NULL, token=NULL;");
         statement.execute("UPDATE players SET callsign=NULL WHERE callsignReserved=FALSE;");
         statement.close();
     }
@@ -237,6 +240,26 @@ public class DatabaseManager {
         return UUID.fromString(result.getString("uuid"));
     }
 
+    public static boolean isPlayerPasswordCorrect(@NotNull UUID player, String password) throws SQLException {
+        if(password == null) return false;
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT uuid FROM players WHERE uuid=? AND password=?;""");
+        preparedStatement.setString(1, player.toString());
+        preparedStatement.setString(2, password);
+        ResultSet result = preparedStatement.executeQuery();
+        return result.next();
+    }
+
+    public static boolean isPlayerTokenCorrect(@NotNull UUID player, String token) throws SQLException {
+        if(token == null) return false;
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT uuid FROM players WHERE uuid=? AND token=?;""");
+        preparedStatement.setString(1, player.toString());
+        preparedStatement.setString(2, token);
+        ResultSet result = preparedStatement.executeQuery();
+        return result.next();
+    }
+
     public static void setPlayerStatus(@NotNull UUID player, @Nullable Status status) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
                 UPDATE players SET status=? WHERE uuid=?;""");
@@ -265,5 +288,27 @@ public class DatabaseManager {
         preparedStatement.setString(3, player.toString());
         preparedStatement.execute();
         preparedStatement.close();
+    }
+
+    public static @NotNull String initPlayerPassword(@NotNull UUID player) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE players SET password=?, token=NULL WHERE uuid=?;""");
+        String password = Credentials.generatePassword();
+        preparedStatement.setString(1, password);
+        preparedStatement.setString(2, player.toString());
+        preparedStatement.execute();
+        preparedStatement.close();
+        return password;
+    }
+
+    public static @NotNull String initPlayerToken(@NotNull UUID player) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE players SET password=NULL, token=? WHERE uuid=?;""");
+        String token = Credentials.generateToken();
+        preparedStatement.setString(1, token);
+        preparedStatement.setString(2, player.toString());
+        preparedStatement.execute();
+        preparedStatement.close();
+        return token;
     }
 }

@@ -98,5 +98,8 @@
   "commands.callsign.success.was_released": " was released",
   "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
   "commands.radio.success.radio": "§3Radio§r ",
-  "commands.radio.success.to": " to "
+  "commands.radio.success.to": " to ",
+  "commands.terminal.success.terminal_credentials": "Terminal Credentials:",
+  "commands.terminal.success.callsign": "Callsign: ",
+  "commands.terminal.success.password": "Password: "
 }

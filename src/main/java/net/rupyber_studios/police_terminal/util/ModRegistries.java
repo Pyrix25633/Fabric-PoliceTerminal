@@ -26,5 +26,6 @@ public class ModRegistries {
         CommandRegistrationCallback.EVENT.register(OfficerCommand::register);
         CommandRegistrationCallback.EVENT.register(CallsignCommand::register);
         CommandRegistrationCallback.EVENT.register(RadioCommand::register);
+        CommandRegistrationCallback.EVENT.register(TerminalCommand::register);
     }
 }
