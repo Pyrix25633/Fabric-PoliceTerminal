@@ -30,8 +30,8 @@ public class WebServer {
     private static final Pattern API_URI_PATTERN = Pattern.compile("^/api(.*)$");
 
     @Contract(pure = true)
-    public static @NotNull String getContentLengthHeader(@NotNull String content) {
-        return CONTENT_LENGTH_HEADER + content.getBytes().length + CRLF;
+    public static @NotNull String getContentLengthHeader(byte @NotNull [] content) {
+        return CONTENT_LENGTH_HEADER + content.length + CRLF;
     }
 
     public static void handleRequest(Socket socket) {
@@ -145,9 +145,11 @@ public class WebServer {
         int b;
         StringBuilder body = new StringBuilder();
 
-        // Waiting for \r\n\r\n to close headers
-        while((b = input.read()) >= 0 && body.length() < contentLength) {
-            body.append(b);
+        // Reading up to specified Content-Length
+        while(body.length() < contentLength) {
+            b = input.read();
+            if(b < 0) break;
+            body.append((char)b);
         }
 
         return body.toString();

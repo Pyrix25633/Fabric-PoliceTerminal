@@ -3,7 +3,6 @@ const sharpModeCssLink = document.getElementById('sharp-mode-css');
 const fontCssLink = document.getElementById('font-css');
 
 export const cachedLogin = JSON.parse(localStorage.getItem('cachedLogin'));
-alert(cachedLogin);
 export const statusCodeActions = {
     400: () => {
         console.log('Error 400: Bad Request');
@@ -28,11 +27,9 @@ export const statusCodeActions = {
 let settings;
 
 export function loadSettings(callback, whenFinished) {
-    alert(JSON.stringify(cachedLogin));
     if(cachedLogin == null || cachedLogin.uuid == undefined || cachedLogin.token == undefined)
         window.location.href = '/login';
     else {
-        alert("test")
         $.ajax({
             url: '/api/user/validate-token',
             method: 'POST',

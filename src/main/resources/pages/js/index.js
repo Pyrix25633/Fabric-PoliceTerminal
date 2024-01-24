@@ -2,8 +2,6 @@ import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js
 
 let settings;
 
-alert("Test");
-
 loadSettings((sett) => {
     settings = sett;
     $.ajax({

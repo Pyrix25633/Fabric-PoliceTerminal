@@ -49,80 +49,11 @@ public class PoliceTerminal implements ModInitializer {
 		ModRegistries.registerCommands();
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-			Rank.loadRanks();
-			RankArgumentType.init();
-
-			Path worldPath = server.getSavePath(WorldSavePath.ROOT);
-			String url = "jdbc:sqlite:" + worldPath + "police.db";
-
-			try {
-				connection = DriverManager.getConnection(url);
-				if(connection != null) {
-					LOGGER.info("Connected to the database");
-					DatabaseManager.createTables();
-					DatabaseManager.handleShutdown();
-				}
-				else throw new IllegalStateException("Not connected to the police database!");
-			} catch(Exception e) {
-				LOGGER.error("Error: ", e);
-				throw new IllegalStateException("Error operating the police database!");
-			}
-
-			OnlineCallsignArgumentType.init();
-
-			try {
-				boolean httpsError = false;
-				if(ModConfig.INSTANCE.https) {
-					try {
-						KeyStore keyStore = KeyStore.getInstance("JKS");
-						keyStore.load(new FileInputStream(ModConfig.INSTANCE.httpsCertificate),
-								ModConfig.INSTANCE.httpsPassword.toCharArray());
-						KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-						keyManagerFactory.init(keyStore, ModConfig.INSTANCE.httpsPassword.toCharArray());
-						SSLContext sslContext = SSLContext.getInstance("TLS");
-						sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
-						socket = sslContext.getServerSocketFactory().createServerSocket(ModConfig.INSTANCE.port);
-						LOGGER.info("Successfully initialized ServerSocket with https");
-					} catch(Exception e) {
-						httpsError = true;
-						LOGGER.warn("Error starting https server, defaulting to http: ", e);
-					}
-				}
-				if(!ModConfig.INSTANCE.https || httpsError)
-					socket = new ServerSocket(ModConfig.INSTANCE.port);
-				serverThread = new Thread(() -> {
-					while(!socket.isClosed()) {
-						try {
-							WebServer.handleRequest(socket.accept());
-						} catch (Exception e) {
-							LOGGER.warn("Error handling request: ", e);
-						}
-					}
-				});
-				serverThread.start();
-				LOGGER.info("Socket listening on port " + ModConfig.INSTANCE.port);
-			} catch(Exception e) {
-				LOGGER.error("Error: ", e);
-				throw new IllegalStateException("Error operating the server socket!");
-			}
+			startServer(server.getSavePath(WorldSavePath.ROOT));
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			try {
-				DatabaseManager.handleShutdown();
-				LOGGER.info("Closing police database connection");
-				connection.close();
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-
-			try {
-				LOGGER.info("Closing server socket");
-				socket.close();
-				serverThread.join(0, 1);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			stopServer();
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -146,5 +77,81 @@ public class PoliceTerminal implements ModInitializer {
 		});
 
 		LOGGER.info("Initializing main");
+	}
+
+	public static void startServer(Path worldPath) {
+		Rank.loadRanks();
+		RankArgumentType.init();
+
+		String url = "jdbc:sqlite:" + worldPath + "police.db";
+
+		try {
+			connection = DriverManager.getConnection(url);
+			if(connection != null) {
+				LOGGER.info("Connected to the database");
+				DatabaseManager.createTables();
+				DatabaseManager.handleShutdown();
+			}
+			else throw new IllegalStateException("Not connected to the police database!");
+		} catch(Exception e) {
+			LOGGER.error("Error: ", e);
+			throw new IllegalStateException("Error operating the police database!");
+		}
+
+		OnlineCallsignArgumentType.init();
+
+		try {
+			boolean httpsError = false;
+			if(ModConfig.INSTANCE.https) {
+				try {
+					KeyStore keyStore = KeyStore.getInstance("JKS");
+					keyStore.load(new FileInputStream(ModConfig.INSTANCE.httpsCertificate),
+							ModConfig.INSTANCE.httpsPassword.toCharArray());
+					KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+					keyManagerFactory.init(keyStore, ModConfig.INSTANCE.httpsPassword.toCharArray());
+					SSLContext sslContext = SSLContext.getInstance("TLS");
+					sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+					socket = sslContext.getServerSocketFactory().createServerSocket(ModConfig.INSTANCE.port);
+					LOGGER.info("Successfully initialized ServerSocket with https");
+				} catch(Exception e) {
+					httpsError = true;
+					LOGGER.warn("Error starting https server, defaulting to http: ", e);
+				}
+			}
+			if(!ModConfig.INSTANCE.https || httpsError)
+				socket = new ServerSocket(ModConfig.INSTANCE.port);
+			serverThread = new Thread(() -> {
+				while(!socket.isClosed()) {
+					try {
+						WebServer.handleRequest(socket.accept());
+					} catch (Exception e) {
+						LOGGER.warn("Error handling request: ", e);
+					}
+				}
+			});
+			serverThread.start();
+			LOGGER.info("Socket listening on port " + ModConfig.INSTANCE.port);
+		} catch(Exception e) {
+			LOGGER.error("Error: ", e);
+			throw new IllegalStateException("Error operating the server socket!");
+		}
+	}
+
+	public static void stopServer() {
+		try {
+			DatabaseManager.handleShutdown();
+			LOGGER.info("Closing police database connection");
+			connection.close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+
+		try {
+			LOGGER.info("Closing server socket");
+			socket.close();
+			serverThread.join(0, 1);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
