@@ -13,6 +13,10 @@ img#pfp, img#change-pfp, img.chat-logo, img.pfp, img#chat-logo, img#change-chat-
     border-radius: 50%;
 }
 
+code {
+    border-radius: 7px;
+}
+
 div.panel {
     border-radius: 30px;
 }

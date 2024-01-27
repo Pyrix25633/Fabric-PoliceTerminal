@@ -74,4 +74,5 @@ function showSettings(settings) {
     compactModeCssLink.href = './css/compact-mode-' + (settings.compactMode ? 'on': 'off') + '.css';
     fontCssLink.href = './css/' + (settings.aurebeshFont ? 'aurebesh' : 'roboto') + '-condensed-' + (settings.condensedFont ? 'on': 'off') + '.css';
     sharpModeCssLink.href = './css/sharp-mode-' + (settings.sharpMode ? 'on': 'off') + '.css';
+    localStorage.setItem('cachedSettings', JSON.stringify(settings));
 }

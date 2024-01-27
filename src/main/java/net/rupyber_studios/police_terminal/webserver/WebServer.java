@@ -1,15 +1,22 @@
 package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +34,8 @@ public class WebServer {
     public static final String CONTENT_LENGTH_HEADER = "Content-Length: ";
     private static final Pattern REQUEST_LINE_PATTERN = Pattern.compile("^(.*) (.*) HTTP/(.*)$");
     private static final Pattern HEADER_PATTERN = Pattern.compile("^(.*): (.*)$");
+    private static final Pattern REMOVE_QUERY_STRING_PATTERN = Pattern.compile("^(.+)\\?.*$");
+    private static final Pattern REMOVE_FRAGMENT_PATTERN = Pattern.compile("^(.+)#.*$");
     private static final Pattern API_URI_PATTERN = Pattern.compile("^/api(.*)$");
 
     @Contract(pure = true)
@@ -49,16 +58,27 @@ public class WebServer {
 
                 HashMap<String, String> headers = parseHeaders(input);
 
-                Matcher matcher = API_URI_PATTERN.matcher(requestLine.uri());
+                String uri = requestLine.uri();
+                Matcher matcher = REMOVE_QUERY_STRING_PATTERN.matcher(uri);
+                if(matcher.find())
+                    uri = matcher.group(1);
+                matcher = REMOVE_FRAGMENT_PATTERN.matcher(uri);
+                if(matcher.find())
+                    uri = matcher.group(1);
+                matcher = API_URI_PATTERN.matcher(uri);
                 if(matcher.find()) {
                     switch(matcher.group(1)) {
-                        case "/user/validate-token" -> ApiServer.validateToken(requestLine.method(), parseBody(input, headers), output);
+                        case "/user/validate-token" -> ApiServer.validateToken(requestLine.method(),
+                                parseBody(input, headers), output);
+                        case "/user/callsign-login-feedback" -> ApiServer.callsignLoginFeedback(requestLine.method(),
+                                parseQueryString(requestLine.uri()), output);
                         default -> FileServer.serveFile("GET", "/404", output);
                     }
                 }
                 else {
-                    switch(requestLine.uri()) {
+                    switch(uri) {
                         case "/" -> FileServer.serveFile(requestLine.method(), "index.html", output);
+                        case "/login" -> FileServer.serveFile(requestLine.method(), "login.html", output);
                         default -> FileServer.serveFile(requestLine.method(), requestLine.uri(), output);
                     }
                 }
@@ -66,6 +86,7 @@ public class WebServer {
                 input.close();
                 output.close();
                 socket.close();
+            } catch(SSLHandshakeException ignored) {
             } catch(Exception e) {
                 PoliceTerminal.LOGGER.error("Error processing request: ", e);
             }
@@ -135,6 +156,14 @@ public class WebServer {
         }
 
         return headers;
+    }
+
+    public static @NotNull HashMap<String, String> parseQueryString(@NotNull String uri) throws URISyntaxException {
+        List<NameValuePair> parameterList = URLEncodedUtils.parse(new URI(uri), StandardCharsets.UTF_8);
+        HashMap<String, String> parameters = new HashMap<>();
+        for(NameValuePair parameter : parameterList)
+            parameters.put(parameter.getName(), parameter.getValue());
+        return parameters;
     }
 
     public static @Nullable String parseBody(@NotNull InputStream input, @NotNull HashMap<String, String> headers) throws IOException {

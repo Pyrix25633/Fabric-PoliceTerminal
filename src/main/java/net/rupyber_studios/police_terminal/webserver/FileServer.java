@@ -37,13 +37,14 @@ public class FileServer {
     }
 
     public static @NotNull String getContentTypeHeader(String path) {
-        Matcher matcher = Pattern.compile("^.*\\.(html|css|js|ttf|otf)$").matcher(path);
+        Matcher matcher = Pattern.compile("^.*\\.(html|css|js|ttf|otf|svg)$").matcher(path);
         if(matcher.find()) {
             return "Content-Type: " + switch(matcher.group(1)) {
                 case "css" -> "text/css";
                 case "js" -> "text/javascript";
                 case "ttf" -> "font/ttf";
                 case "otf" -> "font/otf";
+                case "svg" -> "image/svg+xml";
                 default -> "text/html";
             } + WebServer.CRLF;
         }

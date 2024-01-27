@@ -40,6 +40,10 @@ span.text {
     margin-top: 2px;
 }
 
+code {
+    padding: 1px;
+}
+
 div.container:not(:first-child) {
     margin-top: 8px;
 }

@@ -75,7 +75,6 @@ input.small {
     width: 40px;
 }
 button:active {
-    color: var(--color-police);
     background-color: var(--color-foreground);
 }
 button:disabled {
@@ -97,6 +96,10 @@ span.title {
 
 a {
     color: var(--color-police);
+}
+
+code {
+    background-color: var(--color-police-transparent);
 }
 
 .error {

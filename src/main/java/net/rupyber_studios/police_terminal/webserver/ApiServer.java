@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class ApiServer {
@@ -28,6 +29,31 @@ public class ApiServer {
             response.put("valid", DatabaseManager.isPlayerTokenCorrect(player, token));
             sendJsonResponse(response, output);
         } catch(Exception e) {
+            WebServer.send400(output);
+        }
+    }
+
+    public static void callsignLoginFeedback(@NotNull String method, @NotNull HashMap<String, String> parameters,
+                                             OutputStream output) throws IOException {
+        if(!method.equals("GET")) {
+            WebServer.send405(output);
+            return;
+        }
+        String callsign = parameters.get("callsign");
+        if(callsign == null) {
+            WebServer.send400(output);
+            return;
+        }
+        try {
+            JSONObject response = new JSONObject();
+            String feedback;
+            if(DatabaseManager.isCallsignInUse(callsign))
+                feedback = "Valid Callsign";
+            else
+                feedback = "Callsign does not exist!";
+            response.put("feedback", feedback);
+            sendJsonResponse(response, output);
+        } catch (Exception e) {
             WebServer.send400(output);
         }
     }
