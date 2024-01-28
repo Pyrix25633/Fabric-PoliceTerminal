@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Police Terminal - Login</title>
+        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="./css/login.css">
+        <link rel="stylesheet" href="" id="compact-mode-css">
+        <link rel="stylesheet" href="" id="sharp-mode-css">
+        <link rel="stylesheet" href="" id="font-css">
+        <link rel="icon" href="./img/icon.svg" type="image/png">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script defer src="./js/load-cached-settings.js"></script>
+        <script defer src="./js/login.js"></script>
+    </head>
+    <body>
+        <nav id="navbar">
+            <div class="container navbar">
+                <span class="title police-color">POLICE</span>
+                <span class="title">TERMINAL</span>
+                <img id="icon" src="./img/icon.svg" alt="Police Terminal Icon">
+            </div>
+        </nav>
+        <div class="box panel bottom-margin">
+            <h3>Login with your Callsign and Password</h3>
+            <div class="box">
+                <div class="container label-input">
+                    <label for="callsign">Callsign:</label>
+                    <input type="text" id="callsign">
+                </div>
+                <span class="text" id="callsign-feedback">Input Callsign</span>
+                <div class="container label-input">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password">
+                </div>
+                <span class="text" id="password-feedback">Input Password</span>
+                <div class="container">
+                    <button id="login">Login <img src="./img/login.svg" class="button" alt="Login Icon"></button>
+                </div>
+            </div>
+            <div class="box margin-top">
+                <span class="text">Get a Callsign with <code>/callsign request</code> or <code>/callsing reserve</code> command</span>
+                <span class="text">Get your One Time Password with <code>/terminal credentials</code> command</span>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+label {
+    margin-right: 5px;
+    line-height: 31px;
+}
+
+span {
+    text-align: center;
+}
+
+div.container:not(:first-child) {
+    margin-top: 10px;
+}

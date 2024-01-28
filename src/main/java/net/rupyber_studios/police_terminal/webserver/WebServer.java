@@ -72,6 +72,7 @@ public class WebServer {
                                 parseBody(input, headers), output);
                         case "/user/callsign-login-feedback" -> ApiServer.callsignLoginFeedback(requestLine.method(),
                                 parseQueryString(requestLine.uri()), output);
+                        case "/user/login" -> ApiServer.login(requestLine.method(), parseBody(input, headers), output);
                         default -> FileServer.serveFile("GET", "/404", output);
                     }
                 }
@@ -106,8 +107,20 @@ public class WebServer {
         socket.close();
     }
 
+    public static void send401(@NotNull OutputStream output) throws IOException {
+        output.write(RESPONSE_401.getBytes());
+    }
+
+    public static void send404(@NotNull OutputStream output) throws IOException {
+        output.write(RESPONSE_404.getBytes());
+    }
+
     public static void send405(@NotNull OutputStream output) throws IOException {
         output.write(RESPONSE_405.getBytes());
+    }
+
+    public static void send500(@NotNull OutputStream output) throws IOException {
+        output.write(RESPONSE_500.getBytes());
     }
 
     public static @Nullable RequestLine parseRequestLine(@NotNull InputStream input) throws IOException {

@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileServer {
+    public static final String CACHE_CONTROL_HEADER = "Cache-Control: public, max-age=600" + WebServer.CRLF;
     private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     public static void serveFile(@NotNull String method, String path, OutputStream output) throws IOException {
@@ -29,7 +30,8 @@ public class FileServer {
 
         byte[] content = input.readAllBytes();
 
-        response += WebServer.getContentLengthHeader(content) + getContentTypeHeader(path) + WebServer.CRLF;
+        response += WebServer.getContentLengthHeader(content) + getContentTypeHeader(path) +
+                CACHE_CONTROL_HEADER + WebServer.CRLF;
 
         output.write(response.getBytes());
         output.write(content);

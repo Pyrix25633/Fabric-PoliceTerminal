@@ -1,5 +1,6 @@
 package net.rupyber_studios.police_terminal.webserver;
 
+import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -23,13 +24,16 @@ public class ApiServer {
         }
         try {
             JSONObject request = new JSONObject(body);
-            UUID player = UUID.fromString(request.getString("uuid"));
-            String token = request.getString("token");
+            UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
+            String token = Exceptions.getString(request, "token");
             JSONObject response = new JSONObject();
             response.put("valid", DatabaseManager.isPlayerTokenCorrect(player, token));
             sendJsonResponse(response, output);
+        } catch(Exceptions.HttpException e) {
+            e.sendError(output);
         } catch(Exception e) {
-            WebServer.send400(output);
+            WebServer.send500(output);
+            PoliceTerminal.LOGGER.error("Validate token error: ", e);
         }
     }
 
@@ -53,8 +57,40 @@ public class ApiServer {
                 feedback = "Callsign does not exist!";
             response.put("feedback", feedback);
             sendJsonResponse(response, output);
-        } catch (Exception e) {
+        } catch(Exception e) {
+            WebServer.send500(output);
+            PoliceTerminal.LOGGER.error("Callsign login feedback error: ", e);
+        }
+    }
+
+    public static void login(@NotNull String method, String body, OutputStream output) throws IOException {
+        if(!method.equals("POST")) {
+            WebServer.send405(output);
+            return;
+        }
+        if(body == null) {
             WebServer.send400(output);
+            return;
+        }
+        try {
+            JSONObject request = new JSONObject(body);
+            String callsign = Exceptions.getString(request, "callsign");
+            UUID player = DatabaseManager.getPlayerUuidFromCallsign(callsign);
+            if(player == null) throw new Exceptions.NotFoundException();
+            String password = Exceptions.getString(request, "password");
+            if(DatabaseManager.isPlayerPasswordCorrect(player, password)) {
+                JSONObject response = new JSONObject();
+                response.put("uuid", player.toString());
+                response.put("token", DatabaseManager.initPlayerToken(player));
+                sendJsonResponse(response, output);
+            }
+            else
+                throw new Exceptions.UnauthorizedException();
+        } catch(Exceptions.HttpException e) {
+            e.sendError(output);
+        } catch(Exception e) {
+            WebServer.send500(output);
+            PoliceTerminal.LOGGER.error("Login error: ", e);
         }
     }
 
