@@ -63,6 +63,7 @@ public class DatabaseManager {
                     callsignReserved BOOLEAN NOT NULL DEFAULT FALSE,
                     password CHAR(8) NULL DEFAULT NULL,
                     token CHAR(16) NULL DEFAULT NULL,
+                    settings VARCHAR(64) NOT NULL DEFAULT '{"compactMode":false,"condensedFont":false,"sharpMode":false}',
                     PRIMARY KEY (uuid),
                     UNIQUE (username),
                     UNIQUE (callsign),
@@ -229,6 +230,15 @@ public class DatabaseManager {
         ResultSet result = preparedStatement.executeQuery();
         if(!result.next()) return null;
         return result.getString("callsign");
+    }
+
+    public static @Nullable String getPlayerSettings(@NotNull UUID player) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT settings FROM players WHERE uuid=?;""");
+        preparedStatement.setString(1, player.toString());
+        ResultSet result = preparedStatement.executeQuery();
+        if(!result.next()) return null;
+        return result.getString("settings");
     }
 
     public static @Nullable UUID getPlayerUuidFromCallsign(String callsign) throws SQLException {

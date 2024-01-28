@@ -32,6 +32,12 @@ public class WebServer {
     public static final String RESPONSE_405 = HTTP_VERSION + " 405 Method Not Allowed " + CRLF;
     public static final String RESPONSE_500 = HTTP_VERSION + " 500 Server Error " + CRLF;
     public static final String CONTENT_LENGTH_HEADER = "Content-Length: ";
+    public static final String CORS_HEADERS = "Content-Security-Policy: default-src 'self'; base-uri 'self'; " +
+            "font-src 'self' https:; frame-ancestors 'self'; img-src 'self' data:; object-src 'none'; " +
+            "script-src 'self' https:; script-src-attr 'none'; style-src 'self' https: data: 'unsafe-inline'" + CRLF +
+            "Cross-Origin-Embedder-Policy: require-corp" + CRLF +
+            "Cross-Origin-Opener-Policy: same-origin" + CRLF +
+            "Cross-Origin-Resource-Policy: same-origin" + CRLF;
     private static final Pattern REQUEST_LINE_PATTERN = Pattern.compile("^(.*) (.*) HTTP/(.*)$");
     private static final Pattern HEADER_PATTERN = Pattern.compile("^(.*): (.*)$");
     private static final Pattern REMOVE_QUERY_STRING_PATTERN = Pattern.compile("^(.+)\\?.*$");
@@ -73,6 +79,8 @@ public class WebServer {
                         case "/user/callsign-login-feedback" -> ApiServer.callsignLoginFeedback(requestLine.method(),
                                 parseQueryString(requestLine.uri()), output);
                         case "/user/login" -> ApiServer.login(requestLine.method(), parseBody(input, headers), output);
+                        case "/user/get-settings" -> ApiServer.getSettings(requestLine.method(),
+                                parseBody(input, headers), output);
                         default -> FileServer.serveFile("GET", "/404", output);
                     }
                 }

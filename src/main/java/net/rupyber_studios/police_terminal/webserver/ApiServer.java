@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ApiServer {
@@ -94,10 +95,45 @@ public class ApiServer {
         }
     }
 
+    public static void getSettings(@NotNull String method, String body, OutputStream output) throws IOException {
+        if(!method.equals("POST")) {
+            WebServer.send405(output);
+            return;
+        }
+        if(body == null) {
+            WebServer.send400(output);
+            return;
+        }
+        try {
+            JSONObject request = new JSONObject(body);
+            UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
+            String token = Exceptions.getString(request, "token");
+            if(!isTokenValid(player, token)) throw new Exceptions.UnauthorizedException();
+            sendJsonResponse(Objects.requireNonNull(DatabaseManager.getPlayerSettings(player)), output);
+        } catch(Exceptions.HttpException e) {
+            e.sendError(output);
+        } catch(Exception e) {
+            WebServer.send500(output);
+            PoliceTerminal.LOGGER.error("Login error: ", e);
+        }
+    }
+
+    public static boolean isTokenValid(UUID player, String token) {
+        try {
+            return DatabaseManager.isPlayerTokenCorrect(player, token);
+        } catch(Exception e) {
+            return false;
+        }
+    }
+
     public static void sendJsonResponse(@NotNull JSONObject response, @NotNull OutputStream output) throws IOException {
-        byte[] content = response.toString().getBytes();
+        sendJsonResponse(response.toString(), output);
+    }
+
+    public static void sendJsonResponse(@NotNull String response, @NotNull OutputStream output) throws IOException {
+        byte[] content = response.getBytes();
         output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(content) + JSON_CONTENT_TYPE_HEADER +
-                WebServer.CRLF).getBytes());
+                WebServer.CORS_HEADERS + WebServer.CRLF).getBytes());
         output.write(content);
         output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
     }

@@ -61,10 +61,9 @@ function getSettings(callback) {
         data: JSON.stringify(cachedLogin),
         contentType: 'application/json',
         success: (res) => {
-            settings = res.settings;
-            showSettings(res.settings);
+            showSettings(res);
             if(typeof callback == 'function')
-                callback(settings);
+                callback(res);
         },
         statusCode: statusCodeActions
     });
@@ -72,7 +71,7 @@ function getSettings(callback) {
 
 function showSettings(settings) {
     compactModeCssLink.href = './css/compact-mode-' + (settings.compactMode ? 'on': 'off') + '.css';
-    fontCssLink.href = './css/' + (settings.aurebeshFont ? 'aurebesh' : 'roboto') + '-condensed-' + (settings.condensedFont ? 'on': 'off') + '.css';
+    fontCssLink.href = './css/roboto-condensed-' + (settings.condensedFont ? 'on': 'off') + '.css';
     sharpModeCssLink.href = './css/sharp-mode-' + (settings.sharpMode ? 'on': 'off') + '.css';
     localStorage.setItem('cachedSettings', JSON.stringify(settings));
 }

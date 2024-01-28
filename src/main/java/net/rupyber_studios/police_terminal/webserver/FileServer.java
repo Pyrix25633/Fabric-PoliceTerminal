@@ -31,7 +31,7 @@ public class FileServer {
         byte[] content = input.readAllBytes();
 
         response += WebServer.getContentLengthHeader(content) + getContentTypeHeader(path) +
-                CACHE_CONTROL_HEADER + WebServer.CRLF;
+                CACHE_CONTROL_HEADER + WebServer.CORS_HEADERS + WebServer.CRLF;
 
         output.write(response.getBytes());
         output.write(content);

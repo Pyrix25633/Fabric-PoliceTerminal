@@ -3,19 +3,5 @@ import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js
 let settings;
 
 loadSettings((sett) => {
-    settings = sett;
-    $.ajax({
-        url: '/api/chat/list',
-        method: 'POST',
-        data: JSON.stringify(cachedLogin),
-        contentType: 'application/json',
-        success: (res) => {
-            const chats = Object.keys(res.chats);
-            if(chats.length > 0)
-                loadChatsInfo(chats, res.chats);
-            else
-                disableLoadingDiv();
-        },
-        statusCode: statusCodeActions
-    });
+    console.log("Loaded settings");
 }, true);
