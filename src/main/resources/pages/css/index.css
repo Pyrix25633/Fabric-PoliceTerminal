@@ -1,0 +1,34 @@
+body {
+    height: 100dvh;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    justify-content: flex-start;
+}
+
+nav#tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    background-color: var(--color-lighter);
+}
+
+div.tab {
+    cursor: pointer;
+    background-color: var(--color-police-dark);
+}
+div.tab * {
+    color: var(--color-police);
+}
+div.tab.active {
+    cursor: default;
+    background-color: var(--color-background);
+}
+div.tab.active * {
+    color: var(--color-foreground);
+}

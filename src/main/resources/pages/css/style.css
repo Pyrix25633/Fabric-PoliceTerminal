@@ -1,6 +1,6 @@
 :root {
-    --color-background: #060621;
-    --color-lighter: #0b0b3d;
+    --color-background: #182128;
+    --color-lighter: #26323c;
     --color-foreground: #DDDDDD;
     --color-error: #F54F47;
     --color-warning: #F3E63D;
@@ -91,7 +91,10 @@ span.title {
     letter-spacing: -1px;
 }
 .police-color {
-    color: var(--color-police);
+    color: var(--color-police) !important;
+}
+.foreground-color {
+    color: var(--color-foreground) !important;
 }
 
 a {
@@ -130,6 +133,7 @@ nav#navbar {
     top: 0;
     left: 0;
     z-index: 100;
+    width: 100vw;
 }
 div.navbar {
     background-color: var(--color-police-dark);
@@ -145,7 +149,7 @@ div#footer {
     width: 100vw;
 }
 
-img#icon {
+img#icon, img.icon {
     width: 30px;
     margin-left: 10px;
 }

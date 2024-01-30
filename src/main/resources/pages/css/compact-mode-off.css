@@ -1,23 +1,23 @@
-:root {
-    --sidebars-height: calc(100dvh - 10px);
-    --chat-topbar-width: calc(100vw - 277px*2 - 10px);
-    --marquee-big-width: calc(var(--chat-topbar-width) - 70px - 5px);
-    --messages-width: calc(100% - 10px);
-    --message-max-width: calc(var(--chat-topbar-width) - 100px);
-    --textarea-width: calc(var(--chat-topbar-width) - 70px);
-    --chat-topbar-mobile-width: calc(100vw - 10px);
-    --marquee-big-mobile-width: calc(var(--chat-topbar-mobile-width) - 70px - 15px - 25px*2);
-    --message-mobile-max-width: calc(var(--chat-topbar-mobile-width) - 100px);
-    --textarea-mobile-width: calc(var(--chat-topbar-mobile-width) - 70px);
-    --marquee-big-mobile-small-width: calc(var(--chat-topbar-mobile-width) - 50px - 15px - 25px*2);
-}
-
 nav#navbar {
     padding: 20px 0;
-    width: 100vw;
+}
+nav#tabs {
+    padding: 0 10px;
+    width: calc(100vw - 20px);
 }
 div.navbar {
     padding: 10px;
+}
+div.tab {
+    padding: 5px 10px;
+    margin-top: 5px !important;
+    margin-bottom: 5px;
+}
+div.tab:not(:first-child) {
+    margin-left: 10px;
+}
+div.tab.active {
+    margin-bottom: 0;
 }
 
 div.bottom-margin {

@@ -1,3 +1,9 @@
+div.tab {
+    border-radius: 10px;
+}
+div.tab.active {
+    border-radius: 10px 10px 0 0;
+}
 div.navbar {
     border-radius: 10px;
 }

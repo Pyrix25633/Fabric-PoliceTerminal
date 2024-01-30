@@ -30,7 +30,7 @@ public class WebServer {
     public static final String RESPONSE_403 = HTTP_VERSION + " 403 Forbidden " + CRLF;
     public static final String RESPONSE_404 = HTTP_VERSION + " 404 Not Found " + CRLF;
     public static final String RESPONSE_405 = HTTP_VERSION + " 405 Method Not Allowed " + CRLF;
-    public static final String RESPONSE_500 = HTTP_VERSION + " 500 Server Error " + CRLF;
+    public static final String RESPONSE_500 = HTTP_VERSION + " 500 Internal Server Error " + CRLF;
     public static final String CONTENT_LENGTH_HEADER = "Content-Length: ";
     public static final String CORS_HEADERS = "Content-Security-Policy: default-src 'self'; base-uri 'self'; " +
             "font-src 'self' https:; frame-ancestors 'self'; img-src 'self' data:; object-src 'none'; " +
@@ -88,6 +88,10 @@ public class WebServer {
                     switch(uri) {
                         case "/" -> FileServer.serveFile(requestLine.method(), "index.html", output);
                         case "/login" -> FileServer.serveFile(requestLine.method(), "login.html", output);
+                        case "/civilians" -> FileServer.serveFile(requestLine.method(), "civilians.html", output);
+                        case "/officers" -> FileServer.serveFile(requestLine.method(), "officers.html", output);
+                        case "/callouts" -> FileServer.serveFile(requestLine.method(), "callouts.html", output);
+                        case "/manual" -> FileServer.serveFile(requestLine.method(), "manual.html", output);
                         default -> FileServer.serveFile(requestLine.method(), requestLine.uri(), output);
                     }
                 }
