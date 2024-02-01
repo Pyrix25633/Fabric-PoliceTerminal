@@ -23,7 +23,8 @@ document.getElementById('tabs').innerHTML = `
     <div class="tab container" id="tab-manual">
         <span class="title">Manual</span>
         <img class="icon" src="./img/manual.svg" alt="Manual Icon">
-    </div>`;
+    </div>
+`;
 
 for(const tab of tabs) {
     const div = document.getElementById('tab-' + tab);

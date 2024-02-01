@@ -32,3 +32,28 @@ div.tab.active {
 div.tab.active * {
     color: var(--color-foreground);
 }
+
+table {
+    border-collapse: collapse;
+}
+thead {
+    border-bottom: 2px solid var(--color-foreground);
+}
+tfoot {
+    border-top: 2px solid var(--color-foreground);
+}
+tr:nth-child(even) td {
+    background-color: var(--color-background);
+}
+td {
+    text-align: center;
+}
+
+input#page {
+    width: 50px;
+    padding-left: 1px;
+    text-align: center;
+}
+span#page-max {
+    margin-left: 0;
+}

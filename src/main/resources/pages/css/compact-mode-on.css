@@ -4,6 +4,7 @@ nav#navbar {
 nav#tabs {
     padding: 0 5px;
     width: calc(100vw - 10px);
+    margin-bottom: 20px;
 }
 div.navbar {
     padding: 10px;
@@ -57,33 +58,11 @@ div.panel {
     margin-right: 10px;
 }
 
-div.read, div.unread, div.online, div.offline {
-    right: 2px;
-}
-
-img.chat-logo, img.pfp, img#chat-logo {
-    margin-right: 2px;
-}
-
-div.chat, div.user, div#chats, div#users, div#chat-topbar, div.dpl {
-    padding: 2px;
-}
-div.chat:not(:first-child), div.user:not(:first-child) {
-    margin-top: 2px;
-}
-
-div.chat-settings, div.user-settings, div.user-actions, span.user-last-online, span.user-status {
-    margin-top: 1px !important;
-}
-
 button {
     padding: 2px 4px 2px 4px;
 }
 div.container > img.button:not(:first-child) {
     margin-left: 2px;
-}
-img#show-chats {
-    margin-right: 2px;
 }
 div.box > img.button:not(:first-child) {
     margin-top: 2px;
@@ -92,40 +71,15 @@ button img.button {
     margin-left: 2px;
 }
 
-div#messages {
-    padding: 2px;
-}
-div.message {
-    margin-left: 2px;
-}
-div.message-metas {
-    margin-left: 2px;
-}
-div.message:not(:first-child) {
+tr:not(:first-child){
     margin-top: 2px;
 }
-div.message-data {
-    margin-bottom: 2px;
-}
-span.message-text {
-    padding: 2px;
-}
-div.message-actions {
-    margin-top: 2px !important;
+th, td {
+    padding: 1px 2px;
 }
 
-div.load-more {
-    margin-bottom: 2px;
-}
-
-div#unread-messages {
-    width: calc(100% - 4px);
-    height: 15px;
-    margin: 0 2px 15px 2px;
-}
-div#unread-messages span {
-    line-height: 30px;
-    padding: 0 5px;
+label#page-label {
+    margin-left: 2px;
 }
 
 div#textarea {
@@ -136,36 +90,12 @@ textarea {
     padding: 2px;
 }
 
-div.show-sidebars {
-    margin-right: 2px;
-}
-div.textarea-extras {
-    margin-left: 2px;
-}
-
 span.char-counter {
     margin-top: 2px;
 }
 
-div#emoji-selector {
-    gap: 2px;
-    padding: 2px;
-}
-
-div.user-options {
-    margin-left: 2px;
-}
-
-img.status {
-    margin-left: 20px;
-}
-
 canvas {
     padding: 2px;
-}
-
-div.panel.status {
-    margin-top: 10px;
 }
 
 @media screen and (max-width: 850px) {

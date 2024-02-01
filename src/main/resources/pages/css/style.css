@@ -5,6 +5,7 @@
     --color-error: #F54F47;
     --color-warning: #F3E63D;
     --color-success: #71E0AE;
+    --color-null: #3b609b;
     --color-police: #FFEC58;
     --color-police-transparent: #08275970;
     --color-police-dark: #082759;
@@ -56,9 +57,11 @@ button {
     color: var(--color-background);
     font-weight: bold;
     align-items: center;
+    cursor: pointer;
 }
 img.button {
     height: 25px;
+    cursor: pointer;
 }
 input:focus {
     border-color: var(--color-police);
@@ -105,10 +108,10 @@ code {
     background-color: var(--color-police-transparent);
 }
 
-.error {
+.error, .false {
     color: var(--color-error) !important;
 }
-.warning, .warning * {
+.warning, .warning *, .pk {
     color: var(--color-warning);
     border-color: var(--color-warning);
 }
@@ -120,8 +123,11 @@ button.warning:active {
     background-color: var(--color-foreground);
     color: var(--color-warning);
 }
-.success {
+.success, .true {
     color: var(--color-success) !important;
+}
+.null {
+    color: var(--color-null);
 }
 
 nav#navbar {
