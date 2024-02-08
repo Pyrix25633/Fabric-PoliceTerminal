@@ -1,4 +1,4 @@
-const tabs = ['index', 'civilians', 'officers', 'callouts', 'manual'];
+const tabs = ['index', 'citizens', 'officers', 'callouts', 'manual'];
 
 const current = /^.*\/(.*)$/.exec(location.href)[1];
 
@@ -8,9 +8,9 @@ document.getElementById('tabs').innerHTML = `
         <span class="title foreground-color">TERMINAL</span>
         <img id="icon" src="./img/icon.svg" alt="Police Terminal Icon">
     </div>
-    <div class="tab container" id="tab-civilians">
-        <span class="title">Civilians</span>
-        <img class="icon" src="./img/civilians.svg" alt="Civilians Icon">
+    <div class="tab container" id="tab-citizens">
+        <span class="title">Citizens</span>
+        <img class="icon" src="./img/citizens.svg" alt="Citizens Icon">
     </div>
     <div class="tab container" id="tab-officers">
         <span class="title">Officers</span>

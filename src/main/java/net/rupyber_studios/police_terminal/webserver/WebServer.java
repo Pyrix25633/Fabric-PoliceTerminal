@@ -88,7 +88,7 @@ public class WebServer {
                     switch(uri) {
                         case "/" -> FileServer.serveFile(requestLine.method(), "index.html", output);
                         case "/login" -> FileServer.serveFile(requestLine.method(), "login.html", output);
-                        case "/civilians" -> FileServer.serveFile(requestLine.method(), "civilians.html", output);
+                        case "/citizens" -> FileServer.serveFile(requestLine.method(), "citizens.html", output);
                         case "/officers" -> FileServer.serveFile(requestLine.method(), "officers.html", output);
                         case "/callouts" -> FileServer.serveFile(requestLine.method(), "callouts.html", output);
                         case "/manual" -> FileServer.serveFile(requestLine.method(), "manual.html", output);
