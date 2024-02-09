@@ -157,4 +157,10 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("web")
     @Comment("The https certificate password, if invalid the server will default to http")
     public String httpsPassword = "";
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("web")
+    @Comment("The number of records per page displayed in tables")
+    @ConfigEntry.BoundedDiscrete(min = 5, max = 50)
+    public int recordsPerPage = 15;
 }

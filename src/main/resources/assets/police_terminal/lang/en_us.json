@@ -1,5 +1,5 @@
 {
-  "text.autoconfig.police_terminal.title": "Minebuck Currency Config",
+  "text.autoconfig.police_terminal.title": "Police Terminal Config",
 
   "text.autoconfig.police_terminal.category.default": "General",
   "text.autoconfig.police_terminal.option.hudShowCoordinates": "HUD Show Coordinates",
@@ -62,6 +62,8 @@
   "text.autoconfig.police_terminal.option.httpsCertificate.@Tooltip": "The https certificate path, §eif invalid the server will default to http",
   "text.autoconfig.police_terminal.option.httpsPassword": "HTTPS Certificate Password",
   "text.autoconfig.police_terminal.option.httpsPassword.@Tooltip": "The https certificate password, §eif invalid the server will default to http",
+  "text.autoconfig.police_terminal.option.recordsPerPage": "Records Per Page",
+  "text.autoconfig.police_terminal.option.recordsPerPage.@Tooltip": "The number of records per page displayed in tables",
 
   "text.hud.police_terminal.status": "Status: ",
   "text.hud.police_terminal.status.out_of_service": "§eOut Of Service",

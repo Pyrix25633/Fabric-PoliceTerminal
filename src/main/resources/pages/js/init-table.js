@@ -1,8 +1,10 @@
 const table = document.getElementById('table');
 
-export let pageFirstImg, pagePreviousImg;
-export let pageInput, pageTimer, pageMaxSpan;
-export let pageNextImg, pageLastImg;
+let pageFirstImg, pagePreviousImg;
+let pageInput, pageTimer, pageMaxSpan;
+let pageNextImg, pageLastImg;
+let handler;
+let firstListener, previousListener, nextListener, lastListener;
 
 export function initTable(headers) {
     const thead = document.createElement('thead');
@@ -41,7 +43,8 @@ export function initTable(headers) {
     return tbody;
 }
 
-export function setHandler(handler) {
+export function setHandler(h) {
+    handler = h;
     handler(0, handleFooter);
 
     pageInput.addEventListener('keyup', () => {
@@ -56,7 +59,7 @@ export function setHandler(handler) {
         pageTyped();
     });
     function pageTyped() {
-        handler(parseInt(pageInput.value), handleFooter);
+        handler(parseInt(pageInput.value) - 1, handleFooter);
     }
 }
 
@@ -68,10 +71,20 @@ function handleFooter(page, pages) {
     let nextPage = page + 1;
     if(nextPage > lastPage) nextPage = lastPage;
 
-    pageFirstImg.addEventListener('click', () => {handler(0, handleFooter)});
-    pagePreviousImg.addEventListener('click', () => {handler(previousPage, handleFooter)});
+    pageFirstImg.removeEventListener('click', firstListener);
+    pagePreviousImg.removeEventListener('click', previousListener);
+    pageNextImg.removeEventListener('click', nextListener);
+    pageLastImg.removeEventListener('click', lastListener);
+
+    firstListener = () => {handler(0, handleFooter)};
+    previousListener = () => {handler(previousPage, handleFooter)}
+    nextListener = () => {handler(nextPage, handleFooter)};
+    lastListener = () => {handler(lastPage, handleFooter)};
+
+    pageFirstImg.addEventListener('click', firstListener);
+    pagePreviousImg.addEventListener('click', lastListener);
     pageInput.value = page + 1;
     pageMaxSpan.innerText = pages;
-    pageNextImg.addEventListener('click', () => {handler(nextPage, handleFooter)});
-    pageLastImg.addEventListener('click', () => {handler(lastPage, handleFooter)});
+    pageNextImg.addEventListener('click', nextListener);
+    pageLastImg.addEventListener('click', lastListener);
 }

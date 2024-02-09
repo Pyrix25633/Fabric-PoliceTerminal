@@ -1,12 +1,15 @@
 package net.rupyber_studios.police_terminal.database;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.util.Credentials;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -168,6 +171,10 @@ public class DatabaseManager {
         statement.close();
     }
 
+    // --------------
+    // Query Language
+    // --------------
+
     public static @NotNull ArrayList<String> getAllOnlineCallsigns() throws SQLException {
         Statement statement = PoliceTerminal.connection.createStatement();
         ResultSet result = statement.executeQuery("SELECT callsign FROM players WHERE online=TRUE AND callsign IS NOT NULL;");
@@ -269,6 +276,32 @@ public class DatabaseManager {
         ResultSet result = preparedStatement.executeQuery();
         return result.next();
     }
+
+    public static int getCitizensPages() throws SQLException {
+        Statement statement = PoliceTerminal.connection.createStatement();
+        ResultSet result = statement.executeQuery("""
+                SELECT COUNT(*) AS records FROM players;""");
+        return (int)Math.ceil((double)result.getInt("records") / ModConfig.INSTANCE.recordsPerPage);
+    }
+
+    public static @NotNull JSONArray getCitizens(int page) throws SQLException {
+        Statement statement = PoliceTerminal.connection.createStatement();
+        ResultSet result = statement.executeQuery("SELECT uuid, username, online FROM players LIMIT " +
+                (page * ModConfig.INSTANCE.recordsPerPage) + ", " + ModConfig.INSTANCE.recordsPerPage);
+        JSONArray citizens = new JSONArray();
+        while(result.next()) {
+            JSONObject citizen = new JSONObject();
+            citizen.put("uuid", result.getString("uuid"));
+            citizen.put("username", result.getString("username"));
+            citizen.put("online", result.getBoolean("online"));
+            citizens.put(citizen);
+        }
+        return citizens;
+    }
+
+    // --------------------------
+    // Data Manipulation Language
+    // --------------------------
 
     public static void setPlayerStatus(@NotNull UUID player, @Nullable Status status) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""

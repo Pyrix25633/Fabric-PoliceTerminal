@@ -16,6 +16,14 @@ public class Exceptions {
         }
     }
 
+    public static int getInt(@NotNull JSONObject json, String key) throws BadRequestException {
+        try {
+            return json.getInt(key);
+        } catch(JSONException e) {
+            throw new BadRequestException();
+        }
+    }
+
     public static abstract class HttpException extends Exception {
         public abstract void sendError(OutputStream output) throws IOException;
     }

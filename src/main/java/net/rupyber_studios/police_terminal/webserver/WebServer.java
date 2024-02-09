@@ -1,6 +1,8 @@
 package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.webserver.api.CitizensApi;
+import net.rupyber_studios.police_terminal.webserver.api.UserApi;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jetbrains.annotations.Contract;
@@ -74,13 +76,14 @@ public class WebServer {
                 matcher = API_URI_PATTERN.matcher(uri);
                 if(matcher.find()) {
                     switch(matcher.group(1)) {
-                        case "/user/validate-token" -> ApiServer.validateToken(requestLine.method(),
+                        case "/user/validate-token" -> UserApi.validateToken(requestLine.method(),
                                 parseBody(input, headers), output);
-                        case "/user/callsign-login-feedback" -> ApiServer.callsignLoginFeedback(requestLine.method(),
+                        case "/user/callsign-login-feedback" -> UserApi.callsignLoginFeedback(requestLine.method(),
                                 parseQueryString(requestLine.uri()), output);
-                        case "/user/login" -> ApiServer.login(requestLine.method(), parseBody(input, headers), output);
-                        case "/user/get-settings" -> ApiServer.getSettings(requestLine.method(),
+                        case "/user/login" -> UserApi.login(requestLine.method(), parseBody(input, headers), output);
+                        case "/user/get-settings" -> UserApi.getSettings(requestLine.method(),
                                 parseBody(input, headers), output);
+                        case "/citizens/list" -> CitizensApi.list(requestLine.method(), parseBody(input, headers), output);
                         default -> FileServer.serveFile("GET", "/404", output);
                     }
                 }
