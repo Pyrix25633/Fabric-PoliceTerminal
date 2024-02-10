@@ -7,7 +7,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
+import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,7 @@ public class TerminalCommand {
             ServerPlayerEntity player = source.getPlayer();
             if(player == null) return false;
             try {
-                PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
+                PlayerInfo info = DatabaseSelector.getPlayerInfo(player.getUuid());
                 return info.rank != null && info.callsign != null;
             } catch(SQLException e) {
                 return false;
@@ -34,8 +35,8 @@ public class TerminalCommand {
             ServerPlayerEntity player = context.getSource().getPlayer();
             if(player == null) return 0;
             try {
-                String callsign = DatabaseManager.getPlayerCallsign(player.getUuid());
-                String password = DatabaseManager.initPlayerPassword(player.getUuid());
+                String callsign = DatabaseSelector.getPlayerCallsign(player.getUuid());
+                String password = DatabaseUpdater.initPlayerPassword(player.getUuid());
                 Text feedback = TERMINAL_CREDENTIALS_TEXT.copy().append("\n")
                         .append(CALLSIGN_TEXT).append("§9" + callsign + "§r\n")
                         .append(PASSWORD_TEXT).append("§5" + password);

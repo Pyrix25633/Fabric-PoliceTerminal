@@ -64,8 +64,24 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("duty")
     @Comment("The list of ranks used in the duty system, id and rank must be unique [do not use 0 as Java cannot be distinguish it from NULL (civilian)!], highers ones are higher in the chain of command")
     public List<Rank> ranks = List.of(
-            new Rank(10, "Officer", 0x5555FF),
-            new Rank(5, "Rookie", 0x55FFFF)
+            new Rank(70, "Chief", 0xFF6347),
+            new Rank(60, "Assistant Chief", 0xFFA07A),
+            new Rank(50, "Deputy Chief", 0xFFD700),
+            new Rank(40, "Commander", 0x6495ED),
+            new Rank(33, "Captain III", 0x87CEFA),
+            new Rank(32, "Captain II", 0x00CED1),
+            new Rank(31, "Captain I", 0x4682B4),
+            new Rank(22, "Lieutenant II", 0x20B2AA),
+            new Rank(21, "Lieutenant I", 0x2E8B57),
+            new Rank(15, "Detective III", 0xDC143C),
+            new Rank(14, "Sergeant II", 0x8B4513),
+            new Rank(13, "Detective II", 0xCD853F),
+            new Rank(12, "Sergeant I", 0x008000),
+            new Rank(11, "Detective I", 0x6B8E23),
+            new Rank(4, "Officer III+1", 0x00FA9A),
+            new Rank(3, "Officer III", 0x3CB371),
+            new Rank(2, "Officer II", 0x00FF7F),
+            new Rank(1, "Officer I", 0x66CDAA)
     );
 
     @ConfigEntry.Gui.Tooltip
@@ -86,44 +102,44 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
     @Comment("If true callsigns like 7-Adam-22 will be used")
-    public boolean callsignNumberLetterNumber = true;
+    public boolean callsignAreaUnitBeat = true;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
     @Comment("If true callsigns like 20-David will be used")
-    public boolean callsignNumberLetter = true;
+    public boolean callsignBeatUnit = true;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
     @Comment("If true callsigns like Sam-81 will be used")
-    public boolean callsignLetterNumber = true;
+    public boolean callsignUnitBeat = false;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The minimum for the first number that is $-Adam-22 and $-David")
-    public int callsignFirstNumberMin = 1;
+    @Comment("The minimum for the area number that is $-Adam-22")
+    public int callsignAreaMin = 1;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The maximum for the first number that is $-Adam-22 and $-David")
-    public int callsignFirstNumberMax = 99;
+    @Comment("The maximum for the area number that is $-Adam-22")
+    public int callsignAreaMax = 99;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The minimum for the second number that is 7-Adam-$ and Sam-$")
-    public int callsignSecondNumberMin = 1;
+    @Comment("The minimum for the beat number that is 7-Adam-$, $-David and Sam-$")
+    public int callsignBeatMin = 1;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The maximum for the second number that is 7-Adam-$ and Sam-$")
-    public int callsignSecondNumberMax = 199;
+    @Comment("The maximum for the beat number that is 7-Adam-$, $-David and Sam-$")
+    public int callsignBeatMax = 199;
 
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.Category("duty")
-    @Comment("The letters used in callsigns that are 7-$-22, 20-$ and $-81")
-    public List<String> callsignLetters = List.of(
-            "Adam", "Boy", "Charles", "David", "Edward", "Frank", "George", "Henry", "Ida", "John", "King", "Lincoln", "Mary",
-            "Nora", "Ocean", "Paul", "Queen", "Robert", "Sam", "Tom", "Union", "Victor", "William", "X-Ray", "Young", "Zebra"
+    @Comment("The unit letters used in callsigns that are 7-$-22, 20-$ and $-81")
+    public List<String> callsignUnits = List.of(
+            "Adam", "Charles", "David", "Edward", "George",
+            "Lincoln", "Mary", "Nora", "Ocean", "Robert", "Tom", "William"
     );
 
     @ConfigEntry.Gui.Tooltip

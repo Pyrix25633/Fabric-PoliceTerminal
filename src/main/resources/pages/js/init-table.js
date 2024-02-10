@@ -6,33 +6,48 @@ let pageNextImg, pageLastImg;
 let handler;
 let firstListener, previousListener, nextListener, lastListener;
 
-export function initTable(headers) {
+export function initTable(groups, headers) {
     const thead = document.createElement('thead');
-    const theadRow = document.createElement('tr');
+    if(groups != null) {
+        const groupsTr = document.createElement('tr');
+        for(const group of groups) {
+            const th = document.createElement('th');
+            if(group.length != 0) {
+                th.innerText = group[0];
+                th.colSpan = group[1];
+                th.classList.add('group');
+            }
+            groupsTr.appendChild(th);
+        }
+        thead.appendChild(groupsTr);
+    }
+    
+    const headersTr = document.createElement('tr');
     for(const header of headers) {
         const th = document.createElement('th');
         th.innerText = header;
-        theadRow.appendChild(th);
+        headersTr.appendChild(th);
     }
-    thead.appendChild(theadRow);
+    thead.appendChild(headersTr);
     table.appendChild(thead);
     const tbody = document.createElement('tbody');
     table.appendChild(tbody);
     const tfoot = document.createElement('tfoot');
-    tfoot.innerHTML = `
-        <tr>
-            <td colspan="3">
-                <div class="container">
-                    <img src="./img/page-first.svg" alt="Page First Icon" class="button" id="page-first">
-                    <img src="./img/page-previous.svg" alt="Page Previous Icon" class="button" id="page-previous">
-                    <label for="page" id="page-label">Page</label>
-                    <input type="text" id="page"> / <span id="page-max">8</span>
-                    <img src="./img/page-next.svg" alt="Page Next Icon" class="button" id="page-next">
-                    <img src="./img/page-last.svg" alt="Page Last Icon" class="button" id="page-last">
-                </div>
-            </td>
-        </tr>
+    const footerTr = document.createElement('tr');
+    const footerTd = document.createElement('td');
+    footerTd.colSpan = headers.length;
+    footerTd.innerHTML = `
+        <div class="container">
+            <img src="./img/page-first.svg" alt="Page First Icon" class="button" id="page-first">
+            <img src="./img/page-previous.svg" alt="Page Previous Icon" class="button" id="page-previous">
+            <label for="page" id="page-label">Page</label>
+            <input type="text" id="page"> / <span id="page-max">8</span>
+            <img src="./img/page-next.svg" alt="Page Next Icon" class="button" id="page-next">
+            <img src="./img/page-last.svg" alt="Page Last Icon" class="button" id="page-last">
+        </div>
     `;
+    footerTr.appendChild(footerTd);
+    tfoot.appendChild(footerTr);
     table.appendChild(tfoot);
     pageFirstImg = document.getElementById('page-first');
     pagePreviousImg = document.getElementById('page-previous');
@@ -82,7 +97,7 @@ function handleFooter(page, pages) {
     lastListener = () => {handler(lastPage, handleFooter)};
 
     pageFirstImg.addEventListener('click', firstListener);
-    pagePreviousImg.addEventListener('click', lastListener);
+    pagePreviousImg.addEventListener('click', previousListener);
     pageInput.value = page + 1;
     pageMaxSpan.innerText = pages;
     pageNextImg.addEventListener('click', nextListener);

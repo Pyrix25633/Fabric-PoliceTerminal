@@ -1,11 +1,12 @@
 :root {
     --color-background: #182128;
-    --color-lighter: #26323c;
+    --color-lighter: #26323C;
     --color-foreground: #DDDDDD;
     --color-error: #F54F47;
     --color-warning: #F3E63D;
     --color-success: #71E0AE;
-    --color-null: #3b609b;
+    --color-null: #3B609B;
+    --color-callsign: #5555FF;
     --color-police: #FFEC58;
     --color-police-transparent: #08275970;
     --color-police-dark: #082759;
@@ -128,6 +129,9 @@ button.warning:active {
 }
 .null {
     color: var(--color-null);
+}
+.callsign {
+    color: var(--color-callsign);
 }
 
 nav#navbar {

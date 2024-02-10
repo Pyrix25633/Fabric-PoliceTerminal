@@ -11,7 +11,8 @@ import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
+import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.networking.packet.SendRankS2CPacket;
 import net.rupyber_studios.police_terminal.networking.packet.SendStatusS2CPacket;
 import net.rupyber_studios.police_terminal.util.Rank;
@@ -37,7 +38,7 @@ public class RankCommand {
             try {
                 ServerPlayerEntity player = source.getPlayer();
                 if(player == null) return true;
-                Rank rank = DatabaseManager.getPlayerRank(source.getPlayer().getUuid());
+                Rank rank = DatabaseSelector.getPlayerRank(source.getPlayer().getUuid());
                 return (rank != null && rank.id >= ModConfig.INSTANCE.minimumRankIdForRankCommand) || source.hasPermissionLevel(4);
             } catch(Exception ignored) {
                 return false;
@@ -49,14 +50,14 @@ public class RankCommand {
                     ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
                     Rank playerRank;
                     try {
-                        playerRank = DatabaseManager.getPlayerRank(player.getUuid());
+                        playerRank = DatabaseSelector.getPlayerRank(player.getUuid());
                     } catch(SQLException e) {
                         PoliceTerminal.LOGGER.error("Could not get player rank: ", e);
                         return 0;
                     }
                     if(!ModConfig.INSTANCE.officerCanGrantRankHigherThanHis && dispatchingPlayer != null) {
                         try {
-                            Rank dispatchingPlayerRank = DatabaseManager.getPlayerRank(dispatchingPlayer.getUuid());
+                            Rank dispatchingPlayerRank = DatabaseSelector.getPlayerRank(dispatchingPlayer.getUuid());
                             if(!dispatchingPlayer.hasPermissionLevel(4)) {
                                 if(dispatchingPlayerRank == null) return 0;
                                 if(rank.id > dispatchingPlayerRank.id) return 0;
@@ -67,9 +68,9 @@ public class RankCommand {
                         }
                     }
                     try {
-                        DatabaseManager.setPlayerRank(player.getUuid(), rank);
-                        if(DatabaseManager.getPlayerStatus(player.getUuid()) == null) {
-                            DatabaseManager.setPlayerStatus(player.getUuid(), Status.OUT_OF_SERVICE);
+                        DatabaseUpdater.setPlayerRank(player.getUuid(), rank);
+                        if(DatabaseSelector.getPlayerStatus(player.getUuid()) == null) {
+                            DatabaseUpdater.setPlayerStatus(player.getUuid(), Status.OUT_OF_SERVICE);
                             SendStatusS2CPacket.send(player, Status.OUT_OF_SERVICE);
                         }
                         SendRankS2CPacket.send(player, rank);
@@ -99,14 +100,14 @@ public class RankCommand {
                     ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
                     Rank playerRank;
                     try {
-                        playerRank = DatabaseManager.getPlayerRank(player.getUuid());
+                        playerRank = DatabaseSelector.getPlayerRank(player.getUuid());
                     } catch(SQLException e) {
                         PoliceTerminal.LOGGER.error("Could not get player rank: ", e);
                         return 0;
                     }
                     if(!ModConfig.INSTANCE.officerCanGrantRankHigherThanHis && dispatchingPlayer != null) {
                         try {
-                            Rank dispatchingPlayerRank = DatabaseManager.getPlayerRank(dispatchingPlayer.getUuid());
+                            Rank dispatchingPlayerRank = DatabaseSelector.getPlayerRank(dispatchingPlayer.getUuid());
                             if(!dispatchingPlayer.hasPermissionLevel(4)) {
                                 if(dispatchingPlayerRank == null) return 0;
                                 if(playerRank != null && playerRank.id >= dispatchingPlayerRank.id) return 0;
@@ -116,8 +117,8 @@ public class RankCommand {
                         }
                     }
                     try {
-                        DatabaseManager.setPlayerRank(player.getUuid(), null);
-                        DatabaseManager.setPlayerStatus(player.getUuid(), null);
+                        DatabaseUpdater.setPlayerRank(player.getUuid(), null);
+                        DatabaseUpdater.setPlayerStatus(player.getUuid(), null);
                         SendStatusS2CPacket.send(player, null);
                         SendRankS2CPacket.send(player, null);
                         context.getSource().getServer().getCommandManager().sendCommandTree(player);

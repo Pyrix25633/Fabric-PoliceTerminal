@@ -8,7 +8,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import net.rupyber_studios.police_terminal.util.Rank;
@@ -19,7 +19,7 @@ public class SyncPlayerInfoS2CPacket {
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
         try {
-            PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
+            PlayerInfo info = DatabaseSelector.getPlayerInfo(player.getUuid());
             data.writeInt(info.status != null ? info.status.getId() : 0);
             data.writeInt(info.rank != null ? info.rank.id : 0);
             data.writeString(info.callsign != null ? info.callsign : "");

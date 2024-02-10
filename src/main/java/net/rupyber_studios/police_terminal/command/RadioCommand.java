@@ -9,7 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ public class RadioCommand {
         dispatcher.register(CommandManager.literal("radio").requires((source) -> {
             try {
                 if(source.getPlayer() == null) return false;
-                return DatabaseManager.getPlayerCallsign(source.getPlayer().getUuid()) != null;
+                return DatabaseSelector.getPlayerCallsign(source.getPlayer().getUuid()) != null;
             } catch(SQLException e) {
                 return false;
             }
@@ -37,8 +37,8 @@ public class RadioCommand {
                             String callsign = context.getArgument("callsign", String.class);
                             Text message = MessageArgumentType.getMessage(context, "message");
                             try {
-                                String dispatchingPlayerCallsign = DatabaseManager.getPlayerCallsign(dispatchingPlayer.getUuid());
-                                UUID playerUuid = DatabaseManager.getPlayerUuidFromCallsign(callsign);
+                                String dispatchingPlayerCallsign = DatabaseSelector.getPlayerCallsign(dispatchingPlayer.getUuid());
+                                UUID playerUuid = DatabaseSelector.getPlayerUuidFromCallsign(callsign);
                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
                                 if(player == null) return 0;
                                 Text feedback = RADIO_TEXT.copy().append("(§9" + dispatchingPlayerCallsign + "§r")

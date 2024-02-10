@@ -1,7 +1,8 @@
 package net.rupyber_studios.police_terminal.webserver.api;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
+import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.webserver.ApiServer;
 import net.rupyber_studios.police_terminal.webserver.Exceptions;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
@@ -29,7 +30,7 @@ public class UserApi {
             UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
             String token = Exceptions.getString(request, "token");
             JSONObject response = new JSONObject();
-            response.put("valid", DatabaseManager.isPlayerTokenCorrect(player, token));
+            response.put("valid", DatabaseSelector.isPlayerTokenCorrect(player, token));
             ApiServer.sendJsonResponse(response, output);
         } catch(Exceptions.HttpException e) {
             e.sendError(output);
@@ -53,7 +54,7 @@ public class UserApi {
         try {
             JSONObject response = new JSONObject();
             String feedback;
-            if(DatabaseManager.isCallsignInUse(callsign))
+            if(DatabaseSelector.isCallsignInUse(callsign))
                 feedback = "Valid Callsign";
             else
                 feedback = "Callsign does not exist!";
@@ -77,13 +78,13 @@ public class UserApi {
         try {
             JSONObject request = new JSONObject(body);
             String callsign = Exceptions.getString(request, "callsign");
-            UUID player = DatabaseManager.getPlayerUuidFromCallsign(callsign);
+            UUID player = DatabaseSelector.getPlayerUuidFromCallsign(callsign);
             if(player == null) throw new Exceptions.NotFoundException();
             String password = Exceptions.getString(request, "password");
-            if(DatabaseManager.isPlayerPasswordCorrect(player, password)) {
+            if(DatabaseSelector.isPlayerPasswordCorrect(player, password)) {
                 JSONObject response = new JSONObject();
                 response.put("uuid", player.toString());
-                response.put("token", DatabaseManager.initPlayerToken(player));
+                response.put("token", DatabaseUpdater.initPlayerToken(player));
                 ApiServer.sendJsonResponse(response, output);
             }
             else
@@ -110,18 +111,18 @@ public class UserApi {
             UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
             String token = Exceptions.getString(request, "token");
             if(!isTokenValid(player, token)) throw new Exceptions.UnauthorizedException();
-            ApiServer.sendJsonResponse(Objects.requireNonNull(DatabaseManager.getPlayerSettings(player)), output);
+            ApiServer.sendJsonResponse(Objects.requireNonNull(DatabaseSelector.getPlayerSettings(player)), output);
         } catch(Exceptions.HttpException e) {
             e.sendError(output);
         } catch(Exception e) {
             WebServer.send500(output);
-            PoliceTerminal.LOGGER.error("Login error: ", e);
+            PoliceTerminal.LOGGER.error("Get settings error: ", e);
         }
     }
 
     public static boolean isTokenValid(UUID player, String token) {
         try {
-            return DatabaseManager.isPlayerTokenCorrect(player, token);
+            return DatabaseSelector.isPlayerTokenCorrect(player, token);
         } catch(Exception e) {
             return false;
         }

@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ public class OnlineCallsignArgumentType implements ArgumentType<String> {
 
     public static void init() {
         try {
-            values = DatabaseManager.getAllOnlineCallsigns();
+            values = DatabaseSelector.getAllOnlineCallsigns();
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not list all online callsigns: ", e);
         }

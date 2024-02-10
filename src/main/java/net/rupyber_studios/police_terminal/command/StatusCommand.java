@@ -9,7 +9,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.StatusArgumentType;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
+import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.networking.packet.SendStatusS2CPacket;
 import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
@@ -27,7 +28,7 @@ public class StatusCommand {
             try {
                 ServerPlayerEntity player = source.getPlayer();
                 if(player == null) return false;
-                Rank rank = DatabaseManager.getPlayerRank(player.getUuid());
+                Rank rank = DatabaseSelector.getPlayerRank(player.getUuid());
                 return rank != null;
             } catch(Exception ignored) {
                 return false;
@@ -37,7 +38,7 @@ public class StatusCommand {
             ServerPlayerEntity player = context.getSource().getPlayer();
             if(player == null) return 0;
             try {
-                DatabaseManager.setPlayerStatus(player.getUuid(), status);
+                DatabaseUpdater.setPlayerStatus(player.getUuid(), status);
                 SendStatusS2CPacket.send(player, status);
                 MutableText feedback = STATUS_SET_TO_TEXT.copy().append(status.getText());
                 context.getSource().sendFeedback(() -> feedback, false);

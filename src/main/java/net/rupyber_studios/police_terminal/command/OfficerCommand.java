@@ -8,7 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
+import net.rupyber_studios.police_terminal.database.DatabaseSelector;
 import net.rupyber_studios.police_terminal.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ public class OfficerCommand {
                 .executes((context) -> {
                     ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
                     try {
-                        PlayerInfo info = DatabaseManager.getPlayerInfo(player.getUuid());
+                        PlayerInfo info = DatabaseSelector.getPlayerInfo(player.getUuid());
                         Text feedback;
                         if(info.rank != null && info.status != null)
                             feedback = OFFICER_TEXT.copy().append(player.getGameProfile().getName()).append(":")

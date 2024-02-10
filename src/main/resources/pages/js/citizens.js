@@ -1,7 +1,7 @@
 import { initTable, setHandler } from "./init-table.js";
 import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js";
 
-const citizens = initTable(['UUID', 'Username', 'Online']);
+const citizens = initTable(null, ['UUID', 'Username', 'Online']);
 
 let settings;
 
@@ -11,7 +11,7 @@ loadSettings((sett) => {
 
 setHandler((page, handleFooter) => {
     $.ajax({
-        url: '/api/citizens/list',
+        url: '/api/citizen/list',
         method: 'POST',
         data: JSON.stringify({
             uuid: cachedLogin.uuid,

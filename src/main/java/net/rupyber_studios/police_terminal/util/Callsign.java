@@ -15,62 +15,62 @@ public class Callsign {
 
     public static String createRandomCallsign() {
         ArrayList<String> types = new ArrayList<>();
-        if(ModConfig.INSTANCE.callsignNumberLetter) types.add("N-L");
-        if(ModConfig.INSTANCE.callsignLetterNumber) types.add("L-N");
-        if(ModConfig.INSTANCE.callsignNumberLetterNumber || types.isEmpty()) types.add("N-L-N");
+        if(ModConfig.INSTANCE.callsignBeatUnit) types.add("B-U");
+        if(ModConfig.INSTANCE.callsignUnitBeat) types.add("U-B");
+        if(ModConfig.INSTANCE.callsignAreaUnitBeat || types.isEmpty()) types.add("A-U-B");
         short index = (short)(RANDOM.nextInt(0, types.size()));
-        int firstNumber = RANDOM.nextInt(ModConfig.INSTANCE.callsignFirstNumberMin, ModConfig.INSTANCE.callsignFirstNumberMax + 1);
-        short letterIndex = (short)(RANDOM.nextInt(0, ModConfig.INSTANCE.callsignLetters.size()));
-        int secondNumber = RANDOM.nextInt(ModConfig.INSTANCE.callsignSecondNumberMin, ModConfig.INSTANCE.callsignSecondNumberMax + 1);
+        int area = RANDOM.nextInt(ModConfig.INSTANCE.callsignAreaMin, ModConfig.INSTANCE.callsignAreaMax + 1);
+        short unitIndex = (short)(RANDOM.nextInt(0, ModConfig.INSTANCE.callsignUnits.size()));
+        int beat = RANDOM.nextInt(ModConfig.INSTANCE.callsignBeatMin, ModConfig.INSTANCE.callsignBeatMax + 1);
         return switch(types.get(index)) {
-            case "N-L" -> firstNumber + "-" + ModConfig.INSTANCE.callsignLetters.get(letterIndex);
-            case "L-N" -> ModConfig.INSTANCE.callsignLetters.get(letterIndex) + "-" + secondNumber;
-            default -> firstNumber + "-" + ModConfig.INSTANCE.callsignLetters.get(letterIndex) + "-" + secondNumber;
+            case "B-U" -> beat + "-" + ModConfig.INSTANCE.callsignUnits.get(unitIndex);
+            case "U-B" -> ModConfig.INSTANCE.callsignUnits.get(unitIndex) + "-" + beat;
+            default -> area + "-" + ModConfig.INSTANCE.callsignUnits.get(unitIndex) + "-" + beat;
         };
     }
 
     public static boolean isValid(String callsign) {
         Matcher matcher = NUMBER_LETTER_NUMBER_PATTERN.matcher(callsign);
         if(matcher.find()) {
-            int firstNumber = Integer.parseInt(matcher.group(1));
-            if(firstNumber < ModConfig.INSTANCE.callsignFirstNumberMin || firstNumber > ModConfig.INSTANCE.callsignFirstNumberMax)
+            int area = Integer.parseInt(matcher.group(1));
+            if(area < ModConfig.INSTANCE.callsignAreaMin || area > ModConfig.INSTANCE.callsignAreaMax)
                 return false;
 
-            String letter = matcher.group(2);
-            if(!ModConfig.INSTANCE.callsignLetters.contains(letter))
+            String unit = matcher.group(2);
+            if(!ModConfig.INSTANCE.callsignUnits.contains(unit))
                 return false;
 
-            int secondNumber = Integer.parseInt(matcher.group(3));
-            if(secondNumber < ModConfig.INSTANCE.callsignSecondNumberMin || secondNumber > ModConfig.INSTANCE.callsignSecondNumberMax)
+            int beat = Integer.parseInt(matcher.group(3));
+            if(beat < ModConfig.INSTANCE.callsignBeatMin || beat > ModConfig.INSTANCE.callsignBeatMax)
                 return false;
 
-            return ModConfig.INSTANCE.callsignNumberLetterNumber;
+            return ModConfig.INSTANCE.callsignAreaUnitBeat;
         }
 
         matcher = NUMBER_LETTER_PATTERN.matcher(callsign);
         if(matcher.find()) {
-            int firstNumber = Integer.parseInt(matcher.group(1));
-            if(firstNumber < ModConfig.INSTANCE.callsignFirstNumberMin || firstNumber > ModConfig.INSTANCE.callsignFirstNumberMax)
+            int beat = Integer.parseInt(matcher.group(1));
+            if(beat < ModConfig.INSTANCE.callsignBeatMin || beat > ModConfig.INSTANCE.callsignBeatMax)
                 return false;
 
-            String letter = matcher.group(2);
-            if(!ModConfig.INSTANCE.callsignLetters.contains(letter))
+            String unit = matcher.group(2);
+            if(!ModConfig.INSTANCE.callsignUnits.contains(unit))
                 return false;
 
-            return ModConfig.INSTANCE.callsignNumberLetter;
+            return ModConfig.INSTANCE.callsignBeatUnit;
         }
 
         matcher = LETTER_NUMBER_PATTERN.matcher(callsign);
         if(matcher.find()) {
-            String letter = matcher.group(1);
-            if(!ModConfig.INSTANCE.callsignLetters.contains(letter))
+            String unit = matcher.group(1);
+            if(!ModConfig.INSTANCE.callsignUnits.contains(unit))
                 return false;
 
-            int secondNumber = Integer.parseInt(matcher.group(2));
-            if(secondNumber < ModConfig.INSTANCE.callsignSecondNumberMin || secondNumber > ModConfig.INSTANCE.callsignSecondNumberMax)
+            int beat = Integer.parseInt(matcher.group(2));
+            if(beat < ModConfig.INSTANCE.callsignBeatMin || beat > ModConfig.INSTANCE.callsignBeatMax)
                 return false;
 
-            return ModConfig.INSTANCE.callsignLetterNumber;
+            return ModConfig.INSTANCE.callsignUnitBeat;
         }
 
         return false;
