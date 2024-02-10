@@ -108,7 +108,6 @@ function passwordTyped() {
         passwordFeedbackSpan.classList.replace('success', 'error');
         validPassword = false;
         loginButton.disabled = true;
-        console.log("1");
         return;
     }
     let digits = 0, symbols = 0;
@@ -130,7 +129,6 @@ function passwordTyped() {
         passwordFeedbackSpan.classList.replace('success', 'error');
         validPassword = false;
         loginButton.disabled = true;
-        console.log("3");
     }
     else {
         passwordFeedbackSpan.innerText = 'Valid Password'

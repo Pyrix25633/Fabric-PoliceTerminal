@@ -27,6 +27,7 @@ setHandler((page, handleFooter) => {
             handleFooter(page, res.pages);
             officers.innerHTML = '';
             for(const officer of res.officers) {
+                officers.style.display = 'none';
                 const tr = document.createElement('tr');
                 const uuidTd = document.createElement('td');
                 uuidTd.innerText = officer.uuid;
@@ -65,6 +66,7 @@ setHandler((page, handleFooter) => {
                 tr.appendChild(callsignReservedTd);
                 officers.appendChild(tr);
             }
+            officers.style.display = '';
         },
         statusCode: statusCodeActions
     });

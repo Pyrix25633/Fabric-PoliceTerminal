@@ -102,4 +102,9 @@ function handleFooter(page, pages) {
     pageMaxSpan.innerText = pages;
     pageNextImg.addEventListener('click', nextListener);
     pageLastImg.addEventListener('click', lastListener);
+    // Fix for weird FireFox rendering bug
+    $('#table').hide();
+    setTimeout(function() {
+        $('#table').show();
+    }, 0);
 }
