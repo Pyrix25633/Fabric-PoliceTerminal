@@ -3,31 +3,39 @@ import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js
 import { setColor } from "./util.js";
 
 const officers = initTable(
-    [[], [], [], [], [], ['Callsign', 2]],
-    ['UUID', 'Username', 'Online', 'Status', 'Rank', 'Callsign', 'Reserved']
+    [{}, {}, {}, {}, {}, {text: 'Callsign', colspan: 2}],
+    [
+        {text: 'UUID', order: 'uuid', search: 'uuid'},
+        {text: 'Username', order: 'username', search: 'username'},
+        {text: 'Online', order: 'online', search: 'online'},
+        {text: 'Status', order: 'status', search: 'status'},
+        {text: 'Rank', order: 'rankId', search: 'rank'},
+        {text: 'Callsign', order: 'callsign', search: 'callsign'},
+        {text: 'Reserved', order: 'callsignReserved', search: 'callsignReserved'}
+    ]
 );
 
 let settings;
 
 loadSettings((sett) => {
     settings = sett;
+    setHandler(handler);
 }, true);
 
-setHandler((page, handleFooter) => {
+function handler(page, order, handleHeader, handleFooter) {
     $.ajax({
         url: '/api/officer/list',
         method: 'POST',
         data: JSON.stringify({
             uuid: cachedLogin.uuid,
             token: cachedLogin.token,
-            page: page
+            page: page,
+            order: order
         }),
         contentType: 'application/json',
         success: (res) => {
-            handleFooter(page, res.pages);
             officers.innerHTML = '';
             for(const officer of res.officers) {
-                officers.style.display = 'none';
                 const tr = document.createElement('tr');
                 const uuidTd = document.createElement('td');
                 uuidTd.innerText = officer.uuid;
@@ -66,8 +74,9 @@ setHandler((page, handleFooter) => {
                 tr.appendChild(callsignReservedTd);
                 officers.appendChild(tr);
             }
-            officers.style.display = '';
+            handleHeader(order);
+            handleFooter(page, res.pages);
         },
         statusCode: statusCodeActions
     });
-});
+}

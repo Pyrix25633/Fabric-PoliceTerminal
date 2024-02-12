@@ -99,7 +99,7 @@ public class WebServer {
     }
 
     public static void send400(@NotNull OutputStream output) throws IOException {
-        output.write((RESPONSE_400 + CRLF + getContentLengthHeader("".getBytes())).getBytes());
+        sendError(RESPONSE_400, output);
     }
 
     public static void send400AndClose(@NotNull InputStream input, @NotNull OutputStream output,
@@ -111,19 +111,23 @@ public class WebServer {
     }
 
     public static void send401(@NotNull OutputStream output) throws IOException {
-        output.write((RESPONSE_401 + CRLF + getContentLengthHeader("".getBytes())).getBytes());
+        sendError(RESPONSE_401, output);
     }
 
     public static void send404(@NotNull OutputStream output) throws IOException {
-        output.write((RESPONSE_404 + CRLF + getContentLengthHeader("".getBytes())).getBytes());
+        sendError(RESPONSE_404, output);
     }
 
     public static void send405(@NotNull OutputStream output) throws IOException {
-        output.write((RESPONSE_405 + CRLF + getContentLengthHeader("".getBytes())).getBytes());
+        sendError(RESPONSE_405, output);
     }
 
     public static void send500(@NotNull OutputStream output) throws IOException {
-        output.write((RESPONSE_500 + CRLF + getContentLengthHeader("".getBytes())).getBytes());
+        sendError(RESPONSE_500, output);
+    }
+
+    public static void sendError(String error, @NotNull OutputStream output) throws IOException {
+        output.write((error + getContentLengthHeader("".getBytes()) + CRLF).getBytes());
     }
 
     public static @Nullable RequestLine parseRequestLine(@NotNull InputStream input) throws IOException {

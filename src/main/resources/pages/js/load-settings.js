@@ -24,8 +24,6 @@ export const statusCodeActions = {
     }
 };
 
-let settings;
-
 export function loadSettings(callback, whenFinished) {
     if(cachedLogin == null || cachedLogin.uuid == undefined || cachedLogin.token == undefined)
         window.location.href = '/login';

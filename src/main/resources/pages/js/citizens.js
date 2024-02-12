@@ -1,7 +1,11 @@
 import { initTable, setHandler } from "./init-table.js";
 import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js";
 
-const citizens = initTable(null, ['UUID', 'Username', 'Online']);
+const citizens = initTable(null, [
+    {text: 'UUID', order: 'uuid', search: 'uuid'},
+    {text: 'Username', order: 'username', search: 'username'},
+    {text: 'Online', order: 'online', search: 'online'}
+]);
 
 let settings;
 
@@ -9,17 +13,19 @@ loadSettings((sett) => {
     settings = sett;
 }, true);
 
-setHandler((page, handleFooter) => {
+setHandler((page, order, handleHeader, handleFooter) => {
     $.ajax({
         url: '/api/citizen/list',
         method: 'POST',
         data: JSON.stringify({
             uuid: cachedLogin.uuid,
             token: cachedLogin.token,
-            page: page
+            page: page,
+            order: order
         }),
         contentType: 'application/json',
         success: (res) => {
+            handleHeader(order);
             handleFooter(page, res.pages);
             citizens.innerHTML = '';
             for(const citizen of res.citizens) {

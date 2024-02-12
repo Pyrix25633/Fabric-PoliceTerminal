@@ -151,11 +151,14 @@ public class DatabaseSelector {
         return (int)Math.ceil((double)result.getInt("records") / ModConfig.INSTANCE.recordsPerPage);
     }
 
-    public static @NotNull JSONArray getCitizens(int page) throws SQLException {
+    public static @NotNull JSONArray getCitizens(int page, String orderField, boolean orderAscending) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
                 SELECT uuid, username, online
                 FROM players
-                LIMIT ?, ?;""");
+                ORDER BY #1 #2
+                LIMIT ?, ?;"""
+                .replace("#1", orderField)
+                .replace("#2", orderAscending ? "ASC" : "DESC"));
         preparedStatement.setInt(1, page * ModConfig.INSTANCE.recordsPerPage);
         preparedStatement.setInt(2, ModConfig.INSTANCE.recordsPerPage);
         ResultSet result = preparedStatement.executeQuery();
@@ -177,13 +180,16 @@ public class DatabaseSelector {
         return (int)Math.ceil((double)result.getInt("records") / ModConfig.INSTANCE.recordsPerPage);
     }
 
-    public static @NotNull JSONArray getOfficers(int page) throws SQLException {
+    public static @NotNull JSONArray getOfficers(int page, String orderField, boolean orderAscending) throws SQLException {
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
                 SELECT uuid, username, online, status, rank, r.color AS rankColor, callsign, callsignReserved
                 FROM players AS p
                 INNER JOIN ranks AS r
                 ON p.rankId=r.id
-                LIMIT ?, ?;""");
+                ORDER BY #1 #2
+                LIMIT ?, ?;"""
+                .replace("#1", orderField)
+                .replace("#2", orderAscending ? "ASC" : "DESC"));
         preparedStatement.setInt(1, page * ModConfig.INSTANCE.recordsPerPage);
         preparedStatement.setInt(2, ModConfig.INSTANCE.recordsPerPage);
         ResultSet result = preparedStatement.executeQuery();

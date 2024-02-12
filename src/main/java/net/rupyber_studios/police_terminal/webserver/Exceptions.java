@@ -8,6 +8,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class Exceptions {
+    public static JSONObject getJSONObject(@NotNull JSONObject json, String key) throws BadRequestException {
+        try {
+            return json.getJSONObject(key);
+        } catch(JSONException e) {
+            throw new BadRequestException();
+        }
+    }
+
     public static String getString(@NotNull JSONObject json, String key) throws BadRequestException {
         try {
             return json.getString(key);
@@ -19,6 +27,14 @@ public class Exceptions {
     public static int getInt(@NotNull JSONObject json, String key) throws BadRequestException {
         try {
             return json.getInt(key);
+        } catch(JSONException e) {
+            throw new BadRequestException();
+        }
+    }
+
+    public static boolean getBoolean(@NotNull JSONObject json, String key) throws BadRequestException {
+        try {
+            return json.getBoolean(key);
         } catch(JSONException e) {
             throw new BadRequestException();
         }
