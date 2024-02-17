@@ -7,7 +7,9 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import net.rupyber_studios.police_terminal.client.HudPosition;
+import net.rupyber_studios.police_terminal.util.IncidentType;
 import net.rupyber_studios.police_terminal.util.Rank;
+import net.rupyber_studios.police_terminal.util.ResponseCode;
 
 import java.util.List;
 
@@ -151,6 +153,35 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Category("duty")
     @Comment("Only officers with a rank id greater or equal than the one set below will be able to use the callsign command (except for 'request' subcommand)")
     public int minimumRankIdForCallsignCommand = 10;
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("The list of response codes used in the duty system, id and code must be unique [do not use 0 as Java cannot be distinguish it from NULL!]")
+    public List<ResponseCode> responseCodes = List.of(
+            new ResponseCode(1, "Code 2", 0xAAAAAA, "Respond without Lights and Sirens"),
+            new ResponseCode(2, "Code 2-High", 0x55FFFF, "Respond with Lights, but without Sirens"),
+            new ResponseCode(3, "Code 3", 0x0000AA, "Respond with Lights and Sirens"),
+            new ResponseCode(99, "Code 99", 0xAA0000, "All Units to respond, High-Level Situation")
+    );
+
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.Category("duty")
+    @Comment("The list of incident types used in the duty system, id and code must be unique [do not use 0 as Java cannot be distinguish it from NULL!]")
+    public List<IncidentType> incidentTypes = List.of(
+            new IncidentType(211, "211", 0xAA0000, "Robbery"),
+            new IncidentType(311, "311", 0xFFFF55, "Indecent Exposure"),
+            new IncidentType(390, "390", 0xFFFF55, "Drunk Male"),
+            new IncidentType(391, "390W", 0xFFFF55, "Drunk Female"),
+            new IncidentType(415, "415", 0xFFAA00, "Disturbance"),
+            new IncidentType(459, "459", 0xAA0000, "Burglary"),
+            new IncidentType(484, "484", 0xAA0000, "Theft"),
+            new IncidentType(485, "484PS", 0xAA0000, "Purse Snatching"),
+            new IncidentType(502, "502", 0xFFAA00, "Under-the-Influence Driver"),
+            new IncidentType(507, "507", 0xFFFF55, "Minor Disturbance"),
+            new IncidentType(508, "507FC", 0xFFFF55, "Fire Crackers"),
+            new IncidentType(586, "586", 0xFFAA00, "Illegal Parking"),
+            new IncidentType(587, "586E", 0xFFAA00, "Car parked in Driveway")
+    );
 
     // web
 

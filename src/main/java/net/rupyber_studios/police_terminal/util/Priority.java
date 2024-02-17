@@ -7,18 +7,18 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public enum Status implements StringIdentifiable {
-    OUT_OF_SERVICE, AVAILABLE, ON_PATROL, BUSY, EN_ROUTE, ON_SCENE, EMERGENCY;
+public enum Priority implements StringIdentifiable {
+    LOW, PRIORITY, MAJOR;
 
     @Contract(pure = true)
-    public static @Nullable Status fromId(int id) {
+    public static @Nullable Priority fromId(int id) {
         if(id == 0) return null;
         return values()[id - 1];
     }
 
     @Contract(value = " -> new", pure = true)
     public @NotNull Text getText() {
-        return Text.translatable("text.hud.police_terminal.status." + this.name().toLowerCase());
+        return Text.translatable("text.hud.police_terminal.priority." + this.name().toLowerCase());
     }
 
     public int getId() {
@@ -32,13 +32,9 @@ public enum Status implements StringIdentifiable {
 
     public @NotNull Pair<String, Integer> getData() {
         return switch(this) {
-            case OUT_OF_SERVICE -> new Pair<>("Out Of Service", 0xFFFF55);
-            case AVAILABLE -> new Pair<>("Available", 0x55FF55);
-            case ON_PATROL -> new Pair<>("On Patrol", 0x00AA00);
-            case BUSY -> new Pair<>("Busy", 0xFFAA00);
-            case EN_ROUTE -> new Pair<>("En Route", 0x55FFFF);
-            case ON_SCENE -> new Pair<>("On Scene", 0x00AAAA);
-            case EMERGENCY -> new Pair<>("Emergency", 0xAA0000);
+            case LOW -> new Pair<>("Low", 0x55FF55);
+            case PRIORITY -> new Pair<>("Priority", 0xFFFF55);
+            case MAJOR -> new Pair<>("Major", 0xFF5555);
         };
     }
 }

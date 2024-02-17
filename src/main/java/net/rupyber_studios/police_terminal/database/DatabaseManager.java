@@ -1,7 +1,9 @@
 package net.rupyber_studios.police_terminal.database;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.util.IncidentType;
 import net.rupyber_studios.police_terminal.util.Rank;
+import net.rupyber_studios.police_terminal.util.ResponseCode;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.PreparedStatement;
@@ -18,7 +20,7 @@ public class DatabaseManager {
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS ranks (
                     id INT,
-                    rank VARCHAR(16) NOT NULL,
+                    rank VARCHAR(32) NOT NULL,
                     color INT NOT NULL,
                     PRIMARY KEY (id),
                     UNIQUE (rank)
@@ -50,7 +52,8 @@ public class DatabaseManager {
 
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS players (
-                    uuid CHAR(36),
+                    id INT AUTOINCREMENT,
+                    uuid CHAR(36) NOT NULL,
                     username VARCHAR(16) NULL,
                     online BOOLEAN NOT NULL DEFAULT TRUE,
                     status INT NULL DEFAULT NULL,
@@ -60,7 +63,8 @@ public class DatabaseManager {
                     password CHAR(8) NULL DEFAULT NULL,
                     token CHAR(16) NULL DEFAULT NULL,
                     settings VARCHAR(64) NOT NULL DEFAULT '{"compactMode":false,"condensedFont":false,"sharpMode":false}',
-                    PRIMARY KEY (uuid),
+                    PRIMARY KEY (id),
+                    UNIQUE (uuid),
                     UNIQUE (username),
                     UNIQUE (callsign),
                     FOREIGN KEY (rankId) REFERENCES ranks(id)
@@ -85,6 +89,173 @@ public class DatabaseManager {
             preparedStatement.setInt(1, rankId);
             preparedStatement.execute();
         }
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS emergencyCalls (
+                    id INT AUTOINCREMENT,
+                    callNumber INT NULL,
+                    locationX INT NOT NULL,
+                    locationY INT NOT NULL,
+                    locationZ INT NOT NULL,
+                    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    callerId INT NOT NULL,
+                    description VARCHAR(256),
+                    PRIMARY KEY (id),
+                    FOREIGN KEY (callerId) REFERENCES players(id)
+                );""");
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS responseCodes (
+                    id INT,
+                    code VARCHAR(16) NOT NULL,
+                    color INT NOT NULL,
+                    description VARCHAR(64) NOT NULL,
+                    PRIMARY KEY (id),
+                    UNIQUE (code)
+                );""");
+
+        ArrayList<Integer> responseCodeIds = new ArrayList<>();
+        statement = PoliceTerminal.connection.createStatement();
+        query = new StringBuilder("SELECT id FROM responseCodes WHERE id NOT IN (");
+        for(ResponseCode responseCode : ResponseCode.responseCodes.values())
+            responseCodeIds.add(responseCode.id);
+        if(responseCodeIds.isEmpty()) throw new IllegalStateException("0 response codes, this is not possible");
+
+        for(int i = 0; i < responseCodeIds.size() - 1; i++)
+            query.append(responseCodeIds.get(i)).append(", ");
+        query.append(responseCodeIds.get(responseCodeIds.size() - 1)).append(");");
+        result = statement.executeQuery(query.toString());
+        ArrayList<Integer> missingResponseCodeIds = new ArrayList<>();
+        while(result.next())
+            missingResponseCodeIds.add(result.getInt("id"));
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                REPLACE INTO responseCodes (id, code, color, description) VALUES (?, ?, ?, ?);""");
+        for(ResponseCode responseCode : ResponseCode.responseCodes.values()) {
+            preparedStatement.setInt(1, responseCode.id);
+            preparedStatement.setString(2, responseCode.code);
+            preparedStatement.setInt(3, responseCode.color);
+            preparedStatement.setString(4, responseCode.description);
+            preparedStatement.execute();
+        }
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS incidentTypes (
+                    id INT,
+                    code VARCHAR(8) NOT NULL,
+                    color INT NOT NULL,
+                    description VARCHAR(64) NOT NULL,
+                    PRIMARY KEY (id),
+                    UNIQUE (code)
+                );""");
+
+        ArrayList<Integer> incidentTypeIds = new ArrayList<>();
+        statement = PoliceTerminal.connection.createStatement();
+        query = new StringBuilder("SELECT id FROM incidentTypes WHERE id NOT IN (");
+        for(IncidentType incidentType : IncidentType.incidentTypes.values())
+            incidentTypeIds.add(incidentType.id);
+        if(incidentTypeIds.isEmpty()) throw new IllegalStateException("0 incident types, this is not possible");
+
+        for(int i = 0; i < incidentTypeIds.size() - 1; i++)
+            query.append(incidentTypeIds.get(i)).append(", ");
+        query.append(incidentTypeIds.get(incidentTypeIds.size() - 1)).append(");");
+        result = statement.executeQuery(query.toString());
+        ArrayList<Integer> missingIncidentTypeIds = new ArrayList<>();
+        while(result.next())
+            missingIncidentTypeIds.add(result.getInt("id"));
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                REPLACE INTO incidentTypes (id, code, color, description) VALUES (?, ?, ?, ?);""");
+        for(IncidentType incidentType : IncidentType.incidentTypes.values()) {
+            preparedStatement.setInt(1, incidentType.id);
+            preparedStatement.setString(2, incidentType.code);
+            preparedStatement.setInt(3, incidentType.color);
+            preparedStatement.setString(4, incidentType.description);
+            preparedStatement.execute();
+        }
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS incidentNumbers (
+                    day DATE DEFAULT CURRENT_DATE,
+                    number INT NOT NULL,
+                    PRIMARY KEY (day)
+                );""");
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS incidents (
+                    id INT AUTOINCREMENT,
+                    incidentNumber INT NULL,
+                    emergencyCallId INT NOT NULL,
+                    priority INT NOT NULL,
+                    responseCodeId INT NOT NULL,
+                    recipients INT NOT NULL,
+                    typeId INT NOT NULL,
+                    locationX INT NOT NULL,
+                    locationY INT NOT NULL,
+                    locationZ INT NOT NULL,
+                    description VARCHAR(128) NULL,
+                    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    createdBy INT NOT NULL,
+                    closedAt DATETIME NULL DEFAULT NULL,
+                    closedBy INT NULL DEFAULT NULL,
+                    PRIMARY KEY (id),
+                    FOREIGN KEY (emergencyCallId) REFERENCES emergencyCalls(id),
+                    FOREIGN KEY (responseCodeId) REFERENCES responseCodes(id),
+                    FOREIGN KEY (typeId) REFERENCES incidentTypes(id),
+                    FOREIGN KEY (createdBy) REFERENCES players(id),
+                    FOREIGN KEY (closedBy) REFERENCES players(id)
+                );""");
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE incidents SET responseCodeId=? WHERE responseCodeId=?;""");
+        for(int responseCodeId : missingResponseCodeIds) {
+            Integer nearestResponseCodeId = 0;
+            for(int existingResponseCodeId : responseCodeIds) {
+                if(existingResponseCodeId < responseCodeId && (existingResponseCodeId - responseCodeId) < (nearestResponseCodeId - responseCodeId))
+                    nearestResponseCodeId = existingResponseCodeId;
+            }
+            if(nearestResponseCodeId == 0) nearestResponseCodeId = null;
+            preparedStatement.setObject(1, nearestResponseCodeId);
+            preparedStatement.setInt(2, responseCodeId);
+        }
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                DELETE FROM responseCodes WHERE id=?;""");
+        for(int responseCodeId : missingResponseCodeIds) {
+            preparedStatement.setInt(1, responseCodeId);
+            preparedStatement.execute();
+        }
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                UPDATE incidents SET incidentTypeId=? WHERE incidentTypeId=?;""");
+        for(int incidentTypeId : missingIncidentTypeIds) {
+            Integer nearestIncidentTypeId = 0;
+            for(int existingIncidentTypeId : incidentTypeIds) {
+                if(existingIncidentTypeId < incidentTypeId && (existingIncidentTypeId - incidentTypeId) < (nearestIncidentTypeId - incidentTypeId))
+                    nearestIncidentTypeId = existingIncidentTypeId;
+            }
+            if(nearestIncidentTypeId == 0) nearestIncidentTypeId = null;
+            preparedStatement.setObject(1, nearestIncidentTypeId);
+            preparedStatement.setInt(2, incidentTypeId);
+        }
+
+        preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                DELETE FROM incidentTypes WHERE id=?;""");
+        for(int incidentTypeId : missingIncidentTypeIds) {
+            preparedStatement.setInt(1, incidentTypeId);
+            preparedStatement.execute();
+        }
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS incidentPlayers (
+                    incidentId INT NOT NULL,
+                    role INT NOT NULL,
+                    playerId INT NOT NULL,
+                    addedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    removedAt DATETIME NULL DEFAULT NULL,
+                    FOREIGN KEY (incidentId) REFERENCES incidents(id),
+                    FOREIGN KEY (playerId) REFERENCES players(id)
+                );""");
 
         statement.close();
         preparedStatement.close();

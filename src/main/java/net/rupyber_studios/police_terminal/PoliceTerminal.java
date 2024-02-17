@@ -11,8 +11,10 @@ import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.packet.SyncPlayerInfoS2CPacket;
 import net.rupyber_studios.police_terminal.networking.packet.SyncRanksS2CPacket;
+import net.rupyber_studios.police_terminal.util.IncidentType;
 import net.rupyber_studios.police_terminal.util.ModRegistries;
 import net.rupyber_studios.police_terminal.util.Rank;
+import net.rupyber_studios.police_terminal.util.ResponseCode;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +50,9 @@ public class PoliceTerminal implements ModInitializer {
 
 		ModRegistries.registerCommands();
 
-		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-			startServer(server.getSavePath(WorldSavePath.ROOT));
-		});
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> startServer(server.getSavePath(WorldSavePath.ROOT)));
 
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			stopServer();
-		});
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> stopServer());
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			try {
@@ -81,6 +79,8 @@ public class PoliceTerminal implements ModInitializer {
 
 	public static void startServer(Path worldPath) {
 		Rank.loadRanks();
+		ResponseCode.loadResponseCodes();
+		IncidentType.loadIncidentTypes();
 		RankArgumentType.init();
 
 		String url = "jdbc:sqlite:" + worldPath + "police.db";
