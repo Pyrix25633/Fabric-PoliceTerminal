@@ -8,6 +8,7 @@ import net.rupyber_studios.police_terminal.util.Rank;
 import net.rupyber_studios.police_terminal.util.Status;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DatabaseSelector {
@@ -118,6 +120,21 @@ public class DatabaseSelector {
         ResultSet result = preparedStatement.executeQuery();
         if(!result.next()) return null;
         return UUID.fromString(result.getString("uuid"));
+    }
+
+    public static @Nullable @Unmodifiable List<UUID> getPlayerUuidsFromCallsignLike(String callsign) throws SQLException {
+        PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
+                SELECT uuid
+                FROM players
+                WHERE callsign LIKE ?;""");
+        preparedStatement.setString(1, callsign);
+        ResultSet result = preparedStatement.executeQuery();
+        if(!result.next()) return null;
+        List<UUID> playerUuids = new ArrayList<>();
+        while(result.next()) {
+            playerUuids.add(UUID.fromString(result.getString("uuid")));
+        }
+        return playerUuids;
     }
 
     public static boolean isPlayerPasswordCorrect(@NotNull UUID player, String password) throws SQLException {

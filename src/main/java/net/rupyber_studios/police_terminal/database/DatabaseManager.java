@@ -42,7 +42,9 @@ public class DatabaseManager {
             missingRankIds.add(result.getInt("id"));
 
         PreparedStatement preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                REPLACE INTO ranks (id, rank, color) VALUES (?, ?, ?);""");
+                REPLACE INTO ranks
+                (id, rank, color)
+                VALUES (?, ?, ?);""");
         for(Rank rank : Rank.ranks.values()) {
             preparedStatement.setInt(1, rank.id);
             preparedStatement.setString(2, rank.rank);
@@ -52,7 +54,7 @@ public class DatabaseManager {
 
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS players (
-                    id INT AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY,
                     uuid CHAR(36) NOT NULL,
                     username VARCHAR(16) NULL,
                     online BOOLEAN NOT NULL DEFAULT TRUE,
@@ -63,7 +65,6 @@ public class DatabaseManager {
                     password CHAR(8) NULL DEFAULT NULL,
                     token CHAR(16) NULL DEFAULT NULL,
                     settings VARCHAR(64) NOT NULL DEFAULT '{"compactMode":false,"condensedFont":false,"sharpMode":false}',
-                    PRIMARY KEY (id),
                     UNIQUE (uuid),
                     UNIQUE (username),
                     UNIQUE (callsign),
@@ -71,7 +72,9 @@ public class DatabaseManager {
                 );""");
 
         preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                UPDATE players SET rankId=? WHERE rankId=?;""");
+                UPDATE players
+                SET rankId=?
+                WHERE rankId=?;""");
         for(int rankId : missingRankIds) {
             Integer nearestRankId = 0;
             for(int existingRankId : rankIds) {
@@ -84,23 +87,31 @@ public class DatabaseManager {
         }
 
         preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                DELETE FROM ranks WHERE id=?;""");
+                DELETE FROM ranks
+                WHERE id=?;""");
         for(int rankId : missingRankIds) {
             preparedStatement.setInt(1, rankId);
             preparedStatement.execute();
         }
 
         statement.execute("""
+                CREATE TABLE IF NOT EXISTS emergencyCallNumbers (
+                    day DATE,
+                    number INT NOT NULL,
+                    PRIMARY KEY (day)
+                );""");
+
+        statement.execute("""
                 CREATE TABLE IF NOT EXISTS emergencyCalls (
-                    id INT AUTOINCREMENT,
-                    callNumber INT NULL,
+                    id INTEGER PRIMARY KEY,
+                    callNumber INT NOT NULL,
                     locationX INT NOT NULL,
                     locationY INT NOT NULL,
                     locationZ INT NOT NULL,
                     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     callerId INT NOT NULL,
+                    closed BOOLEAN NOT NULL DEFAULT FALSE,
                     description VARCHAR(256),
-                    PRIMARY KEY (id),
                     FOREIGN KEY (callerId) REFERENCES players(id)
                 );""");
 
@@ -130,7 +141,9 @@ public class DatabaseManager {
             missingResponseCodeIds.add(result.getInt("id"));
 
         preparedStatement = PoliceTerminal.connection.prepareStatement("""
-                REPLACE INTO responseCodes (id, code, color, description) VALUES (?, ?, ?, ?);""");
+                REPLACE INTO responseCodes
+                (id, code, color, description)
+                VALUES (?, ?, ?, ?);""");
         for(ResponseCode responseCode : ResponseCode.responseCodes.values()) {
             preparedStatement.setInt(1, responseCode.id);
             preparedStatement.setString(2, responseCode.code);
@@ -176,20 +189,20 @@ public class DatabaseManager {
 
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS incidentNumbers (
-                    day DATE DEFAULT CURRENT_DATE,
+                    day DATE,
                     number INT NOT NULL,
                     PRIMARY KEY (day)
                 );""");
 
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS incidents (
-                    id INT AUTOINCREMENT,
-                    incidentNumber INT NULL,
-                    emergencyCallId INT NOT NULL,
+                    id INTEGER PRIMARY KEY,
+                    incidentNumber INT NOT NULL,
+                    emergencyCallId INT NULL DEFAULT NULL,
                     priority INT NOT NULL,
                     responseCodeId INT NOT NULL,
                     recipients INT NOT NULL,
-                    typeId INT NOT NULL,
+                    incidentTypeId INT NOT NULL,
                     locationX INT NOT NULL,
                     locationY INT NOT NULL,
                     locationZ INT NOT NULL,
@@ -198,10 +211,9 @@ public class DatabaseManager {
                     createdBy INT NOT NULL,
                     closedAt DATETIME NULL DEFAULT NULL,
                     closedBy INT NULL DEFAULT NULL,
-                    PRIMARY KEY (id),
                     FOREIGN KEY (emergencyCallId) REFERENCES emergencyCalls(id),
                     FOREIGN KEY (responseCodeId) REFERENCES responseCodes(id),
-                    FOREIGN KEY (typeId) REFERENCES incidentTypes(id),
+                    FOREIGN KEY (incidentTypeId) REFERENCES incidentTypes(id),
                     FOREIGN KEY (createdBy) REFERENCES players(id),
                     FOREIGN KEY (closedBy) REFERENCES players(id)
                 );""");
