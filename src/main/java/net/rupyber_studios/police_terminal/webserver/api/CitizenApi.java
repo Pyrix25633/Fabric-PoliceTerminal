@@ -1,17 +1,16 @@
 package net.rupyber_studios.police_terminal.webserver.api;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseSelector;
 import net.rupyber_studios.police_terminal.webserver.ApiServer;
 import net.rupyber_studios.police_terminal.webserver.Exceptions;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
+import net.rupyber_studios.rupyber_database_api.util.Citizen;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.UUID;
 
 public class CitizenApi {
     private static final List<String> ORDER_FIELDS = List.of("uuid", "username", "online");
@@ -27,17 +26,17 @@ public class CitizenApi {
         }
         try {
             JSONObject request = new JSONObject(body);
-            UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
+            int id = Exceptions.getInt(request, "id");
             String token = Exceptions.getString(request, "token");
             int page = Exceptions.getInt(request, "page");
             JSONObject order = Exceptions.getJSONObject(request, "order");
             String orderField = Exceptions.getString(order, "field");
             if(!ORDER_FIELDS.contains(orderField)) throw new Exceptions.BadRequestException();
             boolean orderAscending = Exceptions.getBoolean(order, "ascending");
-            if(!UserApi.isTokenValid(player, token)) throw new Exceptions.UnauthorizedException();
+            if(!UserApi.isTokenValid(id, token)) throw new Exceptions.UnauthorizedException();
             JSONObject response = new JSONObject();
-            response.put("pages", DatabaseSelector.getCitizensPages());
-            response.put("citizens", DatabaseSelector.getCitizens(page, orderField, orderAscending));
+            response.put("pages", Citizen.selectNumberOfCitizenPages());
+            response.put("citizens", Citizen.selectCitizens(page, orderField, orderAscending));
             ApiServer.sendJsonResponse(response, output);
         } catch(Exceptions.HttpException e) {
             e.sendError(output);

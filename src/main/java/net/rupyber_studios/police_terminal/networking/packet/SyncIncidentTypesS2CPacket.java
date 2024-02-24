@@ -9,7 +9,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
-import net.rupyber_studios.police_terminal.util.IncidentType;
+import net.rupyber_studios.rupyber_database_api.table.IncidentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

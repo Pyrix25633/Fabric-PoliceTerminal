@@ -8,14 +8,12 @@ import net.minecraft.util.WorldSavePath;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
-import net.rupyber_studios.police_terminal.database.DatabaseManager;
 import net.rupyber_studios.police_terminal.networking.packet.SyncPlayerInfoS2CPacket;
 import net.rupyber_studios.police_terminal.networking.packet.SyncRanksS2CPacket;
-import net.rupyber_studios.police_terminal.util.IncidentType;
 import net.rupyber_studios.police_terminal.util.ModRegistries;
-import net.rupyber_studios.police_terminal.util.Rank;
-import net.rupyber_studios.police_terminal.util.ResponseCode;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
+import net.rupyber_studios.rupyber_database_api.RupyberDatabaseAPI;
+import net.rupyber_studios.rupyber_database_api.table.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +24,6 @@ import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PoliceTerminal implements ModInitializer {
@@ -47,6 +44,7 @@ public class PoliceTerminal implements ModInitializer {
 		// Proceed with mild caution.
 
 		ModConfig.init();
+		RupyberDatabaseAPI.setPoliceTerminalConfig(ModConfig.INSTANCE);
 
 		ModRegistries.registerCommands();
 
@@ -57,7 +55,7 @@ public class PoliceTerminal implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			try {
 				SyncRanksS2CPacket.send(handler.player);
-				DatabaseManager.insertOrUpdatePlayer(handler.player.getUuid(), handler.player.getGameProfile().getName());
+				Player.insertOrUpdate(handler.player.getUuid(), handler.player.getGameProfile().getName());
 				SyncPlayerInfoS2CPacket.send(handler.player);
 				OnlineCallsignArgumentType.init();
 			} catch (SQLException e) {
@@ -67,7 +65,7 @@ public class PoliceTerminal implements ModInitializer {
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
 			try {
-				DatabaseManager.handlePlayerDisconnection(handler.player.getUuid());
+				Player.handleDisconnection(handler.player.getUuid());
 				OnlineCallsignArgumentType.init();
 			} catch (SQLException e) {
 				LOGGER.error("Error handling player disconnection: ", e);
@@ -78,46 +76,20 @@ public class PoliceTerminal implements ModInitializer {
 	}
 
 	public static void startServer(Path worldPath) {
-		Rank.loadRanks();
-		ResponseCode.loadResponseCodes();
-		IncidentType.loadIncidentTypes();
-		RankArgumentType.init();
-
-		String url = "jdbc:sqlite:" + worldPath + "police.db";
-
 		try {
-			connection = DriverManager.getConnection(url);
-			if(connection != null) {
-				LOGGER.info("Connected to the database");
-				DatabaseManager.createTables();
-				DatabaseManager.handleShutdown();
-			}
-			else throw new IllegalStateException("Not connected to the police database!");
-		} catch(Exception e) {
-			LOGGER.error("Error: ", e);
-			throw new IllegalStateException("Error operating the police database!");
+			RupyberDatabaseAPI.initialized.acquire();
+			RupyberDatabaseAPI.initialized.release();
+		} catch(InterruptedException e) {
+			throw new IllegalStateException("Could not check if RupyberDatabaseAPI is initialized");
 		}
 
+		RankArgumentType.init();
 		OnlineCallsignArgumentType.init();
 
 		try {
 			boolean httpsError = false;
-			if(ModConfig.INSTANCE.https) {
-				try {
-					KeyStore keyStore = KeyStore.getInstance("JKS");
-					keyStore.load(new FileInputStream(ModConfig.INSTANCE.httpsCertificate),
-							ModConfig.INSTANCE.httpsPassword.toCharArray());
-					KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-					keyManagerFactory.init(keyStore, ModConfig.INSTANCE.httpsPassword.toCharArray());
-					SSLContext sslContext = SSLContext.getInstance("TLS");
-					sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
-					socket = sslContext.getServerSocketFactory().createServerSocket(ModConfig.INSTANCE.port);
-					LOGGER.info("Successfully initialized ServerSocket with https");
-				} catch(Exception e) {
-					httpsError = true;
-					LOGGER.warn("Error starting https server, defaulting to http: ", e);
-				}
-			}
+			if(ModConfig.INSTANCE.https)
+				httpsError = !startHttpsServer();
 			if(!ModConfig.INSTANCE.https || httpsError)
 				socket = new ServerSocket(ModConfig.INSTANCE.port);
 			serverThread = new Thread(() -> {
@@ -137,15 +109,25 @@ public class PoliceTerminal implements ModInitializer {
 		}
 	}
 
-	public static void stopServer() {
+	public static boolean startHttpsServer() {
 		try {
-			DatabaseManager.handleShutdown();
-			LOGGER.info("Closing police database connection");
-			connection.close();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(new FileInputStream(ModConfig.INSTANCE.httpsCertificate),
+					ModConfig.INSTANCE.httpsPassword.toCharArray());
+			KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+			keyManagerFactory.init(keyStore, ModConfig.INSTANCE.httpsPassword.toCharArray());
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+			sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+			socket = sslContext.getServerSocketFactory().createServerSocket(ModConfig.INSTANCE.port);
+			LOGGER.info("Successfully initialized ServerSocket with https");
+			return true;
+		} catch(Exception e) {
+			LOGGER.warn("Error starting https server, defaulting to http: ", e);
 		}
+		return false;
+	}
 
+	public static void stopServer() {
 		try {
 			LOGGER.info("Closing server socket");
 			socket.close();

@@ -38,7 +38,8 @@
 		"fabricloader": ">=0.15.3",
 		"minecraft": "~1.20.4",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"rupyber_database": "1.20.4-0.0.1"
 	},
 	"suggests": {
 		"another-mod": "*"

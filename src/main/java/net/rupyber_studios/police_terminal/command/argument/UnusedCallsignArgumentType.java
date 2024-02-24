@@ -8,8 +8,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.database.DatabaseSelector;
-import net.rupyber_studios.police_terminal.util.Callsign;
+import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -26,7 +25,7 @@ public class UnusedCallsignArgumentType implements ArgumentType<String> {
         String string = reader.readString();
         boolean inUse;
         try {
-            inUse = DatabaseSelector.isCallsignInUse(string);
+            inUse = Callsign.isInUse(string);
         } catch(SQLException e) {
             inUse = true;
         }

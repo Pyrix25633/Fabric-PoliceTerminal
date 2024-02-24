@@ -1,11 +1,11 @@
 package net.rupyber_studios.police_terminal.webserver.api;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseSelector;
-import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.webserver.ApiServer;
 import net.rupyber_studios.police_terminal.webserver.Exceptions;
 import net.rupyber_studios.police_terminal.webserver.WebServer;
+import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.UUID;
 
 public class UserApi {
     public static void validateToken(@NotNull String method, String body, OutputStream output) throws IOException {
@@ -27,10 +26,10 @@ public class UserApi {
         }
         try {
             JSONObject request = new JSONObject(body);
-            UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
+            int id = Exceptions.getInt(request, "id");
             String token = Exceptions.getString(request, "token");
             JSONObject response = new JSONObject();
-            response.put("valid", DatabaseSelector.isPlayerTokenCorrect(player, token));
+            response.put("valid", Player.isTokenCorrect(id, token));
             ApiServer.sendJsonResponse(response, output);
         } catch(Exceptions.HttpException e) {
             e.sendError(output);
@@ -54,7 +53,7 @@ public class UserApi {
         try {
             JSONObject response = new JSONObject();
             String feedback;
-            if(DatabaseSelector.isCallsignInUse(callsign))
+            if(Callsign.isInUse(callsign))
                 feedback = "Valid Callsign";
             else
                 feedback = "Callsign does not exist!";
@@ -78,13 +77,13 @@ public class UserApi {
         try {
             JSONObject request = new JSONObject(body);
             String callsign = Exceptions.getString(request, "callsign");
-            UUID player = DatabaseSelector.getPlayerUuidFromCallsign(callsign);
-            if(player == null) throw new Exceptions.NotFoundException();
+            int id = Player.selectIdFromCallsign(callsign);
+            if(id == 0) throw new Exceptions.NotFoundException();
             String password = Exceptions.getString(request, "password");
-            if(DatabaseSelector.isPlayerPasswordCorrect(player, password)) {
+            if(Player.isPasswordCorrect(id, password)) {
                 JSONObject response = new JSONObject();
-                response.put("uuid", player.toString());
-                response.put("token", DatabaseUpdater.initPlayerToken(player));
+                response.put("id", id);
+                response.put("token", Player.initToken(id));
                 ApiServer.sendJsonResponse(response, output);
             }
             else
@@ -108,10 +107,10 @@ public class UserApi {
         }
         try {
             JSONObject request = new JSONObject(body);
-            UUID player = UUID.fromString(Exceptions.getString(request, "uuid"));
+            int id = Exceptions.getInt(request, "id");
             String token = Exceptions.getString(request, "token");
-            if(!isTokenValid(player, token)) throw new Exceptions.UnauthorizedException();
-            ApiServer.sendJsonResponse(Objects.requireNonNull(DatabaseSelector.getPlayerSettings(player)), output);
+            if(!isTokenValid(id, token)) throw new Exceptions.UnauthorizedException();
+            ApiServer.sendJsonResponse(Objects.requireNonNull(Player.selectSettings(id)), output);
         } catch(Exceptions.HttpException e) {
             e.sendError(output);
         } catch(Exception e) {
@@ -120,9 +119,9 @@ public class UserApi {
         }
     }
 
-    public static boolean isTokenValid(UUID player, String token) {
+    public static boolean isTokenValid(int id, String token) {
         try {
-            return DatabaseSelector.isPlayerTokenCorrect(player, token);
+            return Player.isTokenCorrect(id, token);
         } catch(Exception e) {
             return false;
         }

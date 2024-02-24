@@ -9,7 +9,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
+import net.rupyber_studios.rupyber_database_api.table.EmergencyCall;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -39,7 +39,7 @@ public class EmergencyCommand {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if(player == null) return 0;
         try {
-            DatabaseUpdater.createEmergencyCall(player.getUuid(), player.getPos(),
+            EmergencyCall.insert(player.getUuid(), player.getPos(),
                     StringArgumentType.getString(context, "description"));
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not create emergency call: ", e);

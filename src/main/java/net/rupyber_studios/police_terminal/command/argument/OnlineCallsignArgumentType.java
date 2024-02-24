@@ -10,22 +10,23 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.police_terminal.database.DatabaseSelector;
+import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class OnlineCallsignArgumentType implements ArgumentType<String> {
     private static final SimpleCommandExceptionType INVALID_ONLINE_CALLSIGN_EXCEPTION = new SimpleCommandExceptionType(
             Text.translatable("argument.online_callsign.invalid"));
-    public static ArrayList<String> values = new ArrayList<>();
+    public static List<String> values = new ArrayList<>();
 
     public static void init() {
         try {
-            values = DatabaseSelector.getAllOnlineCallsigns();
+            values = Callsign.selectAll();
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not list all online callsigns: ", e);
         }

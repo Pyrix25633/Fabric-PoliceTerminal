@@ -2,10 +2,12 @@ package net.rupyber_studios.police_terminal.database;
 
 import com.github.javafaker.Faker;
 import net.rupyber_studios.police_terminal.config.ModConfig;
-import net.rupyber_studios.police_terminal.util.Callsign;
-import net.rupyber_studios.police_terminal.util.PlayerInfo;
-import net.rupyber_studios.police_terminal.util.Rank;
-import net.rupyber_studios.police_terminal.util.Status;
+import net.rupyber_studios.rupyber_database_api.RupyberDatabaseAPI;
+import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.table.Rank;
+import net.rupyber_studios.rupyber_database_api.util.Callsign;
+import net.rupyber_studios.rupyber_database_api.util.PlayerInfo;
+import net.rupyber_studios.rupyber_database_api.util.Status;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +19,7 @@ public class SeedCleanGenerator {
 
     public static void main(String[] args) {
         ModConfig.INSTANCE = new ModConfig();
+        RupyberDatabaseAPI.setPoliceTerminalConfig(ModConfig.INSTANCE);
         HashMap<UUID, Player> players = new HashMap<>();
 
         for(int i = 0; i < 150; i++) {
@@ -125,6 +128,4 @@ public class SeedCleanGenerator {
         if(username.length() > 16) return generateUsername();
         return username;
     }
-
-    public record Player(UUID uuid, String username, boolean online, PlayerInfo info, boolean callsignReserved) {}
 }

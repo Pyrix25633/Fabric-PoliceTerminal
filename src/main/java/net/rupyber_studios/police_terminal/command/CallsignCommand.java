@@ -12,11 +12,10 @@ import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.UnusedCallsignArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
-import net.rupyber_studios.police_terminal.database.DatabaseSelector;
-import net.rupyber_studios.police_terminal.database.DatabaseUpdater;
 import net.rupyber_studios.police_terminal.networking.packet.SendCallsignS2CPacket;
-import net.rupyber_studios.police_terminal.util.Callsign;
-import net.rupyber_studios.police_terminal.util.Rank;
+import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.table.Rank;
+import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -38,7 +37,7 @@ public class CallsignCommand {
             try {
                 ServerPlayerEntity player = source.getPlayer();
                 if(player == null) return false;
-                Rank rank = DatabaseSelector.getPlayerRank(source.getPlayer().getUuid());
+                Rank rank = Player.selectRankFromUuid(source.getPlayer().getUuid());
                 return rank != null;
             } catch(Exception ignored) {
                 return false;
@@ -47,10 +46,8 @@ public class CallsignCommand {
             try {
                 ServerPlayerEntity player = context.getSource().getPlayer();
                 if(player == null) return 0;
-                String callsign = Callsign.createRandomCallsign();
-                while(DatabaseSelector.isCallsignInUse(callsign))
-                    callsign = Callsign.createRandomCallsign();
-                DatabaseUpdater.setPlayerCallsign(player.getUuid(), callsign, false);
+                String callsign = Callsign.createUnusedCallsign();
+                Player.updateCallsignFromUuid(player.getUuid(), callsign, false);
                 OnlineCallsignArgumentType.init();
                 SendCallsignS2CPacket.send(player, callsign);
                 context.getSource().getServer().getCommandManager().sendCommandTree(player);
@@ -66,7 +63,7 @@ public class CallsignCommand {
                 ServerPlayerEntity player = context.getSource().getPlayer();
                 if(player == null) return 0;
                 String callsign = context.getArgument("callsign", String.class);
-                DatabaseUpdater.setPlayerCallsign(player.getUuid(), callsign, false);
+                Player.updateCallsignFromUuid(player.getUuid(), callsign, false);
                 SendCallsignS2CPacket.send(player, callsign);
                 OnlineCallsignArgumentType.init();
                 context.getSource().getServer().getCommandManager().sendCommandTree(player);
@@ -84,7 +81,7 @@ public class CallsignCommand {
                             ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
                             ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
                             try {
-                                DatabaseUpdater.setPlayerCallsign(player.getUuid(), callsign, true);
+                                Player.updateCallsignFromUuid(player.getUuid(), callsign, true);
                                 SendCallsignS2CPacket.send(player, callsign);
                                 OnlineCallsignArgumentType.init();
                                 context.getSource().getServer().getCommandManager().sendCommandTree(player);
@@ -110,11 +107,11 @@ public class CallsignCommand {
                     String callsign = context.getArgument("callsign", String.class);
                     ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
                     try {
-                        UUID playerUuid = DatabaseSelector.getPlayerUuidFromCallsign(callsign);
+                        UUID playerUuid = Player.selectUuidFromCallsign(callsign);
                         if(playerUuid == null) return 0;
                         ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
                         if(player == null) return 0;
-                        DatabaseUpdater.setPlayerCallsign(playerUuid, null, false);
+                        Player.updateCallsignFromUuid(playerUuid, null, false);
                         SendCallsignS2CPacket.send(player, callsign);
                         OnlineCallsignArgumentType.init();
                         context.getSource().getServer().getCommandManager().sendCommandTree(player);
@@ -142,7 +139,7 @@ public class CallsignCommand {
         try {
             ServerPlayerEntity player = source.getPlayer();
             if(player == null) return true;
-            Rank rank = DatabaseSelector.getPlayerRank(source.getPlayer().getUuid());
+            Rank rank = Player.selectRankFromUuid(source.getPlayer().getUuid());
             return (rank != null && rank.id >= ModConfig.INSTANCE.minimumRankIdForCallsignCommand) || source.hasPermissionLevel(4);
         } catch(Exception ignored) {
             return false;

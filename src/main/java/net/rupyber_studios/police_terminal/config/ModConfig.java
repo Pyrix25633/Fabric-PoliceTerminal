@@ -7,14 +7,15 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import net.rupyber_studios.police_terminal.client.HudPosition;
-import net.rupyber_studios.police_terminal.util.IncidentType;
-import net.rupyber_studios.police_terminal.util.Rank;
-import net.rupyber_studios.police_terminal.util.ResponseCode;
+import net.rupyber_studios.rupyber_database_api.config.PoliceTerminalConfig;
+import net.rupyber_studios.rupyber_database_api.table.IncidentType;
+import net.rupyber_studios.rupyber_database_api.table.Rank;
+import net.rupyber_studios.rupyber_database_api.table.ResponseCode;
 
 import java.util.List;
 
 @Config(name = "police_terminal")
-public class ModConfig implements ConfigData {
+public class ModConfig extends PoliceTerminalConfig implements ConfigData {
     @ConfigEntry.Gui.Excluded
     public static ModConfig INSTANCE;
 

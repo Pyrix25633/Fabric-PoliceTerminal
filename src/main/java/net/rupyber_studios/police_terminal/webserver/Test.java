@@ -2,6 +2,7 @@ package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.config.ModConfig;
+import net.rupyber_studios.rupyber_database_api.RupyberDatabaseAPI;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +19,7 @@ public class Test {
         ModConfig.INSTANCE.https = true;
         ModConfig.INSTANCE.httpsCertificate = "/home/pyrix25633/keystore.jks";
         ModConfig.INSTANCE.httpsPassword = "a1b2c3";
+        RupyberDatabaseAPI.setPoliceTerminalConfig(ModConfig.INSTANCE);
         PoliceTerminal.startServer(Path.of("./run/saves/New World/."));
         try {
             InputStream input = classLoader.getResourceAsStream("database/seed.sql");
