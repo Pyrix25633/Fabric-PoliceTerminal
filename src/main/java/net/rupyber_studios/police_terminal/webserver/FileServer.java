@@ -13,11 +13,15 @@ public class FileServer {
     public static final String CACHE_CONTROL_HEADER = "Cache-Control: public, max-age=600" + WebServer.CRLF;
     private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-    public static void serveFile(@NotNull String method, String path, OutputStream output) throws IOException {
+    public static void serveFile(@NotNull Request request, OutputStream output) throws IOException {
+        serveFile(request, request.requestLine.uri.cleanUri, output);
+    }
+
+    public static void serveFile(@NotNull Request request, String path, OutputStream output) throws IOException {
         InputStream input = classLoader.getResourceAsStream(Paths.get("pages", path).toString());
         String response = WebServer.RESPONSE_200;
 
-        if(!method.equals("GET")) {
+        if(request.requestLine.method != Method.GET) {
             input = classLoader.getResourceAsStream("pages/405.html");
             response = WebServer.RESPONSE_405;
         }

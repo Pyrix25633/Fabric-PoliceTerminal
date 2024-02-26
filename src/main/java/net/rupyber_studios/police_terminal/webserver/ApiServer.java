@@ -2,7 +2,7 @@ package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.webserver.api.CitizenApi;
 import net.rupyber_studios.police_terminal.webserver.api.OfficerApi;
-import net.rupyber_studios.police_terminal.webserver.api.UserApi;
+import net.rupyber_studios.police_terminal.webserver.api.AuthApi;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -15,27 +15,36 @@ import java.util.HashMap;
 public class ApiServer {
     public static final String JSON_CONTENT_TYPE_HEADER = "Content-Type: application/json" + WebServer.CRLF;
 
-    public static void serveApi(@NotNull String path, RequestLine requestLine, HashMap<String, String> headers,
-                                InputStream input, OutputStream output) throws IOException, URISyntaxException {
-        switch(path) {
-            case "/user/validate-token" -> UserApi.validateToken(requestLine.method(),
-                    WebServer.parseBody(input, headers), output);
-            case "/user/callsign-login-feedback" -> UserApi.callsignLoginFeedback(requestLine.method(),
-                    WebServer.parseQueryString(requestLine.uri()), output);
-            case "/user/login" -> UserApi.login(requestLine.method(), WebServer.parseBody(input, headers), output);
-            case "/user/get-settings" -> UserApi.getSettings(requestLine.method(),
-                    WebServer.parseBody(input, headers), output);
-            case "/citizen/list" -> CitizenApi.list(requestLine.method(), WebServer.parseBody(input, headers), output);
-            case "/officer/list" -> OfficerApi.list(requestLine.method(), WebServer.parseBody(input, headers), output);
+    public static void serveApi(@NotNull Request request, InputStream input, OutputStream output)
+            throws IOException, URISyntaxException {
+        switch(request.requestLine.uri.cleanApiUri) {
+            case "/auth/validate-token" -> AuthApi.validateToken(request, output);
+            case "/auth/callsign-login-feedback" -> AuthApi.callsignLoginFeedback(request, output);
+            case "/auth/login" -> AuthApi.login(request, output);
+            case "/auth/get-settings" -> AuthApi.getSettings(request, output);
+            case "/citizen/list" -> CitizenApi.list(request, output);
+            case "/officer/list" -> OfficerApi.list(request, output);
             default -> FileServer.serveFile("GET", "/404", output);
         }
     }
 
     public static void sendJsonResponse(@NotNull JSONObject response, @NotNull OutputStream output) throws IOException {
-        sendJsonResponse(response.toString(), output);
+        sendResponse(response.toString(), output);
     }
 
-    public static void sendJsonResponse(@NotNull String response, @NotNull OutputStream output) throws IOException {
+    public static void sendEmptyResponse(@NotNull OutputStream output) throws IOException {
+        output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
+                WebServer.CORS_HEADERS + WebServer.CRLF).getBytes());
+        output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
+    }
+
+    public static void sendSetCookieResponse(String name, String value, @NotNull OutputStream output) throws IOException {
+        output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
+                WebServer.CORS_HEADERS + WebServer.SET_COOKIE_HEADER + name + "=" + value).getBytes());
+        output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
+    }
+
+    public static void sendResponse(@NotNull String response, @NotNull OutputStream output) throws IOException {
         byte[] content = response.getBytes();
         output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(content) + JSON_CONTENT_TYPE_HEADER +
                 WebServer.CORS_HEADERS + WebServer.CRLF).getBytes());

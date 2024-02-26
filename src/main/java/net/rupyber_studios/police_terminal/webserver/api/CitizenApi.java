@@ -16,7 +16,7 @@ public class CitizenApi {
     private static final List<String> ORDER_FIELDS = List.of("uuid", "username", "online");
 
     public static void list(@NotNull String method, String body, OutputStream output) throws IOException {
-        if(!method.equals("POST")) {
+        if(!method.equals("GET")) {
             WebServer.send405(output);
             return;
         }
@@ -33,7 +33,7 @@ public class CitizenApi {
             String orderField = Exceptions.getString(order, "field");
             if(!ORDER_FIELDS.contains(orderField)) throw new Exceptions.BadRequestException();
             boolean orderAscending = Exceptions.getBoolean(order, "ascending");
-            if(!UserApi.isTokenValid(id, token)) throw new Exceptions.UnauthorizedException();
+            if(!AuthApi.isTokenValid(id, token)) throw new Exceptions.UnauthorizedException();
             JSONObject response = new JSONObject();
             response.put("pages", Citizen.selectNumberOfCitizenPages());
             response.put("citizens", Citizen.selectCitizens(page, orderField, orderAscending));

@@ -24,15 +24,12 @@ loadSettings((sett) => {
 
 function handler(page, order, handleHeader, handleFooter) {
     $.ajax({
-        url: '/api/officer/list',
-        method: 'POST',
+        url: '/api/officers',
+        method: 'GET',
         data: JSON.stringify({
-            uuid: cachedLogin.uuid,
-            token: cachedLogin.token,
             page: page,
             order: order
         }),
-        contentType: 'application/json',
         success: (res) => {
             officers.innerHTML = '';
             for(const officer of res.officers) {

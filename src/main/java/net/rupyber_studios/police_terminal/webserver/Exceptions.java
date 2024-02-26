@@ -64,4 +64,11 @@ public class Exceptions {
             WebServer.send404(output);
         }
     }
+
+    public static class MethodNotAllowedException extends HttpException {
+        @Override
+        public void sendError(OutputStream output) throws IOException {
+            WebServer.send405(output);
+        }
+    }
 }

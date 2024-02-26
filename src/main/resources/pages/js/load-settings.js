@@ -2,7 +2,6 @@ const compactModeCssLink = document.getElementById('compact-mode-css');
 const sharpModeCssLink = document.getElementById('sharp-mode-css');
 const fontCssLink = document.getElementById('font-css');
 
-export const cachedLogin = JSON.parse(localStorage.getItem('cachedLogin'));
 export const statusCodeActions = {
     400: () => {
         console.log('Error 400: Bad Request');
@@ -25,39 +24,31 @@ export const statusCodeActions = {
 };
 
 export function loadSettings(callback, whenFinished) {
-    if(cachedLogin == null || cachedLogin.uuid == undefined || cachedLogin.token == undefined)
-        window.location.href = '/login';
-    else {
-        $.ajax({
-            url: '/api/user/validate-token',
-            method: 'POST',
-            data: JSON.stringify(cachedLogin),
-            contentType: 'application/json',
-            success: (res) => {
-                if(res.valid) {
-                    if(whenFinished) {
-                        getSettings(callback);
-                    }
-                    else {
-                        getSettings();
-                        if(typeof callback == 'function')
-                            callback();
-                    }
+    $.ajax({
+        url: '/api/auth/validate-token',
+        method: 'GET',
+        success: (res) => {
+            if(res.valid) {
+                if(whenFinished) {
+                    getSettings(callback);
                 }
-                else
-                    window.location.href = '/login';
-            },
-            statusCode: statusCodeActions
-        });
-    }
+                else {
+                    getSettings();
+                    if(typeof callback == 'function')
+                        callback();
+                }
+            }
+            else
+                window.location.href = '/login';
+        },
+        statusCode: statusCodeActions
+    });
 }
 
 function getSettings(callback) {
     $.ajax({
-        url: '/api/user/get-settings',
-        method: 'POST',
-        data: JSON.stringify(cachedLogin),
-        contentType: 'application/json',
+        url: '/api/auth/get-settings',
+        method: 'GET',
         success: (res) => {
             showSettings(res);
             if(typeof callback == 'function')

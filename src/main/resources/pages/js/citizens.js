@@ -15,15 +15,12 @@ loadSettings((sett) => {
 
 setHandler((page, order, handleHeader, handleFooter) => {
     $.ajax({
-        url: '/api/citizen/list',
-        method: 'POST',
+        url: '/api/citizens',
+        method: 'GET',
         data: JSON.stringify({
-            uuid: cachedLogin.uuid,
-            token: cachedLogin.token,
             page: page,
             order: order
         }),
-        contentType: 'application/json',
         success: (res) => {
             handleHeader(order);
             handleFooter(page, res.pages);

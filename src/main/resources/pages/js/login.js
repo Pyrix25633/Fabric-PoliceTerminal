@@ -11,7 +11,7 @@ loginButton.disabled = true;
 loginButton.addEventListener('click', async () => {
     if(!(validCallsign && validPassword)) return;
     $.ajax({
-        url: '/api/user/login',
+        url: '/api/auth/login',
         method: 'POST',
         data: JSON.stringify({
             callsign: callsignInput.value,
@@ -19,7 +19,6 @@ loginButton.addEventListener('click', async () => {
         }),
         contentType: 'application/json',
         success: (res) => {
-            localStorage.setItem('cachedLogin', JSON.stringify(res));
             window.location.href = '/';
         },
         statusCode: {
@@ -66,9 +65,11 @@ callsignInput.addEventListener('focusout', () => {
 function callsignTyped() {
     callsignFeedbackSpan.classList.add('error');
     $.ajax({
-        url: '/api/user/callsign-login-feedback?callsign=' + callsignInput.value,
+        url: '/api/auth/callsign-login-feedback',
         method: 'GET',
-        dataType: 'json',
+        data: {
+            callsign: callsignInput.value
+        },
         success: (res) => {
             callsignFeedbackSpan.innerText = res.feedback;
             if(res.feedback.includes('!')) {
