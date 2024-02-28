@@ -1,8 +1,6 @@
 package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,13 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WebServer {
     public static final String HTTP_VERSION = "HTTP/1.1";
@@ -54,7 +45,7 @@ public class WebServer {
                 Request request = new Request(input);
 
                 if(request.requestLine.uri.cleanApiUri != null) {
-                    ApiServer.serveApi(request, input, output);
+                    ApiServer.serveApi(request, output);
                 }
                 else {
                     switch(request.requestLine.uri.cleanUri) {
@@ -101,5 +92,12 @@ public class WebServer {
 
     public static void sendError(String error, @NotNull OutputStream output) throws IOException {
         output.write((error + getContentLengthHeader("".getBytes()) + CRLF).getBytes());
+    }
+
+    public static @Nullable String parseUrlEncodedString(String string) {
+        if(string == null) return null;
+        return string.replaceAll("%5B", "[")
+                .replaceAll("%5D", "]")
+                .replaceAll("%20", " ");
     }
 }

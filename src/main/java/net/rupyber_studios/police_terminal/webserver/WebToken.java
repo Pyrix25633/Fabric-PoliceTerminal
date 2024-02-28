@@ -7,6 +7,7 @@ public class WebToken {
     public String token;
 
     public WebToken(String cookie) throws Exceptions.HttpException {
+        if(cookie == null) throw new Exceptions.UnauthorizedException();
         JSONObject jsonToken = new JSONObject(cookie);
         this.id = Exceptions.getInt(jsonToken, "id");
         this.token = Exceptions.getString(jsonToken, "token");

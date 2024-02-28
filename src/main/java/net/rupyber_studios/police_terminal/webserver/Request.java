@@ -1,5 +1,7 @@
 package net.rupyber_studios.police_terminal.webserver;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,7 +26,7 @@ public class Request {
         if(contentLength <= 0) {
             this.body = null;
             return;
-        };
+        }
         int b;
         StringBuilder body = new StringBuilder();
         // Reading up to specified Content-Length
@@ -34,5 +36,9 @@ public class Request {
             body.append((char)b);
         }
         this.body = body.toString();
+    }
+
+    public JSONObject getJsonBody() {
+        return new JSONObject(body);
     }
 }

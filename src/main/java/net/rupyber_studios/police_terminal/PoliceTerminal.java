@@ -27,9 +27,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class PoliceTerminal implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "police_terminal";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -39,18 +36,15 @@ public class PoliceTerminal implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
 
 		ModConfig.init();
 		RupyberDatabaseAPI.setPoliceTerminalConfig(ModConfig.INSTANCE);
 
 		ModRegistries.registerCommands();
 
-		ServerLifecycleEvents.SERVER_STARTING.register(server -> startServer(server.getSavePath(WorldSavePath.ROOT)));
+		ServerLifecycleEvents.SERVER_STARTING.register((server) -> startServer(server.getSavePath(WorldSavePath.ROOT)));
 
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> stopServer());
+		ServerLifecycleEvents.SERVER_STOPPED.register((server) -> stopServer());
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			try {
@@ -76,13 +70,8 @@ public class PoliceTerminal implements ModInitializer {
 	}
 
 	public static void startServer(Path worldPath) {
-		try {
-			RupyberDatabaseAPI.initialized.acquire();
-			RupyberDatabaseAPI.initialized.release();
-		} catch(InterruptedException e) {
-			throw new IllegalStateException("Could not check if RupyberDatabaseAPI is initialized");
-		}
-
+		RupyberDatabaseAPI.connectIfNotConnected(worldPath);
+		RupyberDatabaseAPI.startPoliceTerminal();
 		RankArgumentType.init();
 		OnlineCallsignArgumentType.init();
 
@@ -128,6 +117,7 @@ public class PoliceTerminal implements ModInitializer {
 	}
 
 	public static void stopServer() {
+		RupyberDatabaseAPI.startPoliceTerminal();
 		try {
 			LOGGER.info("Closing server socket");
 			socket.close();

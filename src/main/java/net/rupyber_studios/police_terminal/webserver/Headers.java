@@ -1,6 +1,7 @@
 package net.rupyber_studios.police_terminal.webserver;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +47,7 @@ public class Headers {
     }
 
     private void parseCookies() {
-        String rawCookies = headers.get("Cookie");
+        String rawCookies = WebServer.parseUrlEncodedString(headers.get("Cookie"));
         if(rawCookies == null) return;
         for(String rawCookie : rawCookies.split("; ")) {
             Matcher matcher = COOKIE_PATTERN.matcher(rawCookie);
@@ -55,15 +56,15 @@ public class Headers {
         }
     }
 
-    public String get(String name) {
+    public @Nullable String get(String name) {
         return headers.get(name);
     }
 
-    public String getCookie(String name) {
+    public @Nullable String getCookie(String name) {
         return cookies.get(name);
     }
 
     public WebToken getWebToken() throws Exceptions.HttpException {
-        return new WebToken(cookies.get("token"));
+        return new WebToken(getCookie("token"));
     }
 }

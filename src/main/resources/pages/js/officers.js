@@ -1,5 +1,5 @@
 import { initTable, setHandler } from "./init-table.js";
-import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js";
+import { loadSettings, statusCodeActions } from "./load-settings.js";
 import { setColor } from "./util.js";
 
 const officers = initTable(
@@ -26,10 +26,10 @@ function handler(page, order, handleHeader, handleFooter) {
     $.ajax({
         url: '/api/officers',
         method: 'GET',
-        data: JSON.stringify({
+        data: {
             page: page,
             order: order
-        }),
+        },
         success: (res) => {
             officers.innerHTML = '';
             for(const officer of res.officers) {

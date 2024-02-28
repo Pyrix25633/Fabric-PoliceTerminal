@@ -47,7 +47,7 @@ export function loadSettings(callback, whenFinished) {
 
 function getSettings(callback) {
     $.ajax({
-        url: '/api/auth/get-settings',
+        url: '/api/auth/settings',
         method: 'GET',
         success: (res) => {
             showSettings(res);

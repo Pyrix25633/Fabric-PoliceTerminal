@@ -24,6 +24,12 @@ public class Exceptions {
         }
     }
 
+    public static @NotNull String getString(@NotNull Request request, String parameter) throws BadRequestException {
+        String value = request.requestLine.uri.getParameter(parameter);
+        if(value == null || value.isEmpty()) throw new BadRequestException();
+        return value;
+    }
+
     public static int getInt(@NotNull JSONObject json, String key) throws BadRequestException {
         try {
             return json.getInt(key);
@@ -32,12 +38,22 @@ public class Exceptions {
         }
     }
 
+    public static int getInt(@NotNull Request request, String parameter) throws BadRequestException {
+        String value = getString(request, parameter);
+        return Integer.parseInt(value);
+    }
+
     public static boolean getBoolean(@NotNull JSONObject json, String key) throws BadRequestException {
         try {
             return json.getBoolean(key);
         } catch(JSONException e) {
             throw new BadRequestException();
         }
+    }
+
+    public static boolean getBoolean(@NotNull Request request, String parameter) throws BadRequestException {
+        String value = getString(request, parameter);
+        return Boolean.parseBoolean(value);
     }
 
     public static abstract class HttpException extends Exception {

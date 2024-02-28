@@ -1,5 +1,5 @@
 import { initTable, setHandler } from "./init-table.js";
-import { loadSettings, cachedLogin, statusCodeActions } from "./load-settings.js";
+import { loadSettings, statusCodeActions } from "./load-settings.js";
 
 const citizens = initTable(null, [
     {text: 'UUID', order: 'uuid', search: 'uuid'},
@@ -17,10 +17,10 @@ setHandler((page, order, handleHeader, handleFooter) => {
     $.ajax({
         url: '/api/citizens',
         method: 'GET',
-        data: JSON.stringify({
+        data: {
             page: page,
             order: order
-        }),
+        },
         success: (res) => {
             handleHeader(order);
             handleFooter(page, res.pages);

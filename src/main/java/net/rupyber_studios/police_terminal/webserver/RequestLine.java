@@ -23,7 +23,7 @@ public class RequestLine {
             else
                 builder.append((char)b);
         }
-        Matcher matcher = REQUEST_LINE_PATTERN.matcher(builder.toString());
+        Matcher matcher = REQUEST_LINE_PATTERN.matcher(WebServer.parseUrlEncodedString(builder.toString()));
         if(matcher.find()) {
             if(Float.parseFloat(matcher.group(3)) < 1.1F)
                 throw new Exceptions.BadRequestException();

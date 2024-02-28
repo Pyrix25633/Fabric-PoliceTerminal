@@ -10,21 +10,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 
 public class ApiServer {
     public static final String JSON_CONTENT_TYPE_HEADER = "Content-Type: application/json" + WebServer.CRLF;
 
-    public static void serveApi(@NotNull Request request, InputStream input, OutputStream output)
-            throws IOException, URISyntaxException {
+    public static void serveApi(@NotNull Request request, OutputStream output)
+            throws IOException {
         switch(request.requestLine.uri.cleanApiUri) {
             case "/auth/validate-token" -> AuthApi.validateToken(request, output);
             case "/auth/callsign-login-feedback" -> AuthApi.callsignLoginFeedback(request, output);
             case "/auth/login" -> AuthApi.login(request, output);
-            case "/auth/get-settings" -> AuthApi.getSettings(request, output);
-            case "/citizen/list" -> CitizenApi.list(request, output);
-            case "/officer/list" -> OfficerApi.list(request, output);
-            default -> FileServer.serveFile("GET", "/404", output);
+            case "/auth/settings" -> AuthApi.settings(request, output);
+            case "/citizens" -> CitizenApi.citizens(request, output);
+            case "/officers" -> OfficerApi.officers(request, output);
+            default -> FileServer.serveFile(request, "/404", output);
         }
     }
 
@@ -40,7 +39,8 @@ public class ApiServer {
 
     public static void sendSetCookieResponse(String name, String value, @NotNull OutputStream output) throws IOException {
         output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
-                WebServer.CORS_HEADERS + WebServer.SET_COOKIE_HEADER + name + "=" + value).getBytes());
+                WebServer.CORS_HEADERS + WebServer.SET_COOKIE_HEADER + name + "=" + value +
+                "; Path=/; SameSite=Strict").getBytes());
         output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
     }
 

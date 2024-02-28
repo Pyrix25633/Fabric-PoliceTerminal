@@ -6,7 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import net.rupyber_studios.police_terminal.config.ModConfig;
-import net.rupyber_studios.police_terminal.util.PlayerInfo;
+import net.rupyber_studios.rupyber_database_api.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
 
 public class HudOverlay implements HudRenderCallback {
