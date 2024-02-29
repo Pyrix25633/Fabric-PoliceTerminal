@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,6 +54,7 @@ public class WebServer {
                         case "/citizens" -> FileServer.serveFile(request, "citizens.html", output);
                         case "/officers" -> FileServer.serveFile(request, "officers.html", output);
                         case "/callouts" -> FileServer.serveFile(request, "callouts.html", output);
+                        case "/emergency-calls" -> FileServer.serveFile(request, "emergency-calls.html", output);
                         case "/manual" -> FileServer.serveFile(request, "manual.html", output);
                         default -> FileServer.serveFile(request, output);
                     }
@@ -62,8 +63,8 @@ public class WebServer {
                 input.close();
                 output.close();
                 socket.close();
-            } catch(SSLHandshakeException ignored) {
-            } catch(Exception e) {
+            } catch(SSLException ignored) {
+            }  catch(Exception e) {
                 PoliceTerminal.LOGGER.error("Error processing request: ", e);
             }
         });

@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Police Terminal - Callouts</title>
+        <title>Police Terminal - Emergency Calls</title>
         <link rel="stylesheet" href="./css/style.css">
         <link rel="stylesheet" href="./css/index.css">
         <link rel="stylesheet" href="./css/compact-mode-off.css" id="compact-mode-css">
@@ -12,12 +12,18 @@
         <link rel="stylesheet" href="./css/roboto-condensed-off.css" id="font-css">
         <link rel="icon" href="./img/icon.svg" type="image/png">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script defer type="module" src="./js/load-settings.js"></script>
-        <script defer type="module" src="./js/index.js"></script>
+        <script type="module" src="./js/load-settings.js"></script>
+        <script type="module" src="./js/init-table.js"></script>
+        <script defer type="module" src="./js/emergency-calls.js"></script>
+        <script type="module" src="./js/util.js"></script>
         <script defer src="./js/init-tabs.js"></script>
     </head>
     <body>
         <nav id="tabs">
         </nav>
+        <div class="panel">
+            <table id="table">
+            </table>
+        </div>
     </body>
 </html>

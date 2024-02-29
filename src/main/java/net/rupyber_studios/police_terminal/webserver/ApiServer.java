@@ -1,15 +1,14 @@
 package net.rupyber_studios.police_terminal.webserver;
 
 import net.rupyber_studios.police_terminal.webserver.api.CitizenApi;
+import net.rupyber_studios.police_terminal.webserver.api.EmergencyCallApi;
 import net.rupyber_studios.police_terminal.webserver.api.OfficerApi;
 import net.rupyber_studios.police_terminal.webserver.api.AuthApi;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 
 public class ApiServer {
     public static final String JSON_CONTENT_TYPE_HEADER = "Content-Type: application/json" + WebServer.CRLF;
@@ -23,6 +22,7 @@ public class ApiServer {
             case "/auth/settings" -> AuthApi.settings(request, output);
             case "/citizens" -> CitizenApi.citizens(request, output);
             case "/officers" -> OfficerApi.officers(request, output);
+            case "/emergency-calls" -> EmergencyCallApi.emergencyCalls(request, output);
             default -> FileServer.serveFile(request, "/404", output);
         }
     }
@@ -40,7 +40,7 @@ public class ApiServer {
     public static void sendSetCookieResponse(String name, String value, @NotNull OutputStream output) throws IOException {
         output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
                 WebServer.CORS_HEADERS + WebServer.SET_COOKIE_HEADER + name + "=" + value +
-                "; Path=/; SameSite=Strict").getBytes());
+                "; Path=/; SameSite=Strict; HttpOnly").getBytes());
         output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
     }
 

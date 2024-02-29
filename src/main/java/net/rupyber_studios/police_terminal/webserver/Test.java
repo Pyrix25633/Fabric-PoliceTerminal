@@ -5,15 +5,18 @@ import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.rupyber_database_api.RupyberDatabaseAPI;
 import net.rupyber_studios.rupyber_database_api.config.PoliceTerminalConfig;
 import net.rupyber_studios.rupyber_database_api.table.IncidentType;
+import net.rupyber_studios.rupyber_database_api.table.Player;
 import net.rupyber_studios.rupyber_database_api.table.Rank;
 import net.rupyber_studios.rupyber_database_api.table.ResponseCode;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class Test {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         PoliceTerminalConfig.load("./run/config/police_terminal.json");
         ModConfig.INSTANCE = new ModConfig();
         ModConfig.INSTANCE.https = true;
@@ -27,6 +30,7 @@ public class Test {
         RupyberDatabaseAPI.createPoliceTerminalTables();
         RupyberDatabaseAPI.updatePoliceTerminalTablesFromConfig();
         PoliceTerminal.startServer(worldPath);
+        PoliceTerminal.LOGGER.info(Player.initPasswordFromUuid(UUID.fromString("9a9101ac-937d-31fc-99f0-be5bc89dd1ba")));
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             do {
