@@ -112,24 +112,26 @@ public class ModConfig extends PoliceTerminalConfig implements ConfigData {
 
     {
         ranks = List.of(
-                new Rank(70, "Chief", 0xFF6347),
-                new Rank(60, "Assistant Chief", 0xFFA07A),
-                new Rank(50, "Deputy Chief", 0xFFD700),
-                new Rank(40, "Commander", 0x6495ED),
-                new Rank(33, "Captain III", 0x87CEFA),
-                new Rank(32, "Captain II", 0x00CED1),
-                new Rank(31, "Captain I", 0x4682B4),
-                new Rank(22, "Lieutenant II", 0x20B2AA),
-                new Rank(21, "Lieutenant I", 0x2E8B57),
-                new Rank(15, "Detective III", 0xDC143C),
-                new Rank(14, "Sergeant II", 0x8B4513),
-                new Rank(13, "Detective II", 0xCD853F),
-                new Rank(12, "Sergeant I", 0x008000),
-                new Rank(11, "Detective I", 0x6B8E23),
-                new Rank(4, "Officer III+1", 0x00FA9A),
-                new Rank(3, "Officer III", 0x3CB371),
-                new Rank(2, "Officer II", 0x00FF7F),
-                new Rank(1, "Officer I", 0x66CDAA)
+                new Rank(80, "Chief", false, 0xFF6347),
+                new Rank(70, "Assistant Chief", false, 0xFFA07A),
+                new Rank(60, "Deputy Chief", false, 0xFFD700),
+                new Rank(50, "Commander", false, 0x6495ED),
+                new Rank(43, "Captain III", false, 0x87CEFA),
+                new Rank(42, "Captain II", false, 0x00CED1),
+                new Rank(41, "Captain I", false, 0x4682B4),
+                new Rank(32, "Lieutenant II", false, 0x20B2AA),
+                new Rank(31, "Lieutenant I", false, 0x2E8B57),
+                new Rank(25, "Detective III", false, 0xDC143C),
+                new Rank(24, "Sergeant II", false, 0x8B4513),
+                new Rank(23, "Detective II", false, 0xCD853F),
+                new Rank(22, "Sergeant I", false, 0x008000),
+                new Rank(21, "Detective I", false, 0x6B8E23),
+                new Rank(14, "Officer III+1", false, 0x00FA9A),
+                new Rank(13, "Officer III", false, 0x3CB371),
+                new Rank(12, "Officer II", false, 0x00FF7F),
+                new Rank(11, "Officer I", false, 0x66CDAA),
+                new Rank(2, "911 Operator II", true, 0x346AB5),
+                new Rank(1, "911 Operator I", true, 0x346AB5)
         );
         callsignAreaUnitBeat = true;
         callsignBeatUnit = true;

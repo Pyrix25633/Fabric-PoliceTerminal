@@ -48,6 +48,7 @@ public class EmergencyCommand {
             context.getSource().sendFeedback(() -> feedback, false);
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not create emergency call: ", e);
+            return 0;
         }
         return 1;
     }

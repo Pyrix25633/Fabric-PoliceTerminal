@@ -26,6 +26,7 @@ public class SyncRanksS2CPacket {
                 Rank rank = Rank.fromId(id);
                 data.writeInt(id);
                 data.writeString(rank.rank);
+                data.writeBoolean(rank.emergencyOperator);
                 data.writeInt(rank.color);
             }
             ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
@@ -39,7 +40,7 @@ public class SyncRanksS2CPacket {
         Rank.ranks = new HashMap<>();
         int size = buf.readInt();
         for(int i = 0; i < size; i++) {
-            Rank rank = new Rank(buf.readInt(), buf.readString(), buf.readInt());
+            Rank rank = new Rank(buf.readInt(), buf.readString(), buf.readBoolean(), buf.readInt());
             Rank.ranks.put(rank.id, rank);
         }
         finished.release();
