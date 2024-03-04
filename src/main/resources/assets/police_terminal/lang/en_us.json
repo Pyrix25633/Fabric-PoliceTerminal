@@ -126,7 +126,12 @@
   "argument.online_callsign.invalid": "Invalid Callsign: no online Player found with specified Callsign",
   "commands.radio.success.radio": "§3Radio ",
   "commands.radio.success.to": " §3to ",
-  "commands.emergency.success.to_911": " to §1911§r: ",
+  "commands.emergency.success.incoming_call": "§cIncoming 911 call, assigned call number: ",
+  "commands.emergency.success.911": "§c911 ",
+  "commands.emergency.success.to": " §cto ",
+  "commands.emergency.success.whats_your_emergency": "911, what's your emergency?",
+  "commands.emergency.success.please_keep_calm": "Ok, please keep calm, we'll take care of it",
+  "commands.emergency.success.no_emergency_responders_available": "§4We are really sorry, but at the moment there are currently no emergency responders available!",
   "commands.terminal.success.terminal_credentials": "Terminal Credentials:",
   "commands.terminal.success.callsign": "Callsign: ",
   "commands.terminal.success.password": "Password: "

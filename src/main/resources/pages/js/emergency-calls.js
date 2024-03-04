@@ -3,7 +3,7 @@ import { loadSettings, statusCodeActions } from "./load-settings.js";
 import { setColor } from "./util.js";
 
 const emergencyCalls = initTable(
-    [{}, {text: "Location", colspan: 3}],
+    [{}, {text: "Location", colspan: 3}, {}, {}, {}, {}],
     [
         {text: 'Call Number', order: 'callNumber', search: 'callNumber'},
         {text: 'X', order: 'locationX', search: 'locationX'},
@@ -11,6 +11,7 @@ const emergencyCalls = initTable(
         {text: 'Z', order: 'locationZ', search: 'locationZ'},
         {text: 'Created At', order: 'createdAt', search: 'createdAt'},
         {text: 'Caller', order: 'caller', search: 'caller'},
+        {text: 'Responder', order: 'responder', search: 'responder'},
         {text: 'Closed', order: 'closed', search: 'closed'}
     ]
 );
@@ -52,6 +53,13 @@ function handler(page, order, handleHeader, handleFooter) {
                     callerTd.classList.add('null');
                 }
                 callerTd.innerText = caller;
+                let responder = emergencyCall.responder;
+                const responderTd = document.createElement('td');
+                if(responder == null) {
+                    responder = 'null';
+                    responderTd.classList.add('null');
+                }
+                responderTd.innerText = responder;
                 const closed = emergencyCall.closed;
                 const closedTd = document.createElement('td');
                 closedTd.innerText = closed;
@@ -62,6 +70,7 @@ function handler(page, order, handleHeader, handleFooter) {
                 tr.appendChild(locationZTd);
                 tr.appendChild(createdAtTd);
                 tr.appendChild(callerTd);
+                tr.appendChild(responderTd);
                 tr.appendChild(closedTd);
                 emergencyCalls.appendChild(tr);
             }

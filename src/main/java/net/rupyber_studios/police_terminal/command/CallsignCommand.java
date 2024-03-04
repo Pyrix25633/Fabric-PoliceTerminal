@@ -78,7 +78,8 @@ public class CallsignCommand {
         return Player.selectRankFromUuid(source.getPlayer().getUuid());
     }
 
-    private static int executeCallsignRequest(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static int executeCallsignRequest(CommandContext<ServerCommandSource> context)
+            throws CommandSyntaxException {
         try {
             return execute(context, Callsign.createUnusedCallsign());
         } catch (SQLException e) {
@@ -87,7 +88,8 @@ public class CallsignCommand {
         }
     }
 
-    private static int executeCallsignRequestWithArgument(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static int executeCallsignRequestWithArgument(CommandContext<ServerCommandSource> context)
+            throws CommandSyntaxException {
         return execute(context, context.getArgument("callsign", String.class));
     }
 
@@ -118,21 +120,28 @@ public class CallsignCommand {
             SendCallsignS2CPacket.send(player, callsign);
             OnlineCallsignArgumentType.init();
             context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            MutableText feedback;
-            if(dispatchingPlayer == null)
-                feedback = CALLSIGN_TEXT.copy().append("§9" + callsign + "§r")
-                        .append(WAS_RESERVED_FOR_TEXT);
-            else
-                feedback = Text.literal(dispatchingPlayer.getGameProfile().getName())
-                        .append(RESERVED_CALLSIGN_TEXT).append("§9" + callsign + "§r").append(FOR_TEXT);
-            feedback.append(player.getGameProfile().getName());
+            Text feedback = buildCallsignReserveFeedback(dispatchingPlayer, player, callsign);
             context.getSource().sendFeedback(() -> feedback, true);
             if(dispatchingPlayer != player)
                 player.sendMessage(feedback);
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not reserve callsign for player: ", e);
+            return 0;
         }
         return 1;
+    }
+
+    private static @NotNull Text buildCallsignReserveFeedback(ServerPlayerEntity dispatchingPlayer,
+                                                              ServerPlayerEntity player, String callsign) {
+        MutableText feedback;
+        if(dispatchingPlayer == null)
+            feedback = CALLSIGN_TEXT.copy().append("§9" + callsign + "§r")
+                    .append(WAS_RESERVED_FOR_TEXT);
+        else
+            feedback = Text.literal(dispatchingPlayer.getGameProfile().getName())
+                    .append(RESERVED_CALLSIGN_TEXT).append("§9" + callsign + "§r").append(FOR_TEXT);
+        feedback.append(player.getGameProfile().getName());
+        return feedback;
     }
 
     private static int executeCallsignRelease(@NotNull CommandContext<ServerCommandSource> context)
@@ -148,20 +157,27 @@ public class CallsignCommand {
             SendCallsignS2CPacket.send(player, callsign);
             OnlineCallsignArgumentType.init();
             context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            Text feedback;
-            if(dispatchingPlayer == null)
-                feedback = CALLSIGN_TEXT.copy().append("§9" + callsign + "§r")
-                        .append(" (" + player.getGameProfile().getName() + ")").append(WAS_RELEASED_TEXT);
-            else
-                feedback = Text.literal(dispatchingPlayer.getGameProfile().getName())
-                        .append(RELEASED_CALLSIGN_TEXT).append("§9" + callsign + "§r")
-                        .append(" (" + player.getGameProfile().getName() + ")");
+            Text feedback = buildCallsignReleaseFeedback(dispatchingPlayer, player, callsign);
             context.getSource().sendFeedback(() -> feedback, true);
             if(dispatchingPlayer != player)
                 player.sendMessage(feedback);
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not release callsign: ", e);
+            return 0;
         }
         return 1;
+    }
+
+    private static Text buildCallsignReleaseFeedback(ServerPlayerEntity dispatchingPlayer, ServerPlayerEntity player,
+                                                     String callsign) {
+        Text feedback;
+        if(dispatchingPlayer == null)
+            feedback = CALLSIGN_TEXT.copy().append("§9" + callsign + "§r")
+                    .append(" (" + player.getGameProfile().getName() + ")").append(WAS_RELEASED_TEXT);
+        else
+            feedback = Text.literal(dispatchingPlayer.getGameProfile().getName())
+                    .append(RELEASED_CALLSIGN_TEXT).append("§9" + callsign + "§r")
+                    .append(" (" + player.getGameProfile().getName() + ")");
+        return feedback;
     }
 }

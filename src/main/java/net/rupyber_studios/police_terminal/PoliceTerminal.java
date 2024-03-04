@@ -30,7 +30,6 @@ public class PoliceTerminal implements ModInitializer {
 	public static final String MOD_ID = "police_terminal";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static Connection connection;
 	public static ServerSocket socket;
 	public static Thread serverThread;
 
@@ -117,7 +116,8 @@ public class PoliceTerminal implements ModInitializer {
 	}
 
 	public static void stopServer() {
-		RupyberDatabaseAPI.startPoliceTerminal();
+		RupyberDatabaseAPI.stopPoliceTerminal();
+		RupyberDatabaseAPI.disconnectIfConnected();
 		try {
 			LOGGER.info("Closing server socket");
 			socket.close();
