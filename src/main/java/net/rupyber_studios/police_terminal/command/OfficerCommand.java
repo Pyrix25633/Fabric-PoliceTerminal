@@ -10,7 +10,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
-import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.util.Officer;
 import net.rupyber_studios.rupyber_database_api.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ public class OfficerCommand {
     private static int execute(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
         try {
-            PlayerInfo info = Player.selectPlayerInfoFromUuid(player.getUuid());
+            PlayerInfo info = Officer.selectPlayerInfoFromUuid(player.getUuid());
             Text feedback;
             if(info.rank != null && info.status != null)
                 feedback = OFFICER_TEXT.copy().append(player.getGameProfile().getName()).append(":")

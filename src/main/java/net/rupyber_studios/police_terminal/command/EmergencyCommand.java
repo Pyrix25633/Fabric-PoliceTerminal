@@ -11,8 +11,12 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
+import net.rupyber_studios.police_terminal.command.argument.EmergencyCallNumberArgumentType;
 import net.rupyber_studios.rupyber_database_api.table.EmergencyCall;
+import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.table.Rank;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
+import net.rupyber_studios.rupyber_database_api.util.Status;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,43 +33,93 @@ public class EmergencyCommand {
             Text.translatable("commands.emergency.success.please_keep_calm");
     private static final Text NO_EMERGENCY_OPERATORS_AVAILABLE_TEXT =
             Text.translatable("commands.emergency.success.no_emergency_responders_available");
+    private static final Text NO_NEED_FOR_POLICE_TEXT =
+            Text.translatable("commands.emergency.success.no_need_for_police");
+    private static final Text CLOSED_CALL_TEXT = Text.translatable("commands.emergency.success.closed_call");
 
     public static void register(@NotNull CommandDispatcher<ServerCommandSource> dispatcher,
                                 CommandRegistryAccess registryAccess,
                                 CommandManager.RegistrationEnvironment environment) {
-        dispatcher.register(CommandManager.literal("emergency").requires(EmergencyCommand::canExecute)
-                .then(CommandManager.argument("description", StringArgumentType.greedyString())
-                        .executes(EmergencyCommand::execute)
-                )
+        dispatcher.register(CommandManager.literal("emergency")
+                .then(CommandManager.literal("ignore")
+                        .requires(EmergencyCommand::canExecuteIgnore)
+                        .then(CommandManager.argument("callNumber", new EmergencyCallNumberArgumentType())
+                                .executes(EmergencyCommand::executeIgnore)))
+                .then(CommandManager.literal("call")
+                        .requires(EmergencyCommand::canExecuteCall)
+                        .then(CommandManager.argument("description", StringArgumentType.greedyString())
+                                .executes(EmergencyCommand::executeCall)))
         );
-        dispatcher.register(CommandManager.literal("911").requires(EmergencyCommand::canExecute)
-                .then(CommandManager.argument("description", StringArgumentType.greedyString())
-                        .executes(EmergencyCommand::execute)
-                )
+        dispatcher.register(CommandManager.literal("911")
+                .then(CommandManager.literal("ignore")
+                        .requires(EmergencyCommand::canExecuteIgnore)
+                        .then(CommandManager.argument("callNumber", new EmergencyCallNumberArgumentType())
+                                .executes(EmergencyCommand::executeIgnore)))
+                .then(CommandManager.literal("call")
+                        .requires(EmergencyCommand::canExecuteCall)
+                        .then(CommandManager.argument("description", StringArgumentType.greedyString())
+                                .executes(EmergencyCommand::executeCall)))
         );
     }
 
-    private static boolean canExecute(@NotNull ServerCommandSource source) {
+    private static boolean canExecuteCall(@NotNull ServerCommandSource source) {
             ServerPlayerEntity player = source.getPlayer();
             return player != null;
     }
 
-    private static int execute(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static boolean canExecuteIgnore(@NotNull ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if(player == null) return false;
+        try {
+            Rank rank = Officer.selectRankFromUuid(player.getUuid());
+            return (rank != null && rank.emergencyOperator);
+        } catch(SQLException e) {
+            return false;
+        }
+    }
+
+    private static int executeCall(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if(player == null) return 0;
         try {
             String description = StringArgumentType.getString(context, "description");
             ServerPlayerEntity respondingOfficer = selectRespondingOfficer(context.getSource().getServer());
-            Text feedback = buildFeedback(player, respondingOfficer, description);
+            Text feedback = buildFeedbackCall(player, respondingOfficer, description);
             if(respondingOfficer != null) {
+                Officer.updateStatusFromUuid(respondingOfficer.getUuid(), Status.BUSY);
                 int callNumber = EmergencyCall.insertAndReturnCallNumber(player.getUuid(), respondingOfficer.getUuid(),
                         player.getPos(), description);
                 respondingOfficer.sendMessage(INCOMING_CALL_TEXT.copy().append(callNumber + "\n").append(feedback));
+                EmergencyCallNumberArgumentType.init();
             }
             if(player != respondingOfficer)
                 context.getSource().sendFeedback(() -> feedback, false);
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not create emergency call: ", e);
+            return 0;
+        }
+        return 1;
+    }
+
+    private static int executeIgnore(@NotNull CommandContext<ServerCommandSource> context)
+            throws CommandSyntaxException {
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if(player == null) return 0;
+        try {
+            int callNumber = context.getArgument("callNumber", Integer.class);
+            EmergencyCall emergencyCall = EmergencyCall.selectFromCallNumber(callNumber);
+            if(emergencyCall == null) return 0;
+            if(!canOfficerIgnoreEmergencyCall(player, emergencyCall)) return 0;
+            EmergencyCall.updateClosedTrue(emergencyCall.id);
+            ServerPlayerEntity caller = selectCaller(context.getSource().getServer(), emergencyCall.callerId);
+            if(caller == null) return 0;
+            Text feedback = buildFeedbackIgnore(player, caller);
+            context.getSource().sendFeedback(() -> feedback.copy().append("\n").append(CLOSED_CALL_TEXT)
+                            .append(callNumber + ""), false);
+            if(caller != player)
+                caller.sendMessage(feedback);
+        } catch(SQLException e) {
+            PoliceTerminal.LOGGER.error("Could not ignore emergency call: ", e);
             return 0;
         }
         return 1;
@@ -82,7 +136,22 @@ public class EmergencyCommand {
         return emergencyOperator;
     }
 
-    private static Text buildFeedback(@NotNull ServerPlayerEntity player,
+    private static boolean canOfficerIgnoreEmergencyCall(@NotNull ServerPlayerEntity officer,
+                                                         EmergencyCall emergencyCall) throws SQLException{
+        Integer officerId = Player.selectIdFromUuid(officer.getUuid());
+        if(officerId == null) return false;
+        if(emergencyCall.closed) return false;
+        return emergencyCall.responderId == officerId;
+    }
+
+    private static @Nullable ServerPlayerEntity selectCaller(@NotNull MinecraftServer server, int callerId)
+            throws SQLException {
+        UUID callerUuid = Player.selectUuidFromId(callerId);
+        if(callerUuid == null) return null;
+        return server.getPlayerManager().getPlayer(callerUuid);
+    }
+
+    private static Text buildFeedbackCall(@NotNull ServerPlayerEntity player,
                                       @Nullable ServerPlayerEntity respondingOfficer, String description) {
         String playerUsername = player.getGameProfile().getName();
         if(respondingOfficer == null) {
@@ -98,5 +167,10 @@ public class EmergencyCommand {
                     .append(_911_TEXT).append("§c(§r" + respondingOfficerUsername).append(TO_TEXT)
                     .append("§r" + playerUsername + "§c):§r ").append(PLEASE_KEEP_CALM_TEXT);
         }
+    }
+
+    private static Text buildFeedbackIgnore(@NotNull ServerPlayerEntity player, @NotNull ServerPlayerEntity caller) {
+        return _911_TEXT.copy().append("§c(§r" + player.getGameProfile().getName()).append(TO_TEXT)
+                .append("§r" + caller.getGameProfile().getName() + "§c):§r ").append(NO_NEED_FOR_POLICE_TEXT);
     }
 }

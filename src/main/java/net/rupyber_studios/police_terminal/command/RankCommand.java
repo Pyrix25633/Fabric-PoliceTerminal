@@ -15,8 +15,8 @@ import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.networking.packet.SendRankS2CPacket;
 import net.rupyber_studios.police_terminal.networking.packet.SendStatusS2CPacket;
-import net.rupyber_studios.rupyber_database_api.table.Player;
 import net.rupyber_studios.rupyber_database_api.table.Rank;
+import net.rupyber_studios.rupyber_database_api.util.Officer;
 import net.rupyber_studios.rupyber_database_api.util.Status;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,10 +47,10 @@ public class RankCommand {
 
     private static boolean canExecute(@NotNull ServerCommandSource source) {
         if(ModConfig.INSTANCE.rankCommandRequiresAdmin && !source.hasPermissionLevel(4)) return false;
+        ServerPlayerEntity player = source.getPlayer();
+        if(player == null) return true;
         try {
-            ServerPlayerEntity player = source.getPlayer();
-            if(player == null) return true;
-            Rank rank = Player.selectRankFromUuid(source.getPlayer().getUuid());
+            Rank rank = Officer.selectRankFromUuid(source.getPlayer().getUuid());
             return (rank != null && rank.id >= ModConfig.INSTANCE.minimumRankIdForRankCommand) ||
                     source.hasPermissionLevel(4);
         } catch(Exception ignored) {
@@ -85,6 +85,7 @@ public class RankCommand {
                 player.sendMessage(feedback);
         } catch(Exception e) {
             if(e instanceof CommandSyntaxException cse) throw cse;
+            PoliceTerminal.LOGGER.error("Could not set rank for player: ", e);
             return 0;
         }
         return 1;
@@ -92,7 +93,7 @@ public class RankCommand {
 
     private static Rank selectPlayerRank(@NotNull ServerPlayerEntity player) throws SQLException {
         try {
-            return Player.selectRankFromUuid(player.getUuid());
+            return Officer.selectRankFromUuid(player.getUuid());
         } catch(SQLException e) {
             PoliceTerminal.LOGGER.error("Could not get player rank: ", e);
             throw e;
@@ -112,10 +113,10 @@ public class RankCommand {
 
     private static void updatePlayerRank(@NotNull ServerPlayerEntity player, Rank rank) throws SQLException {
         try {
-            Player.updateRankFromUuid(player.getUuid(), rank);
+            Officer.updateRankFromUuid(player.getUuid(), rank);
             if(rank != null) {
-                if(Player.selectStatusFromUuid(player.getUuid()) == null) {
-                    Player.updateStatusFromUuid(player.getUuid(), Status.OUT_OF_SERVICE);
+                if(Officer.selectStatusFromUuid(player.getUuid()) == null) {
+                    Officer.updateStatusFromUuid(player.getUuid(), Status.OUT_OF_SERVICE);
                     SendStatusS2CPacket.send(player, Status.OUT_OF_SERVICE);
                 }
             }

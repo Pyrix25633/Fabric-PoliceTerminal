@@ -12,7 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
-import net.rupyber_studios.rupyber_database_api.table.Player;
+import net.rupyber_studios.rupyber_database_api.util.Officer;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -39,9 +39,10 @@ public class RadioCommand {
     }
 
     private static boolean canExecute(@NotNull ServerCommandSource source) {
+        ServerPlayerEntity player = source.getPlayer();
+        if(player == null) return false;
         try {
-            if(source.getPlayer() == null) return false;
-            return Player.selectCallsignFromUuid(source.getPlayer().getUuid()) != null;
+            return Officer.selectCallsignFromUuid(source.getPlayer().getUuid()) != null;
         } catch(SQLException e) {
             return false;
         }
@@ -62,7 +63,7 @@ public class RadioCommand {
         String callsign = context.getArgument("callsign", String.class);
         Text message = MessageArgumentType.getMessage(context, "message");
         try {
-            String dispatchingPlayerCallsign = Player.selectCallsignFromUuid(dispatchingPlayer.getUuid());
+            String dispatchingPlayerCallsign = Officer.selectCallsignFromUuid(dispatchingPlayer.getUuid());
             List<UUID> playerUuids = getPlayerUuids(callsign, like);
             if(playerUuids == null) return 0;
             Text feedback = buildFeedback(dispatchingPlayerCallsign, callsign, message);
@@ -81,9 +82,9 @@ public class RadioCommand {
     private static List<UUID> getPlayerUuids(String callsign, boolean like) throws SQLException {
         List<UUID> playerUuids;
         if(like)
-            playerUuids = Player.selectUuidsFromCallsignLike(callsign);
+            playerUuids = Officer.selectUuidsFromCallsignLike(callsign);
         else {
-            UUID playerUuid = Player.selectUuidFromCallsign(callsign);
+            UUID playerUuid = Officer.selectUuidFromCallsign(callsign);
             if(playerUuid != null) playerUuids = List.of(playerUuid);
             else playerUuids = null;
         }

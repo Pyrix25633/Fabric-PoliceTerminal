@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.WorldSavePath;
+import net.rupyber_studios.police_terminal.command.argument.EmergencyCallNumberArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
@@ -23,7 +24,6 @@ import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.security.KeyStore;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class PoliceTerminal implements ModInitializer {
@@ -73,6 +73,7 @@ public class PoliceTerminal implements ModInitializer {
 		RupyberDatabaseAPI.startPoliceTerminal();
 		RankArgumentType.init();
 		OnlineCallsignArgumentType.init();
+		EmergencyCallNumberArgumentType.init();
 
 		try {
 			boolean httpsError = false;

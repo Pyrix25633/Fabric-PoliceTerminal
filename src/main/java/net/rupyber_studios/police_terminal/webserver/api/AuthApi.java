@@ -4,6 +4,7 @@ import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.webserver.*;
 import net.rupyber_studios.rupyber_database_api.table.Player;
 import net.rupyber_studios.rupyber_database_api.util.Callsign;
+import net.rupyber_studios.rupyber_database_api.util.Officer;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -52,13 +53,13 @@ public class AuthApi {
             if(request.body == null) throw new Exceptions.BadRequestException();
             JSONObject requestBody = request.getJsonBody();
             String callsign = Exceptions.getString(requestBody, "callsign");
-            int id = Player.selectIdFromCallsign(callsign);
+            int id = Officer.selectIdFromCallsign(callsign);
             if(id == 0) throw new Exceptions.NotFoundException();
             String password = Exceptions.getString(requestBody, "password");
-            if(Player.isPasswordCorrect(id, password)) {
+            if(Officer.isPasswordCorrect(id, password)) {
                 JSONObject cookie = new JSONObject();
                 cookie.put("id", id);
-                cookie.put("token", Player.initToken(id));
+                cookie.put("token", Officer.initToken(id));
                 ApiServer.sendSetCookieResponse("token", cookie.toString(), output);
             }
             else
@@ -94,7 +95,7 @@ public class AuthApi {
 
     public static boolean isTokenValid(WebToken webToken) {
         try {
-            return Player.isTokenCorrect(webToken.id, webToken.token);
+            return Officer.isTokenCorrect(webToken.id, webToken.token);
         } catch(Exception e) {
             return false;
         }

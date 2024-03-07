@@ -5,9 +5,9 @@ import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.rupyber_database_api.RupyberDatabaseAPI;
 import net.rupyber_studios.rupyber_database_api.config.PoliceTerminalConfig;
 import net.rupyber_studios.rupyber_database_api.table.IncidentType;
-import net.rupyber_studios.rupyber_database_api.table.Player;
 import net.rupyber_studios.rupyber_database_api.table.Rank;
 import net.rupyber_studios.rupyber_database_api.table.ResponseCode;
+import net.rupyber_studios.rupyber_database_api.util.Officer;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,7 +30,7 @@ public class Test {
         RupyberDatabaseAPI.createPoliceTerminalTables();
         RupyberDatabaseAPI.updatePoliceTerminalTablesFromConfig();
         PoliceTerminal.startServer(worldPath);
-        PoliceTerminal.LOGGER.info(Player.initPasswordFromUuid(UUID.fromString("9a9101ac-937d-31fc-99f0-be5bc89dd1ba")));
+        PoliceTerminal.LOGGER.info(Officer.initPasswordFromUuid(UUID.fromString("9a9101ac-937d-31fc-99f0-be5bc89dd1ba")));
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             do {

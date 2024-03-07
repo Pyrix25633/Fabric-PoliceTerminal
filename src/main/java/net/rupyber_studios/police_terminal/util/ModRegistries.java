@@ -6,10 +6,7 @@ import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.util.Identifier;
 import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.*;
-import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
-import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
-import net.rupyber_studios.police_terminal.command.argument.StatusArgumentType;
-import net.rupyber_studios.police_terminal.command.argument.UnusedCallsignArgumentType;
+import net.rupyber_studios.police_terminal.command.argument.*;
 
 public class ModRegistries {
     public static void registerCommands() {
@@ -21,6 +18,8 @@ public class ModRegistries {
                 UnusedCallsignArgumentType.class, ConstantArgumentSerializer.of(UnusedCallsignArgumentType::new));
         ArgumentTypeRegistry.registerArgumentType(new Identifier(PoliceTerminal.MOD_ID, "online_callsign"),
                 OnlineCallsignArgumentType.class, ConstantArgumentSerializer.of(OnlineCallsignArgumentType::new));
+        ArgumentTypeRegistry.registerArgumentType(new Identifier(PoliceTerminal.MOD_ID, "emergency_call_number"),
+                EmergencyCallNumberArgumentType.class, ConstantArgumentSerializer.of(EmergencyCallNumberArgumentType::new));
         CommandRegistrationCallback.EVENT.register(StatusCommand::register);
         CommandRegistrationCallback.EVENT.register(RankCommand::register);
         CommandRegistrationCallback.EVENT.register(OfficerCommand::register);
