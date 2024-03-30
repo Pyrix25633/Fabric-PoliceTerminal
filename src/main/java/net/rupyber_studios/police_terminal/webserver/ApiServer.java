@@ -32,13 +32,13 @@ public class ApiServer {
     }
 
     public static void sendEmptyResponse(@NotNull OutputStream output) throws IOException {
-        output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
+        output.write((WebServer.RESPONSE_204 + WebServer.getContentLengthHeader(new byte[0]) +
                 WebServer.CORS_HEADERS + WebServer.CRLF).getBytes());
         output.write((WebServer.CRLF + WebServer.CRLF).getBytes());
     }
 
     public static void sendSetCookieResponse(String name, String value, @NotNull OutputStream output) throws IOException {
-        output.write((WebServer.RESPONSE_200 + WebServer.getContentLengthHeader(new byte[0]) +
+        output.write((WebServer.RESPONSE_204 + WebServer.getContentLengthHeader(new byte[0]) +
                 WebServer.CORS_HEADERS + WebServer.SET_COOKIE_HEADER + name + "=" + value +
                 "; Path=/; SameSite=Strict; HttpOnly").getBytes());
         output.write((WebServer.CRLF + WebServer.CRLF).getBytes());

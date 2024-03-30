@@ -13,7 +13,9 @@
         <link rel="icon" href="./img/icon.svg" type="image/png">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script defer src="./js/load-cached-settings.js"></script>
-        <script defer src="./js/login.js"></script>
+        <script defer type="module" src="./js/compiled/require-non-null.js" id="require-non-null"></script>
+        <script defer type="module" src="./js/compiled/form.js" id="form"></script>
+        <script defer type="module" src="./js/compiled/login.js" id="login"></script>
     </head>
     <body>
         <nav id="navbar">
@@ -25,24 +27,12 @@
         </nav>
         <div class="box panel bottom-margin">
             <h3>Login with your Callsign and Password</h3>
-            <div class="box">
-                <div class="container label-input">
-                    <label for="callsign">Callsign:</label>
-                    <input type="text" id="callsign" autofocus>
-                </div>
-                <span class="text" id="callsign-feedback">Input Callsign</span>
-                <div class="container label-input">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password">
-                </div>
-                <span class="text" id="password-feedback">Input Password</span>
-                <div class="container">
-                    <button id="login">Login <img src="./img/login.svg" class="button" alt="Login Icon"></button>
-                </div>
+            <div class="box" id="login-form">
+
             </div>
             <div class="box margin-top">
-                <span class="text">Get a Callsign with <code>/callsign request</code> or <code>/callsing reserve</code> command</span>
-                <span class="text">Get your One Time Password with <code>/terminal credentials</code> command</span>
+                <span class="text">Get a Callsign with <code>/callsign request</code> or <code>/callsing reserve</code> Command</span>
+                <span class="text">Get your One Time Password with <code>/terminal credentials</code> Command</span>
             </div>
         </div>
     </body>

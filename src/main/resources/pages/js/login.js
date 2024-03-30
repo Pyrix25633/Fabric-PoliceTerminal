@@ -121,7 +121,6 @@ function passwordTyped() {
             passwordFeedbackSpan.classList.replace('success', 'error');
             validPassword = false;
             loginButton.disabled = true;
-            console.log(c);
             return;
         }
     }

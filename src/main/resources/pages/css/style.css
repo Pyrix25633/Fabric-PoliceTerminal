@@ -83,6 +83,10 @@ button:active {
 }
 button:disabled {
     filter: brightness(70%);
+    cursor: not-allowed;
+}
+button:disabled img.button {
+    cursor: not-allowed;
 }
 
 span.text, span.text * {
