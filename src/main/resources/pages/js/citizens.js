@@ -1,5 +1,6 @@
 import { initTable, setHandler } from "./init-table.js";
-import { loadSettings, statusCodeActions } from "./load-settings.js";
+import { loadSettings } from "./compiled/load-settings.js";
+import { defaultStatusCode } from "./compiled/utils.js";
 
 const citizens = initTable(null, [
     {text: 'UUID', order: 'uuid', search: 'uuid'},
@@ -7,11 +8,7 @@ const citizens = initTable(null, [
     {text: 'Online', order: 'online', search: 'online'}
 ]);
 
-let settings;
-
-loadSettings((sett) => {
-    settings = sett;
-}, true);
+await loadSettings();
 
 setHandler((page, order, handleHeader, handleFooter) => {
     $.ajax({
@@ -47,6 +44,6 @@ setHandler((page, order, handleHeader, handleFooter) => {
                 citizens.appendChild(tr);
             }
         },
-        statusCode: statusCodeActions
+        statusCode: defaultStatusCode
     });
 });

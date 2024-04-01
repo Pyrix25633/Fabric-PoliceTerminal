@@ -1,7 +1,4 @@
-import { RequireNonNull } from './require-non-null.js';
-
-type Success = (res: object) => void;
-type StatusCode = { [index: number]: () => void; };
+import { RequireNonNull, StatusCode, Success } from './utils.js';
 
 export abstract class Form {
     private url: string;
@@ -19,9 +16,9 @@ export abstract class Form {
         this.form = RequireNonNull.getElementById(id);
         this.inputs = inputs;
         for(const input of inputs)
-            input.append(this);
+            input.appendTo(this);
         this.submitButton = submitButton;
-        this.submitButton.append(this);
+        this.submitButton.appendTo(this);
         this.submitButton.addClickListener((): void => { this.submit(); });
         this.success = success;
         this.statusCode = statusCode;
@@ -68,7 +65,7 @@ export abstract class SubmitButton {
         this.button.appendChild(icon);
     }
 
-    append(form: Form) {
+    appendTo(form: Form) {
         const div = document.createElement('div');
         div.classList.add('container');
         div.appendChild(this.button);
@@ -121,7 +118,7 @@ export abstract class Input {
         });
     }
 
-    append(form: Form): void {
+    appendTo(form: Form): void {
         this.form = form;
         const container = document.createElement('div');
         container.classList.add('container');

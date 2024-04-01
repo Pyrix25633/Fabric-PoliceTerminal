@@ -1,13 +1,4 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-import { RequireNonNull } from './require-non-null.js';
+import { RequireNonNull } from './utils.js';
 export class Form {
     constructor(id, url, method, inputs, submitButton, success, statusCode) {
         this.valid = false;
@@ -16,9 +7,9 @@ export class Form {
         this.form = RequireNonNull.getElementById(id);
         this.inputs = inputs;
         for (const input of inputs)
-            input.append(this);
+            input.appendTo(this);
         this.submitButton = submitButton;
-        this.submitButton.append(this);
+        this.submitButton.appendTo(this);
         this.submitButton.addClickListener(() => { this.submit(); });
         this.success = success;
         this.statusCode = statusCode;
@@ -32,21 +23,19 @@ export class Form {
             this.valid = this.valid && !input.getError();
         this.submitButton.setDisabled(!this.valid);
     }
-    submit() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.submitButton.isDisabled())
-                return;
-            const data = {};
-            for (const input of this.inputs)
-                data[input.id] = yield input.parse();
-            $.ajax({
-                url: this.url,
-                method: this.method,
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: this.success,
-                statusCode: this.statusCode
-            });
+    async submit() {
+        if (this.submitButton.isDisabled())
+            return;
+        const data = {};
+        for (const input of this.inputs)
+            data[input.id] = await input.parse();
+        $.ajax({
+            url: this.url,
+            method: this.method,
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: this.success,
+            statusCode: this.statusCode
         });
     }
 }
@@ -61,7 +50,7 @@ export class SubmitButton {
         icon.alt = text + ' Icon';
         this.button.appendChild(icon);
     }
-    append(form) {
+    appendTo(form) {
         const div = document.createElement('div');
         div.classList.add('container');
         div.appendChild(this.button);
@@ -104,7 +93,7 @@ export class Input {
             this.parse();
         });
     }
-    append(form) {
+    appendTo(form) {
         this.form = form;
         const container = document.createElement('div');
         container.classList.add('container');
@@ -145,25 +134,23 @@ export class ApiFeedbackInput extends Input {
     getInputValue() {
         return this.input.value;
     }
-    parse() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = {};
-            data[this.id] = this.getInputValue();
-            return new Promise((resolve) => {
-                $.ajax({
-                    url: this.url,
-                    method: this.method,
-                    data: data,
-                    success: (res) => {
-                        this.setError(res.feedback.includes('!'), res.feedback);
-                        resolve(this.getInputValue());
-                    },
-                    error: (req, err) => {
-                        console.error(err);
-                        this.setError(true, 'Server unreachable!');
-                        resolve(null);
-                    }
-                });
+    async parse() {
+        const data = {};
+        data[this.id] = this.getInputValue();
+        return new Promise((resolve) => {
+            $.ajax({
+                url: this.url,
+                method: this.method,
+                data: data,
+                success: (res) => {
+                    this.setError(res.feedback.includes('!'), res.feedback);
+                    resolve(this.getInputValue());
+                },
+                error: (req, err) => {
+                    console.error(err);
+                    this.setError(true, 'Server unreachable!');
+                    resolve(null);
+                }
             });
         });
     }

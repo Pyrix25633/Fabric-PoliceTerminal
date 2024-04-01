@@ -1,4 +1,5 @@
 import { ApiFeedbackInput, Form, Input, SubmitButton } from './form.js';
+import { defaultStatusCode } from './utils.js';
 
 class LoginButton extends SubmitButton {
     constructor() {
@@ -45,26 +46,21 @@ class PasswordInput extends Input {
 const callsignInput = new CallsignInput();
 const passwordInput = new PasswordInput();
 
+const loginStatusCode = Object.assign({}, defaultStatusCode);
+loginStatusCode[401] = (): void => {
+    passwordInput.setError(true, 'Wrong Password!');
+};
+loginStatusCode[404] = (): void => {
+    callsignInput.setError(true, 'Callsign not found!');
+};
+
 class LoginForm extends Form {
     constructor() {
         super('login-form', '/api/auth/login', 'POST', [
             callsignInput, passwordInput
         ], new LoginButton(), (): void => {
             window.location.href = '/';
-        }, {
-            400: (): void => {
-                console.error('400: Bad Request');
-            },
-            401: (): void => {
-                passwordInput.setError(true, 'Wrong Password!');
-            },
-            404: (): void => {
-                callsignInput.setError(true, 'Callsign not found!');
-            },
-            500: (): void => {
-                console.error('500: Internal Server Error')
-            }
-        });
+        }, loginStatusCode);
     }
 }
 
