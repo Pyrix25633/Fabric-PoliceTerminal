@@ -28,6 +28,11 @@ export class RequireNonNull {
             return element;
         throw new Error('No element found with id: ' + id);
     }
+    static parse(value) {
+        if (value == null)
+            throw new Error('Null not allowed');
+        return value;
+    }
 }
 export class Auth {
     static async validateToken() {

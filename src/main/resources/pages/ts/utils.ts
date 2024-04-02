@@ -31,6 +31,11 @@ export class RequireNonNull {
         if(element != null) return element;
         throw new Error('No element found with id: ' + id);
     }
+
+    static parse<T>(value: T | null): T {
+        if(value == null) throw new Error('Null not allowed');
+        return value;
+    }
 }
 
 export class Auth {
