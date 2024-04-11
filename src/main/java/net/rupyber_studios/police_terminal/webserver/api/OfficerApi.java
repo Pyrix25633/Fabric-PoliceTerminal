@@ -12,8 +12,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class OfficerApi {
-    private static final List<String> ORDER_FIELDS = List.of("uuid", "username", "online", "status",
-            "rankId", "callsign", "callsignReserved");
+    private static final List<String> COLUMNS = List.of("uuid", "username", "online", "status",
+            "rank", "callsign", "callsignReserved");
 
     public static void officers(Request request, OutputStream output) throws IOException {
         try {
@@ -32,13 +32,14 @@ public class OfficerApi {
     public static void getOfficers(@NotNull Request request, OutputStream output)
             throws IOException, Exceptions.HttpException, SQLException {
         int page = Exceptions.getInt(request, "page");
-        String orderField = Exceptions.getString(request, "order[field]");
-        if(!ORDER_FIELDS.contains(orderField)) throw new Exceptions.BadRequestException();
+        String orderColumn = Exceptions.getString(request, "order[column]");
+        if(!COLUMNS.contains(orderColumn)) throw new Exceptions.BadRequestException();
+        if(orderColumn.equals("rank")) orderColumn = "rankId";
         boolean orderAscending = Exceptions.getBoolean(request, "order[ascending]");
         if(!AuthApi.isTokenValid(request.headers.getWebToken())) throw new Exceptions.UnauthorizedException();
         JSONObject response = new JSONObject();
         response.put("pages", Officer.selectNumberOfOfficerPages());
-        response.put("officers", Officer.selectOfficers(page, orderField, orderAscending));
+        response.put("officers", Officer.selectOfficers(page, orderColumn, orderAscending));
         ApiServer.sendJsonResponse(response, output);
     }
 }

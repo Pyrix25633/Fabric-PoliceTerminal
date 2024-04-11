@@ -1,13 +1,13 @@
 import { RequireNonNull, StatusCode, Success } from './utils.js';
 
 export abstract class Form {
-    private url: string;
-    private method: string;
-    private form: HTMLElement;
-    private inputs: Input[];
-    private submitButton: SubmitButton;
-    private success: Success;
-    private statusCode: StatusCode;
+    private readonly url: string;
+    private readonly method: string;
+    private readonly form: HTMLElement;
+    private readonly inputs: Input[];
+    private readonly submitButton: SubmitButton;
+    private readonly success: Success;
+    private readonly statusCode: StatusCode;
     private valid: boolean = false;
 
     constructor(id: string, url: string, method: string, inputs: Input[], submitButton: SubmitButton, success: Success, statusCode: StatusCode) {
@@ -52,7 +52,7 @@ export abstract class Form {
 }
 
 export abstract class SubmitButton {
-    private button: HTMLButtonElement;
+    private readonly button: HTMLButtonElement;
 
     constructor(text: string, iconSrc: string) {
         this.button = document.createElement('button');
@@ -86,7 +86,7 @@ export abstract class SubmitButton {
 }
 
 export abstract class Input {
-    readonly id: string;
+    public readonly id: string;
     private form: Form | undefined = undefined;
     protected input: HTMLInputElement;
     private feedback: HTMLSpanElement;
@@ -154,8 +154,8 @@ export abstract class Input {
 }
 
 export abstract class ApiFeedbackInput extends Input {
-    private url: string;
-    private method: string;
+    private readonly url: string;
+    private readonly method: string;
 
     constructor(id: string, type: string, labelText: string, feedbackText: string, url: string, method: string) {
         super(id, type, labelText, feedbackText);

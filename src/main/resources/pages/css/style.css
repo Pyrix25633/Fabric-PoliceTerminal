@@ -78,6 +78,11 @@ input.medium {
 input.small {
     width: 40px;
 }
+input[type=number] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
 button:active {
     background-color: var(--color-foreground);
 }

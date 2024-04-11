@@ -35,13 +35,13 @@ public class EmergencyCallApi {
     public static void getEmergencyCalls(@NotNull Request request, OutputStream output)
             throws IOException, Exceptions.HttpException, SQLException {
         int page = Exceptions.getInt(request, "page");
-        String orderField = Exceptions.getString(request, "order[field]");
-        if(!ORDER_FIELDS.contains(orderField)) throw new Exceptions.BadRequestException();
+        String orderColumn = Exceptions.getString(request, "order[column]");
+        if(!ORDER_FIELDS.contains(orderColumn)) throw new Exceptions.BadRequestException();
         boolean orderAscending = Exceptions.getBoolean(request, "order[ascending]");
         if(!AuthApi.isTokenValid(request.headers.getWebToken())) throw new Exceptions.UnauthorizedException();
         JSONObject response = new JSONObject();
         response.put("pages", EmergencyCall.selectNumberOfEmergencyCallPages());
-        response.put("emergencyCalls", EmergencyCall.selectEmergencyCalls(page, orderField, orderAscending));
+        response.put("emergencyCalls", EmergencyCall.selectEmergencyCalls(page, orderColumn, orderAscending));
         ApiServer.sendJsonResponse(response, output);
     }
 }
