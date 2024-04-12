@@ -1,12 +1,13 @@
 import { loadSettings } from "./load-settings.js";
-import { BooleanTableData, StringTableData, Table, TableHeader, TableRow, UuidTableData } from "./table.js";
+import { BooleanTableData, LinkTableHeader, PrimaryKeyTableHeader, StringTableData, Table, TableHeader, TableRow } from "./table.js";
 await loadSettings();
 class CitizensTable extends Table {
     constructor() {
         super('/api/citizens', 'citizens', null, [
-            new TableHeader('UUID', 'uuid', true),
+            new PrimaryKeyTableHeader('UUID', 'uuid'),
             new TableHeader('Username', 'username'),
-            new TableHeader('Online', 'online')
+            new TableHeader('Online', 'online'),
+            new LinkTableHeader('View')
         ]);
     }
     parseElement(element) {
@@ -15,7 +16,11 @@ class CitizensTable extends Table {
 }
 class CitizensTableRow extends TableRow {
     parseData(element) {
-        return [new UuidTableData(element.uuid), new StringTableData(element.username), new BooleanTableData(element.online)];
+        return [
+            new StringTableData(element.uuid, undefined, true),
+            new StringTableData(element.username),
+            new BooleanTableData(element.online)
+        ];
     }
 }
 const citizensTable = new CitizensTable();

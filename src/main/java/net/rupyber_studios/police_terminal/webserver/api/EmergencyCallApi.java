@@ -16,7 +16,7 @@ import java.util.List;
 
 public class EmergencyCallApi {
     private static final List<String> ORDER_FIELDS = List.of("callNumber", "locationX", "locationY", "locationZ",
-            "createdAt", "caller", "closed");
+            "createdAt", "caller", "responder", "closedAt");
 
     public static void emergencyCalls(@NotNull Request request, OutputStream output) throws IOException {
         try {

@@ -20,19 +20,15 @@ public class SyncRanksS2CPacket {
 
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        try {
-            data.writeInt(Rank.ranks.size());
-            for(int id : Rank.ranks.keySet()) {
-                Rank rank = Rank.fromId(id);
-                data.writeInt(id);
-                data.writeString(rank.rank);
-                data.writeBoolean(rank.emergencyOperator);
-                data.writeInt(rank.color);
-            }
-            ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
-        } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncRanksS2CPacket: ", e);
+        data.writeInt(Rank.ranks.size());
+        for(int id : Rank.ranks.keySet()) {
+            Rank rank = Rank.fromId(id);
+            data.writeInt(id);
+            data.writeString(rank.rank);
+            data.writeBoolean(rank.emergencyOperator);
+            data.writeInt(rank.color);
         }
+        ServerPlayNetworking.send(player, ModMessages.SYNC_RANKS, data);
     }
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler,

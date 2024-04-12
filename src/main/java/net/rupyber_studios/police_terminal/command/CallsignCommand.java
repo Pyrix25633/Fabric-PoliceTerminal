@@ -10,7 +10,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.police_terminal.command.argument.UnusedCallsignArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
@@ -21,7 +20,6 @@ import net.rupyber_studios.rupyber_database_api.util.Officer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class CallsignCommand {
@@ -72,20 +70,15 @@ public class CallsignCommand {
         }
     }
 
-    private static @Nullable Rank getPlayerRankFromSource(@NotNull ServerCommandSource source) throws SQLException {
+    private static @Nullable Rank getPlayerRankFromSource(@NotNull ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if(player == null) return null;
-        return Officer.selectRankFromUuid(source.getPlayer().getUuid());
+        return Officer.selectRankWhereUuid(source.getPlayer().getUuid());
     }
 
     private static int executeCallsignRequest(CommandContext<ServerCommandSource> context)
             throws CommandSyntaxException {
-        try {
-            return execute(context, Callsign.createUnusedCallsign());
-        } catch (SQLException e) {
-            PoliceTerminal.LOGGER.info("Unable to create unused callsign: ", e);
-            return 0;
-        }
+        return execute(context, Callsign.createUnusedCallsign());
     }
 
     private static int executeCallsignRequestWithArgument(CommandContext<ServerCommandSource> context)
@@ -94,19 +87,14 @@ public class CallsignCommand {
     }
 
     private static int execute(@NotNull CommandContext<ServerCommandSource> context, String callsign) {
-        try {
-            ServerPlayerEntity player = context.getSource().getPlayer();
-            if(player == null) return 0;
-            Officer.updateCallsignFromUuid(player.getUuid(), callsign, false);
-            OnlineCallsignArgumentType.init();
-            SendCallsignS2CPacket.send(player, callsign);
-            context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            Text feedback = YOUR_CALLSIGN_IS_NOW_TEXT.copy().append("§9" + callsign);
-            context.getSource().sendFeedback(() -> feedback, false);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not assign a callsign to player: ", e);
-            return 0;
-        }
+        ServerPlayerEntity player = context.getSource().getPlayer();
+        if(player == null) return 0;
+        Officer.updateCallsignWhereUuid(player.getUuid(), callsign, false);
+        OnlineCallsignArgumentType.init();
+        SendCallsignS2CPacket.send(player, callsign);
+        context.getSource().getServer().getCommandManager().sendCommandTree(player);
+        Text feedback = YOUR_CALLSIGN_IS_NOW_TEXT.copy().append("§9" + callsign);
+        context.getSource().sendFeedback(() -> feedback, false);
         return 1;
     }
 
@@ -115,19 +103,14 @@ public class CallsignCommand {
         String callsign = context.getArgument("callsign", String.class);
         ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
         ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
-        try {
-            Officer.updateCallsignFromUuid(player.getUuid(), callsign, true);
-            SendCallsignS2CPacket.send(player, callsign);
-            OnlineCallsignArgumentType.init();
-            context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            Text feedback = buildCallsignReserveFeedback(dispatchingPlayer, player, callsign);
-            context.getSource().sendFeedback(() -> feedback, true);
-            if(dispatchingPlayer != player)
-                player.sendMessage(feedback);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not reserve callsign for player: ", e);
-            return 0;
-        }
+        Officer.updateCallsignWhereUuid(player.getUuid(), callsign, true);
+        SendCallsignS2CPacket.send(player, callsign);
+        OnlineCallsignArgumentType.init();
+        context.getSource().getServer().getCommandManager().sendCommandTree(player);
+        Text feedback = buildCallsignReserveFeedback(dispatchingPlayer, player, callsign);
+        context.getSource().sendFeedback(() -> feedback, true);
+        if(dispatchingPlayer != player)
+            player.sendMessage(feedback);
         return 1;
     }
 
@@ -148,23 +131,18 @@ public class CallsignCommand {
             throws CommandSyntaxException {
         String callsign = context.getArgument("callsign", String.class);
         ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
-        try {
-            UUID playerUuid = Officer.selectUuidFromCallsign(callsign);
-            if(playerUuid == null) return 0;
-            ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
-            if(player == null) return 0;
-            Officer.updateCallsignFromUuid(playerUuid, null, false);
-            SendCallsignS2CPacket.send(player, callsign);
-            OnlineCallsignArgumentType.init();
-            context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            Text feedback = buildCallsignReleaseFeedback(dispatchingPlayer, player, callsign);
-            context.getSource().sendFeedback(() -> feedback, true);
-            if(dispatchingPlayer != player)
-                player.sendMessage(feedback);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not release callsign: ", e);
-            return 0;
-        }
+        UUID playerUuid = Officer.selectUuidWhereCallsign(callsign);
+        if(playerUuid == null) return 0;
+        ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
+        if(player == null) return 0;
+        Officer.updateCallsignWhereUuid(playerUuid, null, false);
+        SendCallsignS2CPacket.send(player, callsign);
+        OnlineCallsignArgumentType.init();
+        context.getSource().getServer().getCommandManager().sendCommandTree(player);
+        Text feedback = buildCallsignReleaseFeedback(dispatchingPlayer, player, callsign);
+        context.getSource().sendFeedback(() -> feedback, true);
+        if(dispatchingPlayer != player)
+            player.sendMessage(feedback);
         return 1;
     }
 

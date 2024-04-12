@@ -10,12 +10,10 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.OnlineCallsignArgumentType;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,11 +39,7 @@ public class RadioCommand {
     private static boolean canExecute(@NotNull ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if(player == null) return false;
-        try {
-            return Officer.selectCallsignFromUuid(source.getPlayer().getUuid()) != null;
-        } catch(SQLException e) {
-            return false;
-        }
+        return Officer.selectCallsignWhereUuid(source.getPlayer().getUuid()) != null;
     }
 
     private static int executeRadioLike(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -62,29 +56,25 @@ public class RadioCommand {
         if(dispatchingPlayer == null) return 0;
         String callsign = context.getArgument("callsign", String.class);
         Text message = MessageArgumentType.getMessage(context, "message");
-        try {
-            String dispatchingPlayerCallsign = Officer.selectCallsignFromUuid(dispatchingPlayer.getUuid());
-            List<UUID> playerUuids = getPlayerUuids(callsign, like);
-            if(playerUuids == null) return 0;
-            Text feedback = buildFeedback(dispatchingPlayerCallsign, callsign, message);
-            context.getSource().sendFeedback(() -> feedback, false);
-            for(UUID playerUuid : playerUuids) {
-                ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
-                if(player != null && dispatchingPlayer != player)
-                    player.sendMessage(feedback);
-            }
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not get player from callsign: ", e);
+        String dispatchingPlayerCallsign = Officer.selectCallsignWhereUuid(dispatchingPlayer.getUuid());
+        List<UUID> playerUuids = getPlayerUuids(callsign, like);
+        if(playerUuids == null) return 0;
+        Text feedback = buildFeedback(dispatchingPlayerCallsign, callsign, message);
+        context.getSource().sendFeedback(() -> feedback, false);
+        for(UUID playerUuid : playerUuids) {
+            ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(playerUuid);
+            if(player != null && dispatchingPlayer != player)
+                player.sendMessage(feedback);
         }
         return 1;
     }
 
-    private static List<UUID> getPlayerUuids(String callsign, boolean like) throws SQLException {
+    private static List<UUID> getPlayerUuids(String callsign, boolean like) {
         List<UUID> playerUuids;
         if(like)
-            playerUuids = Officer.selectUuidsFromCallsignLike(callsign);
+            playerUuids = Officer.selectUuidsWhereCallsignLike(callsign);
         else {
-            UUID playerUuid = Officer.selectUuidFromCallsign(callsign);
+            UUID playerUuid = Officer.selectUuidWhereCallsign(callsign);
             if(playerUuid != null) playerUuids = List.of(playerUuid);
             else playerUuids = null;
         }

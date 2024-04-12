@@ -30,6 +30,7 @@ bin/
 
 # fabric
 
+libs/
 run/
 logs/
 

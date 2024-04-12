@@ -8,12 +8,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
 import net.rupyber_studios.rupyber_database_api.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
-
-import java.sql.SQLException;
 
 public class TerminalCommand {
     private static final Text TERMINAL_CREDENTIALS_TEXT = Text.translatable("commands.terminal.success.terminal_credentials");
@@ -33,28 +30,19 @@ public class TerminalCommand {
     private static boolean canExecute(@NotNull ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if(player == null) return false;
-        try {
-            PlayerInfo info = Officer.selectPlayerInfoFromUuid(player.getUuid());
-            return info.rank != null && info.callsign != null;
-        } catch(SQLException e) {
-            return false;
-        }
+        PlayerInfo info = Officer.selectPlayerInfoWhereUuid(player.getUuid());
+        return info.rank != null && info.callsign != null;
     }
 
     private static int execute(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if(player == null) return 0;
-        try {
-            String callsign = Officer.selectCallsignFromUuid(player.getUuid());
-            String password = Officer.initPasswordFromUuid(player.getUuid());
-            Text feedback = TERMINAL_CREDENTIALS_TEXT.copy().append("\n")
-                    .append(CALLSIGN_TEXT).append("§9" + callsign + "§r\n")
-                    .append(PASSWORD_TEXT).append("§5" + password);
-            context.getSource().sendFeedback(() -> feedback, false);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not get credentials for player: ", e);
-            return 0;
-        }
+        String callsign = Officer.selectCallsignWhereUuid(player.getUuid());
+        String password = Officer.initPasswordWhereUuid(player.getUuid());
+        Text feedback = TERMINAL_CREDENTIALS_TEXT.copy().append("\n")
+                .append(CALLSIGN_TEXT).append("§9" + callsign + "§r\n")
+                .append(PASSWORD_TEXT).append("§5" + password);
+        context.getSource().sendFeedback(() -> feedback, false);
         return 1;
     }
 }

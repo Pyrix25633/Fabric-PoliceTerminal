@@ -9,11 +9,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.rupyber_database_api.table.EmergencyCall;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,14 +24,10 @@ public class EmergencyCallNumberArgumentType implements ArgumentType<Integer> {
     public static List<String> stringValues = new ArrayList<>();
 
     public static void init() {
-        try {
-            values = EmergencyCall.selectCallNumberWhereClosedFalse();
-            stringValues = new ArrayList<>();
-            for(Integer value : values)
-                stringValues.add(String.valueOf(value));
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not list all emergency call numbers: ", e);
-        }
+        values = EmergencyCall.selectCallNumberWhereClosedFalse();
+        stringValues = new ArrayList<>();
+        for(Integer value : values)
+            stringValues.add(String.valueOf(value));
     }
 
     @Override

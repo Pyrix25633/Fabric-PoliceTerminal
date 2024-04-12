@@ -82,7 +82,7 @@
   "text.autoconfig.police_terminal.option.recordsPerPage.@Tooltip": "The number of records per page displayed in tables",
 
   "text.hud.police_terminal.status": "Status: ",
-  "text.hud.police_terminal.status.out_of_service": "§eOut Of Service",
+  "text.hud.police_terminal.status.out_of_service": "§eOut of Service",
   "text.hud.police_terminal.status.available": "§aAvailable",
   "text.hud.police_terminal.status.on_patrol": "§2On Patrol",
   "text.hud.police_terminal.status.busy": "§6Busy",

@@ -103,7 +103,7 @@ export abstract class Table {
                 $('#table').hide();
                 setTimeout((): void => {
                     $('#table').show();
-                }, 0);
+                }, 250);
             },
             statusCode: defaultStatusCode
         });
@@ -120,18 +120,23 @@ class GenericTableHeader {
     }
 }
 
+export enum Extra {
+    PrimaryKey,
+    Link
+}
+
 export class TableHeader extends GenericTableHeader {
     public readonly column: string;
     private readonly orderImg: HTMLImageElement;
-    private readonly primaryKey: boolean;
+    private readonly extra: Extra | undefined;
     
-    public constructor(text: string, column: string, primaryKey: boolean = false) {
+    public constructor(text: string, column: string, extra: Extra | undefined = undefined) {
         super(text);
         this.column = column;
         this.orderImg = document.createElement('img');
         this.orderImg.classList.add('button');
         this.orderImg.alt = 'Order Icon';
-        this.primaryKey = primaryKey;
+        this.extra = extra;
     }
 
     public appendTo(table: Table): void {
@@ -140,25 +145,43 @@ export class TableHeader extends GenericTableHeader {
         div.classList.add('container');
         const span = document.createElement('span');
         span.classList.add('th');
-        if(this.primaryKey) span.classList.add('pk');
+        if(this.extra == Extra.PrimaryKey)
+            span.classList.add('primary-key');
+        else if(this.extra == Extra.Link)
+            span.classList.add('link');
         span.innerText = this.text;
-        this.updateOrderImg(table.getOrder());
-        this.orderImg.addEventListener('click', (): void => {
-            let order = table.getOrder();
-            if(order.column == this.column)
-                order = { column: order.column, ascending: !order.ascending };
-            else
-                order = { column: this.column, ascending: true };
-            table.setOrder(order);
-        });
+        if(this.extra != Extra.Link) {
+            this.updateOrderImg(table.getOrder());
+            this.orderImg.addEventListener('click', (): void => {
+                let order = table.getOrder();
+                if(order.column == this.column)
+                    order = { column: order.column, ascending: !order.ascending };
+                else
+                    order = { column: this.column, ascending: true };
+                table.setOrder(order);
+            });
+        }
         div.appendChild(span);
-        div.appendChild(this.orderImg);
+        if(this.extra != Extra.Link)
+            div.appendChild(this.orderImg);
         th.appendChild(div);
         table.appendChildToHeaders(th);
     }
 
     public updateOrderImg(order: Order): void {
         this.orderImg.src = '/img/order' + (order.column == this.column ? '-' + (order.ascending ? 'ascending' : 'descending') : '') + '.svg';
+    }
+}
+
+export class PrimaryKeyTableHeader extends TableHeader {
+    public constructor(text: string, column: string) {
+        super(text, column, Extra.PrimaryKey);
+    }
+}
+
+export class LinkTableHeader extends TableHeader {
+    public constructor(text: string) {
+        super(text, '', Extra.Link);
     }
 }
 
@@ -195,51 +218,58 @@ type Element = { [index: string]: any; };
 export abstract class TableData<T> {
     protected readonly value: T | null;
     protected readonly color: number | undefined;
+    protected readonly primaryKey: boolean;
 
-    public constructor(value: T | null, color: number | undefined = undefined) {
+    public constructor(value: T | null, color: number | undefined = undefined, primaryKey: boolean = false) {
         this.value = value;
         this.color = color;
+        this.primaryKey = primaryKey;
     }
 
-    public abstract appendTo(row: TableRow): void;
-}
-
-export class StringTableData extends TableData<string> {
-    public appendTo(row: TableRow): void {
+    public createTd(): HTMLTableCellElement {
         const td = document.createElement('td');
-        td.innerText = this.value ?? 'null';
+        td.innerText = this.value != null ? this.value.toString() : 'null';
         if(this.value == null)
             td.classList.add('null');
         td.style.color = '#' + this.color?.toString(16).padStart(6, '0');
-        row.appendChild(td);
+        if(this.primaryKey)
+            td.classList.add('primary-key');
+        return td;
     }
+
+    public appendTo(row: TableRow): void {
+        row.appendChild(this.createTd());
+    };
 }
+
+export class StringTableData extends TableData<string> {}
 
 export class BooleanTableData extends TableData<boolean> {
-    public appendTo(row: TableRow): void {
-        const td = document.createElement('td');
-        td.innerText = this.value ? 'true' : 'false';
-        td.classList.add(this.value ? 'success' : 'error');
-        row.appendChild(td);
+    public createTd(): HTMLTableCellElement {
+        const td = super.createTd();
+        if(this.value != null)
+            td.classList.add(this.value.toString());
+        return td;
     }
 }
 
-export class NumberTableData extends TableData<number> {
-    public appendTo(row: TableRow): void {
-        const td = document.createElement('td');
-        td.innerText = this.value == null ? 'null' : this.value.toString();
-        if(this.value == null)
-            td.classList.add('null');
-        row.appendChild(td);
-    }
-}
+export class NumberTableData extends TableData<number> {}
 
-export class UuidTableData extends StringTableData {
-    public appendTo(row: TableRow): void {
+export class LinkTableData extends TableData<string> {
+    private readonly href: string;
+
+    constructor(value: string, href: string) {
+        super(value);
+        this.href = href;
+    }
+
+    public createTd(): HTMLTableCellElement {
         const td = document.createElement('td');
-        td.classList.add('pk');
-        td.innerText = this.value ?? 'null';
-        row.appendChild(td);
+        const a = document.createElement('a');
+        a.innerText = this.value ?? '';
+        a.href = this.href;
+        td.appendChild(a);
+        return td;
     }
 }
 

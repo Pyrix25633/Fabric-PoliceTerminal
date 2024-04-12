@@ -25,9 +25,7 @@ fabricApi {
 }
 
 dependencies {
-	implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.41.2.2'
 	implementation group: 'org.json', name: 'json', version: '20231013'
-	implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
 
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -43,7 +41,7 @@ dependencies {
 	}
 	include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}"
 
-	modImplementation files("libs/rupyber_database_api-${project.rupyber_database_api_version}.jar")
+	modImplementation files("libs/rupyber_database_api-${project.rupyber_database_api_version}-all.jar")
 	
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

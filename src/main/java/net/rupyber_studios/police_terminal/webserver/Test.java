@@ -30,7 +30,7 @@ public class Test {
         RupyberDatabaseAPI.createPoliceTerminalTables();
         RupyberDatabaseAPI.updatePoliceTerminalTablesFromConfig();
         PoliceTerminal.startServer(worldPath);
-        PoliceTerminal.LOGGER.info(Officer.initPasswordFromUuid(UUID.fromString("9a9101ac-937d-31fc-99f0-be5bc89dd1ba")));
+        PoliceTerminal.LOGGER.info(Officer.initPasswordWhereUuid(UUID.fromString("9a9101ac-937d-31fc-99f0-be5bc89dd1ba")));
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             do {

@@ -1,5 +1,5 @@
 import { loadSettings } from "./load-settings.js";
-import { BooleanTableData, EmptyTableHeaderGroup, StringTableData, Table, TableHeader, TableHeaderGroup, TableRow, UuidTableData } from "./table.js";
+import { BooleanTableData, EmptyTableHeaderGroup, LinkTableHeader, PrimaryKeyTableHeader, StringTableData, Table, TableHeader, TableHeaderGroup, TableRow } from "./table.js";
 await loadSettings();
 class OfficersTable extends Table {
     constructor() {
@@ -9,15 +9,16 @@ class OfficersTable extends Table {
             new EmptyTableHeaderGroup(),
             new EmptyTableHeaderGroup(),
             new EmptyTableHeaderGroup(),
-            new TableHeaderGroup('Callsing', 2)
+            new TableHeaderGroup('Callsign', 2)
         ], [
-            new TableHeader('UUID', 'uuid', true),
+            new PrimaryKeyTableHeader('UUID', 'uuid'),
             new TableHeader('Username', 'username'),
             new TableHeader('Online', 'online'),
             new TableHeader('Status', 'status'),
             new TableHeader('Rank', 'rank'),
             new TableHeader('Callsign', 'callsign'),
-            new TableHeader('Reserved', 'callsignReserved')
+            new TableHeader('Reserved', 'callsignReserved'),
+            new LinkTableHeader('View')
         ]);
     }
     parseElement(element) {
@@ -37,7 +38,7 @@ class CallsignTableData extends StringTableData {
 class OfficersTableRow extends TableRow {
     parseData(element) {
         return [
-            new UuidTableData(element.uuid),
+            new StringTableData(element.uuid, undefined, true),
             new StringTableData(element.username),
             new BooleanTableData(element.online),
             new StringTableData(element.status, element.statusColor),

@@ -20,19 +20,15 @@ public class SyncResponseCodesS2CPacket {
 
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        try {
-            data.writeInt(ResponseCode.responseCodes.size());
-            for(int id : ResponseCode.responseCodes.keySet()) {
-                ResponseCode responseCode = ResponseCode.fromId(id);
-                data.writeInt(id);
-                data.writeString(responseCode.code);
-                data.writeInt(responseCode.color);
-                data.writeString(responseCode.description);
-            }
-            ServerPlayNetworking.send(player, ModMessages.SYNC_RESPONSE_CODES, data);
-        } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncResponseCodesS2CPacket: ", e);
+        data.writeInt(ResponseCode.responseCodes.size());
+        for(int id : ResponseCode.responseCodes.keySet()) {
+            ResponseCode responseCode = ResponseCode.fromId(id);
+            data.writeInt(id);
+            data.writeString(responseCode.code);
+            data.writeInt(responseCode.color);
+            data.writeString(responseCode.description);
         }
+        ServerPlayNetworking.send(player, ModMessages.SYNC_RESPONSE_CODES, data);
     }
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler,

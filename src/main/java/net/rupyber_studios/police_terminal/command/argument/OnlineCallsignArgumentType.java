@@ -9,11 +9,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,11 +23,7 @@ public class OnlineCallsignArgumentType implements ArgumentType<String> {
     public static List<String> values = new ArrayList<>();
 
     public static void init() {
-        try {
-            values = Callsign.selectAll();
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not list all online callsigns: ", e);
-        }
+        values = Callsign.selectAll();
     }
 
     @Override

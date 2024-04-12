@@ -6,6 +6,7 @@
     --color-warning: #F3E63D;
     --color-success: #71E0AE;
     --color-null: #3B609B;
+    --color-primary-key: #FFD93D;
     --color-callsign: #5555FF;
     --color-police: #FFEC58;
     --color-police-transparent: #08275970;
@@ -105,12 +106,13 @@ span.title {
 }
 .police-color {
     color: var(--color-police) !important;
+    font-style: italic;
 }
 .foreground-color {
     color: var(--color-foreground) !important;
 }
 
-a {
+a, .link {
     color: var(--color-police);
 }
 
@@ -121,9 +123,12 @@ code {
 .error, .false {
     color: var(--color-error) !important;
 }
-.warning, .warning *, .pk {
+.warning, .warning * {
     color: var(--color-warning);
     border-color: var(--color-warning);
+}
+.primary-key {
+    color: var(--color-primary-key);
 }
 button.warning {
     background-color: var(--color-warning);

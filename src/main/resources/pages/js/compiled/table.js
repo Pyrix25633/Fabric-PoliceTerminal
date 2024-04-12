@@ -74,7 +74,7 @@ export class Table {
                 $('#table').hide();
                 setTimeout(() => {
                     $('#table').show();
-                }, 0);
+                }, 250);
             },
             statusCode: defaultStatusCode
         });
@@ -85,14 +85,19 @@ class GenericTableHeader {
         this.text = text;
     }
 }
+export var Extra;
+(function (Extra) {
+    Extra[Extra["PrimaryKey"] = 0] = "PrimaryKey";
+    Extra[Extra["Link"] = 1] = "Link";
+})(Extra || (Extra = {}));
 export class TableHeader extends GenericTableHeader {
-    constructor(text, column, primaryKey = false) {
+    constructor(text, column, extra = undefined) {
         super(text);
         this.column = column;
         this.orderImg = document.createElement('img');
         this.orderImg.classList.add('button');
         this.orderImg.alt = 'Order Icon';
-        this.primaryKey = primaryKey;
+        this.extra = extra;
     }
     appendTo(table) {
         const th = document.createElement('th');
@@ -100,25 +105,40 @@ export class TableHeader extends GenericTableHeader {
         div.classList.add('container');
         const span = document.createElement('span');
         span.classList.add('th');
-        if (this.primaryKey)
-            span.classList.add('pk');
+        if (this.extra == Extra.PrimaryKey)
+            span.classList.add('primary-key');
+        else if (this.extra == Extra.Link)
+            span.classList.add('link');
         span.innerText = this.text;
-        this.updateOrderImg(table.getOrder());
-        this.orderImg.addEventListener('click', () => {
-            let order = table.getOrder();
-            if (order.column == this.column)
-                order = { column: order.column, ascending: !order.ascending };
-            else
-                order = { column: this.column, ascending: true };
-            table.setOrder(order);
-        });
+        if (this.extra != Extra.Link) {
+            this.updateOrderImg(table.getOrder());
+            this.orderImg.addEventListener('click', () => {
+                let order = table.getOrder();
+                if (order.column == this.column)
+                    order = { column: order.column, ascending: !order.ascending };
+                else
+                    order = { column: this.column, ascending: true };
+                table.setOrder(order);
+            });
+        }
         div.appendChild(span);
-        div.appendChild(this.orderImg);
+        if (this.extra != Extra.Link)
+            div.appendChild(this.orderImg);
         th.appendChild(div);
         table.appendChildToHeaders(th);
     }
     updateOrderImg(order) {
         this.orderImg.src = '/img/order' + (order.column == this.column ? '-' + (order.ascending ? 'ascending' : 'descending') : '') + '.svg';
+    }
+}
+export class PrimaryKeyTableHeader extends TableHeader {
+    constructor(text, column) {
+        super(text, column, Extra.PrimaryKey);
+    }
+}
+export class LinkTableHeader extends TableHeader {
+    constructor(text) {
+        super(text, '', Extra.Link);
     }
 }
 export class TableHeaderGroup extends GenericTableHeader {
@@ -144,46 +164,52 @@ export class EmptyTableHeaderGroup extends TableHeaderGroup {
     }
 }
 export class TableData {
-    constructor(value, color = undefined) {
+    constructor(value, color = undefined, primaryKey = false) {
         this.value = value;
         this.color = color;
+        this.primaryKey = primaryKey;
     }
-}
-export class StringTableData extends TableData {
-    appendTo(row) {
-        var _a, _b;
+    createTd() {
+        var _a;
         const td = document.createElement('td');
-        td.innerText = (_a = this.value) !== null && _a !== void 0 ? _a : 'null';
+        td.innerText = this.value != null ? this.value.toString() : 'null';
         if (this.value == null)
             td.classList.add('null');
-        td.style.color = '#' + ((_b = this.color) === null || _b === void 0 ? void 0 : _b.toString(16).padStart(6, '0'));
-        row.appendChild(td);
+        td.style.color = '#' + ((_a = this.color) === null || _a === void 0 ? void 0 : _a.toString(16).padStart(6, '0'));
+        if (this.primaryKey)
+            td.classList.add('primary-key');
+        return td;
     }
+    appendTo(row) {
+        row.appendChild(this.createTd());
+    }
+    ;
+}
+export class StringTableData extends TableData {
 }
 export class BooleanTableData extends TableData {
-    appendTo(row) {
-        const td = document.createElement('td');
-        td.innerText = this.value ? 'true' : 'false';
-        td.classList.add(this.value ? 'success' : 'error');
-        row.appendChild(td);
+    createTd() {
+        const td = super.createTd();
+        if (this.value != null)
+            td.classList.add(this.value.toString());
+        return td;
     }
 }
 export class NumberTableData extends TableData {
-    appendTo(row) {
-        const td = document.createElement('td');
-        td.innerText = this.value == null ? 'null' : this.value.toString();
-        if (this.value == null)
-            td.classList.add('null');
-        row.appendChild(td);
-    }
 }
-export class UuidTableData extends StringTableData {
-    appendTo(row) {
+export class LinkTableData extends TableData {
+    constructor(value, href) {
+        super(value);
+        this.href = href;
+    }
+    createTd() {
         var _a;
         const td = document.createElement('td');
-        td.classList.add('pk');
-        td.innerText = (_a = this.value) !== null && _a !== void 0 ? _a : 'null';
-        row.appendChild(td);
+        const a = document.createElement('a');
+        a.innerText = (_a = this.value) !== null && _a !== void 0 ? _a : '';
+        a.href = this.href;
+        td.appendChild(a);
+        return td;
     }
 }
 export class TableRow {

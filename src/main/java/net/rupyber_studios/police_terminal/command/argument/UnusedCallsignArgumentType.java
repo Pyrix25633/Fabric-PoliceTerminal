@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 import net.rupyber_studios.rupyber_database_api.util.Callsign;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -24,11 +23,7 @@ public class UnusedCallsignArgumentType implements ArgumentType<String> {
     public String parse(@NotNull StringReader reader) throws CommandSyntaxException {
         String string = reader.readString();
         boolean inUse;
-        try {
-            inUse = Callsign.isInUse(string);
-        } catch(SQLException e) {
-            inUse = true;
-        }
+        inUse = Callsign.isInUse(string);
         if(!inUse && Callsign.isValid(string)) return string;
         throw INVALID_UNUSED_CALLSIGN_EXCEPTION.createWithContext(reader);
     }

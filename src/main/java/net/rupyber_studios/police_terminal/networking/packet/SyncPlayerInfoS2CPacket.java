@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.networking.ModMessages;
 import net.rupyber_studios.rupyber_database_api.table.Rank;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
@@ -18,15 +17,11 @@ import org.jetbrains.annotations.NotNull;
 public class SyncPlayerInfoS2CPacket {
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        try {
-            PlayerInfo info = Officer.selectPlayerInfoFromUuid(player.getUuid());
-            data.writeInt(info.status != null ? info.status.getId() : 0);
-            data.writeInt(info.rank != null ? info.rank.id : 0);
-            data.writeString(info.callsign != null ? info.callsign : "");
-            ServerPlayNetworking.send(player, ModMessages.SYNC_PLAYER_INFO, data);
-        } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncPlayerInfoS2CPacket: ", e);
-        }
+        PlayerInfo info = Officer.selectPlayerInfoWhereUuid(player.getUuid());
+        data.writeInt(info.status != null ? info.status.getId() : 0);
+        data.writeInt(info.rank != null ? info.rank.id : 0);
+        data.writeString(info.callsign != null ? info.callsign : "");
+        ServerPlayNetworking.send(player, ModMessages.SYNC_PLAYER_INFO, data);
     }
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler,

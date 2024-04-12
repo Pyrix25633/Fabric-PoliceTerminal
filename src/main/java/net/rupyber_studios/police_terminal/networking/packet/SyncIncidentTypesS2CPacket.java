@@ -20,19 +20,15 @@ public class SyncIncidentTypesS2CPacket {
 
     public static void send(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        try {
-            data.writeInt(IncidentType.incidentTypes.size());
-            for(int id : IncidentType.incidentTypes.keySet()) {
-                IncidentType incidentType = IncidentType.fromId(id);
-                data.writeInt(id);
-                data.writeString(incidentType.code);
-                data.writeInt(incidentType.color);
-                data.writeString(incidentType.description);
-            }
-            ServerPlayNetworking.send(player, ModMessages.SYNC_INCIDENT_TYPES, data);
-        } catch(Exception e) {
-            PoliceTerminal.LOGGER.error("Could not send SyncIncidentTypesS2CPacket: ", e);
+        data.writeInt(IncidentType.incidentTypes.size());
+        for(int id : IncidentType.incidentTypes.keySet()) {
+            IncidentType incidentType = IncidentType.fromId(id);
+            data.writeInt(id);
+            data.writeString(incidentType.code);
+            data.writeInt(incidentType.color);
+            data.writeString(incidentType.description);
         }
+        ServerPlayNetworking.send(player, ModMessages.SYNC_INCIDENT_TYPES, data);
     }
 
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler,

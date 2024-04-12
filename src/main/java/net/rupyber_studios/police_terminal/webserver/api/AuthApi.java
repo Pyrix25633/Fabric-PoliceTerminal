@@ -41,6 +41,8 @@ public class AuthApi {
                 feedback = "Callsign does not exist!";
             response.put("feedback", feedback);
             ApiServer.sendJsonResponse(response, output);
+        } catch(Exceptions.HttpException e) {
+            e.sendError(output);
         } catch(Exception e) {
             WebServer.send500(output);
             PoliceTerminal.LOGGER.error("Callsign login feedback error: ", e);
@@ -53,8 +55,8 @@ public class AuthApi {
             if(request.body == null) throw new Exceptions.BadRequestException();
             JSONObject requestBody = request.getJsonBody();
             String callsign = Exceptions.getString(requestBody, "callsign");
-            int id = Officer.selectIdFromCallsign(callsign);
-            if(id == 0) throw new Exceptions.NotFoundException();
+            Integer id = Officer.selectIdWhereCallsign(callsign);
+            if(id == null) throw new Exceptions.NotFoundException();
             String password = Exceptions.getString(requestBody, "password");
             if(Officer.isPasswordCorrect(id, password)) {
                 JSONObject cookie = new JSONObject();

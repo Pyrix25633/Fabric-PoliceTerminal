@@ -1,5 +1,5 @@
 import { loadSettings } from "./load-settings.js";
-import { BooleanTableData, EmptyTableHeaderGroup, StringTableData, Table, TableData, TableHeader, TableHeaderGroup, TableRow, UuidTableData } from "./table.js";
+import { BooleanTableData, EmptyTableHeaderGroup, Extra, LinkTableHeader, PrimaryKeyTableHeader, StringTableData, Table, TableData, TableHeader, TableHeaderGroup, TableRow } from "./table.js";
 
 await loadSettings();
 
@@ -11,7 +11,7 @@ type Officer = {
     statusColor: number;
     rank: string;
     rankColor: number;
-    callsign: string;
+    callsign: string | null;
     callsignReserved: boolean;
 };
 
@@ -23,15 +23,16 @@ class OfficersTable extends Table {
             new EmptyTableHeaderGroup(),
             new EmptyTableHeaderGroup(),
             new EmptyTableHeaderGroup(),
-            new TableHeaderGroup('Callsing', 2)
+            new TableHeaderGroup('Callsign', 2)
         ], [
-            new TableHeader('UUID', 'uuid', true),
+            new PrimaryKeyTableHeader('UUID', 'uuid'),
             new TableHeader('Username', 'username'),
             new TableHeader('Online', 'online'),
             new TableHeader('Status', 'status'),
             new TableHeader('Rank', 'rank'),
             new TableHeader('Callsign', 'callsign'),
-            new TableHeader('Reserved', 'callsignReserved')
+            new TableHeader('Reserved', 'callsignReserved'),
+            new LinkTableHeader('View')
         ]);
     }
 
@@ -53,7 +54,7 @@ class CallsignTableData extends StringTableData {
 class OfficersTableRow extends TableRow {
     public parseData(element: Officer): TableData<any>[] {
         return [
-            new UuidTableData(element.uuid),
+            new StringTableData(element.uuid, undefined, true),
             new StringTableData(element.username),
             new BooleanTableData(element.online),
             new StringTableData(element.status, element.statusColor),

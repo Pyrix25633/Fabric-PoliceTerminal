@@ -10,7 +10,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.EmergencyCallNumberArgumentType;
 import net.rupyber_studios.rupyber_database_api.table.EmergencyCall;
 import net.rupyber_studios.rupyber_database_api.table.Player;
@@ -20,7 +19,6 @@ import net.rupyber_studios.rupyber_database_api.util.Status;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class EmergencyCommand {
@@ -70,34 +68,25 @@ public class EmergencyCommand {
     private static boolean canExecuteIgnore(@NotNull ServerCommandSource source) {
         ServerPlayerEntity player = source.getPlayer();
         if(player == null) return false;
-        try {
-            Rank rank = Officer.selectRankFromUuid(player.getUuid());
-            return (rank != null && rank.emergencyOperator);
-        } catch(SQLException e) {
-            return false;
-        }
+        Rank rank = Officer.selectRankWhereUuid(player.getUuid());
+        return (rank != null && rank.emergencyOperator);
     }
 
     private static int executeCall(@NotNull CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if(player == null) return 0;
-        try {
-            String description = StringArgumentType.getString(context, "description");
-            ServerPlayerEntity respondingOfficer = selectRespondingOfficer(context.getSource().getServer());
-            Text feedback = buildFeedbackCall(player, respondingOfficer, description);
-            if(respondingOfficer != null) {
-                Officer.updateStatusFromUuid(respondingOfficer.getUuid(), Status.BUSY);
-                int callNumber = EmergencyCall.insertAndReturnCallNumber(player.getUuid(), respondingOfficer.getUuid(),
-                        player.getPos(), description);
-                respondingOfficer.sendMessage(INCOMING_CALL_TEXT.copy().append(callNumber + "\n").append(feedback));
-                EmergencyCallNumberArgumentType.init();
-            }
-            if(player != respondingOfficer)
-                context.getSource().sendFeedback(() -> feedback, false);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not create emergency call: ", e);
-            return 0;
+        String description = StringArgumentType.getString(context, "description");
+        ServerPlayerEntity respondingOfficer = selectRespondingOfficer(context.getSource().getServer());
+        Text feedback = buildFeedbackCall(player, respondingOfficer, description);
+        if(respondingOfficer != null) {
+            Officer.updateStatusWhereUuid(respondingOfficer.getUuid(), Status.BUSY);
+            int callNumber = EmergencyCall.insertAndReturnCallNumber(player.getUuid(), respondingOfficer.getUuid(),
+                    player.getPos(), description);
+            respondingOfficer.sendMessage(INCOMING_CALL_TEXT.copy().append(callNumber + "\n").append(feedback));
+            EmergencyCallNumberArgumentType.init();
         }
+        if(player != respondingOfficer)
+            context.getSource().sendFeedback(() -> feedback, false);
         return 1;
     }
 
@@ -105,28 +94,22 @@ public class EmergencyCommand {
             throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
         if(player == null) return 0;
-        try {
-            int callNumber = context.getArgument("callNumber", Integer.class);
-            EmergencyCall emergencyCall = EmergencyCall.selectFromCallNumber(callNumber);
-            if(emergencyCall == null) return 0;
-            if(!canOfficerIgnoreEmergencyCall(player, emergencyCall)) return 0;
-            EmergencyCall.updateClosedTrue(emergencyCall.id);
-            ServerPlayerEntity caller = selectCaller(context.getSource().getServer(), emergencyCall.callerId);
-            if(caller == null) return 0;
-            Text feedback = buildFeedbackIgnore(player, caller);
-            context.getSource().sendFeedback(() -> feedback.copy().append("\n").append(CLOSED_CALL_TEXT)
-                            .append(callNumber + ""), false);
-            if(caller != player)
-                caller.sendMessage(feedback);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not ignore emergency call: ", e);
-            return 0;
-        }
+        int callNumber = context.getArgument("callNumber", Integer.class);
+        EmergencyCall emergencyCall = EmergencyCall.selectWhereCallNumber(callNumber);
+        if(emergencyCall == null) return 0;
+        if(!canOfficerIgnoreEmergencyCall(player, emergencyCall)) return 0;
+        EmergencyCall.updateClosedTrue(emergencyCall.id);
+        ServerPlayerEntity caller = selectCaller(context.getSource().getServer(), emergencyCall.callerId);
+        if(caller == null) return 0;
+        Text feedback = buildFeedbackIgnore(player, caller);
+        context.getSource().sendFeedback(() -> feedback.copy().append("\n").append(CLOSED_CALL_TEXT)
+                        .append(callNumber + ""), false);
+        if(caller != player)
+            caller.sendMessage(feedback);
         return 1;
     }
 
-    private static @Nullable ServerPlayerEntity selectRespondingOfficer(@NotNull MinecraftServer server)
-            throws SQLException {
+    private static @Nullable ServerPlayerEntity selectRespondingOfficer(@NotNull MinecraftServer server) {
         ServerPlayerEntity emergencyOperator;
         do {
             UUID emergencyOperatorUuid = Officer.selectAvailableEmergencyOperator();
@@ -137,16 +120,15 @@ public class EmergencyCommand {
     }
 
     private static boolean canOfficerIgnoreEmergencyCall(@NotNull ServerPlayerEntity officer,
-                                                         EmergencyCall emergencyCall) throws SQLException{
-        Integer officerId = Player.selectIdFromUuid(officer.getUuid());
+                                                         EmergencyCall emergencyCall) {
+        Integer officerId = Player.selectIdWhereUuid(officer.getUuid());
         if(officerId == null) return false;
-        if(emergencyCall.closed) return false;
+        if(emergencyCall.closedAt != null) return false;
         return emergencyCall.responderId == officerId;
     }
 
-    private static @Nullable ServerPlayerEntity selectCaller(@NotNull MinecraftServer server, int callerId)
-            throws SQLException {
-        UUID callerUuid = Player.selectUuidFromId(callerId);
+    private static @Nullable ServerPlayerEntity selectCaller(@NotNull MinecraftServer server, int callerId) {
+        UUID callerUuid = Player.selectUuid(callerId);
         if(callerUuid == null) return null;
         return server.getPlayerManager().getPlayer(callerUuid);
     }

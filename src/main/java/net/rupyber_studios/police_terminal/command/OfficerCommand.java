@@ -9,12 +9,9 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
 import net.rupyber_studios.rupyber_database_api.util.PlayerInfo;
 import org.jetbrains.annotations.NotNull;
-
-import java.sql.SQLException;
 
 public class OfficerCommand {
     private static final Text OFFICER_TEXT = Text.translatable("commands.officer.success.officer");
@@ -34,21 +31,16 @@ public class OfficerCommand {
 
     private static int execute(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
-        try {
-            PlayerInfo info = Officer.selectPlayerInfoFromUuid(player.getUuid());
-            Text feedback;
-            if(info.rank != null && info.status != null)
-                feedback = OFFICER_TEXT.copy().append(player.getGameProfile().getName()).append(":")
-                        .append(STATUS_TEXT).append(info.status.getText())
-                        .append(RANK_TEXT).append(Text.literal(info.rank.rank).withColor(info.rank.color))
-                        .append(CALLSIGN_TEXT).append(info.callsign != null ? ("§9" + info.callsign) : "§7-");
-            else
-                feedback = Text.literal(player.getGameProfile().getName()).append(NOT_OFFICER_TEXT);
-            context.getSource().sendFeedback(() -> feedback, false);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not display info for player: ", e);
-            return 0;
-        }
+        PlayerInfo info = Officer.selectPlayerInfoWhereUuid(player.getUuid());
+        Text feedback;
+        if(info.rank != null && info.status != null)
+            feedback = OFFICER_TEXT.copy().append(player.getGameProfile().getName()).append(":")
+                    .append(STATUS_TEXT).append(info.status.getText())
+                    .append(RANK_TEXT).append(Text.literal(info.rank.rank).withColor(info.rank.color))
+                    .append(CALLSIGN_TEXT).append(info.callsign != null ? ("§9" + info.callsign) : "§7-");
+        else
+            feedback = Text.literal(player.getGameProfile().getName()).append(NOT_OFFICER_TEXT);
+        context.getSource().sendFeedback(() -> feedback, false);
         return 1;
     }
 }

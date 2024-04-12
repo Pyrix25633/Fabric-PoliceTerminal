@@ -10,7 +10,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.rupyber_studios.police_terminal.PoliceTerminal;
 import net.rupyber_studios.police_terminal.command.argument.RankArgumentType;
 import net.rupyber_studios.police_terminal.config.ModConfig;
 import net.rupyber_studios.police_terminal.networking.packet.SendRankS2CPacket;
@@ -19,8 +18,6 @@ import net.rupyber_studios.rupyber_database_api.table.Rank;
 import net.rupyber_studios.rupyber_database_api.util.Officer;
 import net.rupyber_studios.rupyber_database_api.util.Status;
 import org.jetbrains.annotations.NotNull;
-
-import java.sql.SQLException;
 
 public class RankCommand {
     private static final Text WAS_PROMOTED_TEXT = Text.translatable("commands.rank.success.was_promoted");
@@ -49,13 +46,9 @@ public class RankCommand {
         if(ModConfig.INSTANCE.rankCommandRequiresAdmin && !source.hasPermissionLevel(4)) return false;
         ServerPlayerEntity player = source.getPlayer();
         if(player == null) return true;
-        try {
-            Rank rank = Officer.selectRankFromUuid(source.getPlayer().getUuid());
-            return (rank != null && rank.id >= ModConfig.INSTANCE.minimumRankIdForRankCommand) ||
-                    source.hasPermissionLevel(4);
-        } catch(Exception ignored) {
-            return false;
-        }
+        Rank rank = Officer.selectRankWhereUuid(source.getPlayer().getUuid());
+        return (rank != null && rank.id >= ModConfig.INSTANCE.minimumRankIdForRankCommand) ||
+                source.hasPermissionLevel(4);
     }
 
     private static int executeRankSet(@NotNull CommandContext<ServerCommandSource> context)
@@ -70,38 +63,27 @@ public class RankCommand {
 
     private static int execute(@NotNull CommandContext<ServerCommandSource> context, Rank rank)
             throws CommandSyntaxException {
-        try {
-            ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
-            ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
-            Rank playerRank = selectPlayerRank(player);
-            if(!ModConfig.INSTANCE.officerCanGrantRankHigherThanHis && dispatchingPlayer != null) {
-                if(!canDispatchingPlayerModifyPlayerRank(dispatchingPlayer, rank, playerRank)) return 0;
-            }
-            updatePlayerRank(player, rank);
-            context.getSource().getServer().getCommandManager().sendCommandTree(player);
-            Text feedback = buildFeedback(dispatchingPlayer, player, rank, playerRank);
-            context.getSource().sendFeedback(() -> feedback, true);
-            if(dispatchingPlayer != player)
-                player.sendMessage(feedback);
-        } catch(Exception e) {
-            if(e instanceof CommandSyntaxException cse) throw cse;
-            PoliceTerminal.LOGGER.error("Could not set rank for player: ", e);
-            return 0;
+        ServerPlayerEntity dispatchingPlayer = context.getSource().getPlayer();
+        ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "username");
+        Rank playerRank = selectPlayerRank(player);
+        if(!ModConfig.INSTANCE.officerCanGrantRankHigherThanHis && dispatchingPlayer != null) {
+            if(!canDispatchingPlayerModifyPlayerRank(dispatchingPlayer, rank, playerRank)) return 0;
         }
+        updatePlayerRank(player, rank);
+        context.getSource().getServer().getCommandManager().sendCommandTree(player);
+        Text feedback = buildFeedback(dispatchingPlayer, player, rank, playerRank);
+        context.getSource().sendFeedback(() -> feedback, true);
+        if(dispatchingPlayer != player)
+            player.sendMessage(feedback);
         return 1;
     }
 
-    private static Rank selectPlayerRank(@NotNull ServerPlayerEntity player) throws SQLException {
-        try {
-            return Officer.selectRankFromUuid(player.getUuid());
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not get player rank: ", e);
-            throw e;
-        }
+    private static Rank selectPlayerRank(@NotNull ServerPlayerEntity player) {
+        return Officer.selectRankWhereUuid(player.getUuid());
     }
 
     private static boolean canDispatchingPlayerModifyPlayerRank(ServerPlayerEntity dispatchingPlayer,
-                                                                Rank rank, Rank playerRank) throws SQLException {
+                                                                Rank rank, Rank playerRank) {
         Rank dispatchingPlayerRank = selectPlayerRank(dispatchingPlayer);
         if(!dispatchingPlayer.hasPermissionLevel(4)) {
             if(dispatchingPlayerRank == null) return false;
@@ -111,22 +93,17 @@ public class RankCommand {
         return true;
     }
 
-    private static void updatePlayerRank(@NotNull ServerPlayerEntity player, Rank rank) throws SQLException {
-        try {
-            Officer.updateRankFromUuid(player.getUuid(), rank);
-            if(rank != null) {
-                if(Officer.selectStatusFromUuid(player.getUuid()) == null) {
-                    Officer.updateStatusFromUuid(player.getUuid(), Status.OUT_OF_SERVICE);
-                    SendStatusS2CPacket.send(player, Status.OUT_OF_SERVICE);
-                }
+    private static void updatePlayerRank(@NotNull ServerPlayerEntity player, Rank rank) {
+        Officer.updateRankWhereUuid(player.getUuid(), rank);
+        if(rank != null) {
+            if(Officer.selectStatusWhereUuid(player.getUuid()) == null) {
+                Officer.updateStatusWhereUuid(player.getUuid(), Status.OUT_OF_SERVICE);
+                SendStatusS2CPacket.send(player, Status.OUT_OF_SERVICE);
             }
-            else
-                SendStatusS2CPacket.send(player, null);
-            SendRankS2CPacket.send(player, rank);
-        } catch(SQLException e) {
-            PoliceTerminal.LOGGER.error("Could not " + (rank == null ? "un" : "") + "set rank for player: ", e);
-            throw e;
         }
+        else
+            SendStatusS2CPacket.send(player, null);
+        SendRankS2CPacket.send(player, rank);
     }
 
     private static @NotNull Text buildFeedback(ServerPlayerEntity dispatchingPlayer, ServerPlayerEntity player,

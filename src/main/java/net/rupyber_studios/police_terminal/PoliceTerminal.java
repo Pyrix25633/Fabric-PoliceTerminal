@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.security.KeyStore;
-import java.sql.SQLException;
 
 public class PoliceTerminal implements ModInitializer {
 	public static final String MOD_ID = "police_terminal";
@@ -46,23 +45,15 @@ public class PoliceTerminal implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPED.register((server) -> stopServer());
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			try {
-				SyncRanksS2CPacket.send(handler.player);
-				Player.insertOrUpdate(handler.player.getUuid(), handler.player.getGameProfile().getName());
-				SyncPlayerInfoS2CPacket.send(handler.player);
-				OnlineCallsignArgumentType.init();
-			} catch (SQLException e) {
-				LOGGER.error("Error handling player join: ", e);
-			}
+			SyncRanksS2CPacket.send(handler.player);
+			Player.insertOrUpdate(handler.player.getUuid(), handler.player.getGameProfile().getName());
+			SyncPlayerInfoS2CPacket.send(handler.player);
+			OnlineCallsignArgumentType.init();
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-			try {
-				Player.handleDisconnection(handler.player.getUuid());
-				OnlineCallsignArgumentType.init();
-			} catch (SQLException e) {
-				LOGGER.error("Error handling player disconnection: ", e);
-			}
+			Player.handleDisconnection(handler.player.getUuid());
+			OnlineCallsignArgumentType.init();
 		});
 
 		LOGGER.info("Initializing main");
