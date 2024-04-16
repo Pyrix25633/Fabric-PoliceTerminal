@@ -1,10 +1,13 @@
 package net.rupyber_studios.police_terminal.webserver;
 
+import net.rupyber_studios.police_terminal.webserver.api.AuthApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,10 +21,14 @@ public class Headers {
     private final Map<String, String> cookies;
 
     public Headers(@NotNull InputStream input) throws IOException {
-        this.headers = new HashMap<>();
-        this.cookies = new HashMap<>();
+        this();
         this.parse(input);
         this.parseCookies();
+    }
+
+    public Headers() {
+        this.headers = new HashMap<>();
+        this.cookies = new HashMap<>();
     }
 
     private void parse(@NotNull InputStream input) throws IOException {
@@ -60,11 +67,32 @@ public class Headers {
         return headers.get(name);
     }
 
+    public void set(String name, String value) {
+        headers.put(name, value);
+    }
+
     public @Nullable String getCookie(String name) {
         return cookies.get(name);
     }
 
+    public void setCookie(String name, String value) {
+        cookies.put(name, value);
+    }
+
     public WebToken getWebToken() throws Exceptions.HttpException {
-        return new WebToken(getCookie("token"));
+        return new WebToken(getCookie(AuthApi.WEB_TOKEN_COOKIE_NAME));
+    }
+
+    public void setWebToken(@NotNull JSONObject token) {
+        setCookie(AuthApi.WEB_TOKEN_COOKIE_NAME, token.toString());
+    }
+
+    public void writeTo(OutputStream output) throws IOException {
+        for(String name : headers.keySet())
+            output.write((name + ": " + headers.get(name) + WebServer.CRLF).getBytes());
+        for(String name : cookies.keySet())
+            output.write(("Set-Cookie: " + name + "=" + cookies.get(name) + "; Path=/; SameSite=Strict; HttpOnly" +
+                    WebServer.CRLF).getBytes());
+        output.write(WebServer.CRLF.getBytes());
     }
 }

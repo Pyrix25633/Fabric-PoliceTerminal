@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 public class RequestLine {
     private static final Pattern REQUEST_LINE_PATTERN = Pattern.compile("^(.*) (.*) HTTP/(.*)$");
 
-    public Method method;
-    public URI uri;
+    public final Method method;
+    public final URI uri;
 
     public RequestLine(@NotNull InputStream input) throws IOException, Exceptions.BadRequestException {
         int b;

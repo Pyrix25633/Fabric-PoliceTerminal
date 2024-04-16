@@ -4,9 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 public class Exceptions {
     public static JSONObject getJSONObject(@NotNull JSONObject json, String key) throws BadRequestException {
         try {
@@ -57,34 +54,41 @@ public class Exceptions {
     }
 
     public static abstract class HttpException extends Exception {
-        public abstract void sendError(OutputStream output) throws IOException;
+        public abstract Response getResponse();
     }
 
     public static class BadRequestException extends HttpException {
         @Override
-        public void sendError(OutputStream output) throws IOException {
-            WebServer.send400(output);
+        public Response getResponse() {
+            return new Response(Status.BAD_REQUEST);
         }
     }
 
     public static class UnauthorizedException extends HttpException {
         @Override
-        public void sendError(OutputStream output) throws IOException {
-            WebServer.send401(output);
+        public Response getResponse() {
+            return new Response(Status.UNAUTHORIZED);
         }
     }
 
     public static class NotFoundException extends HttpException {
         @Override
-        public void sendError(OutputStream output) throws IOException {
-            WebServer.send404(output);
+        public Response getResponse() {
+            return new Response(Status.NOT_FOUND);
         }
     }
 
     public static class MethodNotAllowedException extends HttpException {
         @Override
-        public void sendError(OutputStream output) throws IOException {
-            WebServer.send405(output);
+        public Response getResponse() {
+            return new Response(Status.METHOD_NOT_ALLOWED);
+        }
+    }
+
+    public static class InternalServerException extends HttpException {
+        @Override
+        public Response getResponse() {
+            return new Response(Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

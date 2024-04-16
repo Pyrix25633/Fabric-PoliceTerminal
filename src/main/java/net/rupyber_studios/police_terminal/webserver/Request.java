@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Request {
-    public RequestLine requestLine;
-    public Headers headers;
-    public String body;
+    public final RequestLine requestLine;
+    public final Headers headers;
+    public JSONObject body;
 
     public Request(InputStream input) throws Exceptions.BadRequestException, IOException {
         this.requestLine = new RequestLine(input);
@@ -17,7 +17,7 @@ public class Request {
     }
 
     private void parseBody(InputStream input) throws IOException {
-        String contentLengthString = headers.get("Content-Length");
+        String contentLengthString = headers.get(WebServer.CONTENT_LENGTH_HEADER);
         if(contentLengthString == null) {
             this.body = null;
             return;
@@ -35,10 +35,6 @@ public class Request {
             if(b < 0) break;
             body.append((char)b);
         }
-        this.body = body.toString();
-    }
-
-    public JSONObject getJsonBody() {
-        return new JSONObject(body);
+        this.body = new JSONObject(body.toString());
     }
 }
